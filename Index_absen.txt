@@ -248,6 +248,30 @@
                     </div>
                     <p class="text-[10px] text-gray-400 mt-4"><i class="fa-solid fa-circle-info mr-1"></i> Scanner kini khusus Live Camera. Jika browser menolak kamera di iframe, scanner otomatis dibuka di tab/popup terpisah (out-frame).</p>
                 </div>
+                <div class="glass-panel mt-6 p-5 rounded-3xl w-full max-w-4xl shadow-xl border border-purple-100">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-base font-extrabold text-purple-800"><i class="fa-solid fa-umbrella-beach mr-2"></i>Daftar Pegawai Cuti Bulan Ini</h3>
+                            <p id="cutiBulanLabel" class="text-xs text-gray-500 font-semibold">Memuat data cuti bulan berjalan...</p>
+                        </div>
+                        <button onclick="loadDaftarCutiBulanIni()" class="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-purple-100 transition"><i class="fa-solid fa-arrows-rotate mr-1"></i>Refresh</button>
+                    </div>
+                    <div class="overflow-x-auto rounded-2xl border border-purple-100">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-purple-50">
+                                <tr class="text-purple-700 uppercase text-[10px] tracking-wider">
+                                    <th class="px-3 py-2 text-left">Nama Pegawai</th>
+                                    <th class="px-3 py-2 text-left">Jabatan</th>
+                                    <th class="px-3 py-2 text-center">Total Hari Cuti</th>
+                                    <th class="px-3 py-2 text-left">Periode</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbCutiBulanIni">
+                                <tr><td colspan="4" class="text-center py-6 text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat daftar cuti...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 <button onclick="navTo('loginView')" class="mt-8 text-xs font-semibold text-gray-400 hover:text-pusk-blue transition py-2 px-4 rounded-full hover:bg-gray-200"><i class="fa-solid fa-shield-halved mr-2"></i> Akses Administrator</button>
             </div>
         </section>
@@ -814,6 +838,7 @@
             document.getElementById('kegTgl').value = todayStr;
             jalankanJam();
             muatIdentitasAplikasi();
+            loadDaftarCutiBulanIni();
             window.addEventListener('message', handlePopupScanMessage);
         });
 
@@ -838,6 +863,7 @@
             if(viewId === 'settingView') loadPengaturan();
             if(viewId === 'harianView') loadAbsenHarian();
             if(viewId === 'scanView' || viewId === 'loginView') muatIdentitasAplikasi();
+            if(viewId === 'scanView') loadDaftarCutiBulanIni();
         }
 
         function muatIdentitasAplikasi() {
@@ -1049,6 +1075,33 @@
             popupScannerWindow.document.write(popupHtml);
             popupScannerWindow.document.close();
             popupScannerWindow.focus();
+        }
+
+        function loadDaftarCutiBulanIni() {
+            const tb = document.getElementById('tbCutiBulanIni');
+            const label = document.getElementById('cutiBulanLabel');
+            if (!tb || !label) return;
+            tb.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat daftar cuti...</td></tr>`;
+            google.script.run.withSuccessHandler(res => {
+                label.innerText = `Periode: ${res.bulan || '-'} ${res.tahun || ''}`;
+                if (!res.data || res.data.length === 0) {
+                    tb.innerHTML = `<tr><td colspan="4" class="text-center py-7 text-gray-500 font-semibold"><i class="fa-solid fa-circle-check text-green-500 mr-1"></i>Tidak ada pegawai cuti pada bulan ini.</td></tr>`;
+                    return;
+                }
+                tb.innerHTML = res.data.map((r, i) => `
+                    <tr class="border-t border-purple-50 hover:bg-purple-50/40 transition">
+                        <td class="px-3 py-2">
+                            <div class="font-bold text-gray-800">${i + 1}. ${r.nama}</div>
+                            <div class="text-[10px] text-gray-400">ID: ${r.id_qr}</div>
+                        </td>
+                        <td class="px-3 py-2 text-gray-600">${r.jabatan || '-'}</td>
+                        <td class="px-3 py-2 text-center"><span class="px-2 py-1 rounded-full text-[11px] font-extrabold bg-purple-100 text-purple-700">${r.total_hari} Hari</span></td>
+                        <td class="px-3 py-2 text-gray-600 text-[12px]">${r.periode || '-'}</td>
+                    </tr>
+                `).join('');
+            }).withFailureHandler(() => {
+                tb.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-red-500 font-semibold">Gagal memuat data cuti.</td></tr>`;
+            }).getDaftarCutiBulanIni();
         }
 
         function resetDeviceBinding() {
@@ -1318,6 +1371,10 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
                                 <input type="date" id="swal-cuti-selesai" class="swal2-input w-full !mx-0 !mt-0">
                             </div>
                             <p class="text-[10px] text-purple-600 mt-1 ml-1 font-semibold"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Sistem akan mengisi status CUTI otomatis dari tanggal mulai s/d tanggal akhir.</p>
+                            <div id="cuti-day-counter" class="mt-2 ml-1 inline-flex items-center gap-2 bg-gradient-to-r from-purple-50 to-fuchsia-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-full text-[11px] font-extrabold">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                <span id="cuti-day-counter-text">Total cuti: 1 hari</span>
+                            </div>
                         </div>
                     </div>
                 `,
@@ -1325,6 +1382,9 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
                 didOpen: () => {
                     document.getElementById('swal-cuti-mulai').value = tgl;
                     document.getElementById('swal-cuti-selesai').value = tgl;
+                    document.getElementById('swal-cuti-mulai').addEventListener('change', updateCutiDayCounter);
+                    document.getElementById('swal-cuti-selesai').addEventListener('change', updateCutiDayCounter);
+                    updateCutiDayCounter();
                     toggleManualFields(document.getElementById('swal-manual-status').value);
                 },
                 preConfirm: () => {
@@ -1358,6 +1418,20 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
             const tampilAlasan = (val !== 'HADIR_MASUK' && val !== 'HADIR_PULANG' && val !== 'ALPA');
             if (alasanEl) alasanEl.style.display = tampilAlasan ? 'block' : 'none';
             if (cutiEl) cutiEl.style.display = val === 'CUTI' ? 'block' : 'none';
+            if (val === 'CUTI') updateCutiDayCounter();
+        }
+
+        function updateCutiDayCounter() {
+            const startEl = document.getElementById('swal-cuti-mulai');
+            const endEl = document.getElementById('swal-cuti-selesai');
+            const textEl = document.getElementById('cuti-day-counter-text');
+            if (!startEl || !endEl || !textEl) return;
+            if (!startEl.value || !endEl.value) { textEl.innerText = 'Total cuti: -'; return; }
+            const s = new Date(startEl.value + 'T00:00:00');
+            const e = new Date(endEl.value + 'T00:00:00');
+            if (isNaN(s.getTime()) || isNaN(e.getTime()) || s > e) { textEl.innerText = 'Total cuti: tanggal belum valid'; return; }
+            const total = Math.floor((e - s) / 86400000) + 1;
+            textEl.innerText = `Total cuti: ${total} hari`;
         }
 
         function terapkanBulkAlpa() {

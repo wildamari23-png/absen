@@ -357,6 +357,87 @@ function hitungJarak(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+function parseTanggalAbsensi(value) {
+  if (value instanceof Date) return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  let s = String(value || "").replace(/'/g, "").trim();
+  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return null;
+  return new Date(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10));
+}
+
+function getDaftarCutiBulanIni() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const dataAbsen = ss.getSheetByName("Absensi").getDataRange().getValues();
+  const dataPegawai = ss.getSheetByName("Pegawai").getDataRange().getValues();
+
+  const now = new Date();
+  const bulanNow = now.getMonth();
+  const tahunNow = now.getFullYear();
+  const bulanLabel = Utilities.formatDate(now, "Asia/Jakarta", "MMMM");
+
+  let pegawaiMap = {};
+  for (let i = 1; i < dataPegawai.length; i++) {
+    pegawaiMap[dataPegawai[i][0]] = { nama: dataPegawai[i][1] || "-", jabatan: dataPegawai[i][3] || "-" };
+  }
+
+  let cutiMap = {};
+  for (let i = 1; i < dataAbsen.length; i++) {
+    let ket = String(dataAbsen[i][10] || "").toUpperCase().trim();
+    if (ket !== "CUTI") continue;
+
+    let d = parseTanggalAbsensi(dataAbsen[i][1]);
+    if (!d || d.getMonth() !== bulanNow || d.getFullYear() !== tahunNow) continue;
+
+    let idQR = dataAbsen[i][4];
+    if (!cutiMap[idQR]) cutiMap[idQR] = { tanggal: [], nama: pegawaiMap[idQR] ? pegawaiMap[idQR].nama : (dataAbsen[i][5] || "-"), jabatan: pegawaiMap[idQR] ? pegawaiMap[idQR].jabatan : "-" };
+    cutiMap[idQR].tanggal.push(new Date(d));
+  }
+
+  let hasil = [];
+  Object.keys(cutiMap).forEach(idQR => {
+    let dates = cutiMap[idQR].tanggal
+      .sort((a, b) => a - b)
+      .map(d => Utilities.formatDate(d, "Asia/Jakarta", "dd/MM/yyyy"));
+
+    let uniqueDates = Array.from(new Set(dates));
+    let periods = [];
+    let start = null, prev = null;
+    uniqueDates.forEach((ds, idx) => {
+      let parts = ds.split('/');
+      let current = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+      if (!start) { start = current; prev = current; }
+      else {
+        let nextExpected = new Date(prev);
+        nextExpected.setDate(nextExpected.getDate() + 1);
+        if (current.getTime() !== nextExpected.getTime()) {
+          periods.push(`${Utilities.formatDate(start, "Asia/Jakarta", "dd/MM")} - ${Utilities.formatDate(prev, "Asia/Jakarta", "dd/MM")}`);
+          start = current;
+        }
+        prev = current;
+      }
+      if (idx === uniqueDates.length - 1) {
+        periods.push(`${Utilities.formatDate(start, "Asia/Jakarta", "dd/MM")} - ${Utilities.formatDate(prev, "Asia/Jakarta", "dd/MM")}`);
+      }
+    });
+
+    hasil.push({
+      id_qr: idQR,
+      nama: cutiMap[idQR].nama,
+      jabatan: cutiMap[idQR].jabatan,
+      total_hari: uniqueDates.length,
+      periode: periods.join(", ")
+    });
+  });
+
+  hasil.sort((a, b) => b.total_hari - a.total_hari || a.nama.localeCompare(b.nama));
+
+  return {
+    bulan: bulanLabel,
+    tahun: tahunNow,
+    data: hasil
+  };
+}
+
 // 5. FITUR ADMIN HARIAN
 function getAbsenHarian(tglStr) {
   let parts = tglStr.split('-');
