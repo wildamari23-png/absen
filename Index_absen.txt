@@ -246,21 +246,7 @@
                             <span class="font-bold text-sm">Live Scan PULANG</span>
                         </button>
                     </div>
-                    <div class="grid grid-cols-2 gap-4 mb-2 relative z-10">
-                        <label for="qr-input-masuk" class="action-card bg-gradient-to-br from-pusk-blue to-blue-800 text-white rounded-2xl p-5 cursor-pointer flex flex-col items-center justify-center border border-blue-900 shadow-md">
-                            <i class="fa-solid fa-arrow-right-to-bracket text-3xl text-pusk-yellow mb-3"></i>
-                            <span class="font-bold text-sm">Absen MASUK</span>
-                        </label>
-                        <input type="file" id="qr-input-masuk" accept="image/*" capture="environment" class="hidden" onchange="handleQRScan(event, 'MASUK')">
-
-                        <label for="qr-input-pulang" class="action-card bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-2xl p-5 cursor-pointer flex flex-col items-center justify-center border border-orange-600 shadow-md">
-                            <i class="fa-solid fa-person-walking-arrow-right text-3xl mb-3"></i>
-                            <span class="font-bold text-sm">Absen PULANG</span>
-                        </label>
-                        <input type="file" id="qr-input-pulang" accept="image/*" capture="environment" class="hidden" onchange="handleQRScan(event, 'PULANG')">
-                    </div>
-                    <p class="text-[10px] text-gray-400 mt-4"><i class="fa-solid fa-circle-info mr-1"></i> Gunakan Live Scan untuk kamera real-time. Jika browser menolak kamera di iframe, scanner akan dibuka di tab/popup terpisah (out-frame).</p>
-                    <div id="reader" style="display:none;"></div>
+                    <p class="text-[10px] text-gray-400 mt-4"><i class="fa-solid fa-circle-info mr-1"></i> Scanner kini khusus Live Camera. Jika browser menolak kamera di iframe, scanner otomatis dibuka di tab/popup terpisah (out-frame).</p>
                 </div>
                 <button onclick="navTo('loginView')" class="mt-8 text-xs font-semibold text-gray-400 hover:text-pusk-blue transition py-2 px-4 rounded-full hover:bg-gray-200"><i class="fa-solid fa-shield-halved mr-2"></i> Akses Administrator</button>
             </div>
@@ -1066,18 +1052,6 @@
         function resetDeviceBinding() {
             Swal.fire({ title: 'Reset Kunci HP?', text: 'Ini akan menghapus ikatan QR Code pada HP ini. Siapapun bisa absen lagi menggunakan HP ini.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Reset'
             }).then((result) => { if(result.isConfirmed) { localStorage.removeItem('pusk_sintang_bound_qr'); Swal.fire('Berhasil', 'Kunci perangkat di HP ini telah dihapus.', 'success'); } });
-        }
-
-        function handleQRScan(e, actionType) {
-            if (e.target.files.length == 0) return;
-            if(!currentUserLat || !currentUserLng) { Swal.fire('Peringatan GPS', 'Menunggu sinyal GPS...', 'warning'); e.target.value = ''; return; }
-
-            const imageFile = e.target.files[0]; const html5QrCode = new Html5Qrcode("reader");
-            Swal.fire({ title: 'Menganalisis QR...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            html5QrCode.scanFile(imageFile, true).then(decodedText => {
-                handleScanResult(decodedText, actionType, () => { e.target.value = ''; });
-            }).catch(err => { Swal.fire('QR Tidak Valid', 'Barcode tidak terbaca.', 'error'); e.target.value = ''; });
         }
 
         function handleScanResult(decodedText, actionType, onFinish = null) {
