@@ -291,12 +291,151 @@ function setManualAbsenAdmin(idQR, tglStrYMD, actionStatus, alasan) {
   return {status: true, message: "Status & Jam kehadiran berhasil diperbarui manual!"};
 }
 
+// 4D. ADMIN SET CUTI RENTANG TANGGAL
+function setCutiRangeAdmin(idQR, tglMulaiYMD, tglAkhirYMD, alasan) {
+  if (!idQR || !tglMulaiYMD || !tglAkhirYMD) {
+    return { status: false, message: "Data cuti belum lengkap." };
+  }
+
+  let start = new Date(tglMulaiYMD + "T00:00:00");
+  let end = new Date(tglAkhirYMD + "T00:00:00");
+  if (start > end) return { status: false, message: "Tanggal mulai cuti tidak boleh lebih besar dari tanggal akhir." };
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetAbsen = ss.getSheetByName("Absensi");
+  const allAbsen = sheetAbsen.getDataRange().getValues();
+  const allPegawai = ss.getSheetByName("Pegawai").getDataRange().getValues();
+
+  let namaPgw = "Unknown";
+  for (let i = 1; i < allPegawai.length; i++) {
+    if (allPegawai[i][0] === idQR) { namaPgw = allPegawai[i][1]; break; }
+  }
+
+  let inserted = 0, updated = 0, skipped = 0;
+  let note = (alasan || "Diset Admin").trim();
+
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    let tglStr = Utilities.formatDate(d, "Asia/Jakarta", "dd/MM/yyyy");
+    let blnStr = Utilities.formatDate(d, "Asia/Jakarta", "MMMM");
+    let thnStr = Utilities.formatDate(d, "Asia/Jakarta", "yyyy");
+
+    let rowIndex = -1;
+    for (let r = 1; r < allAbsen.length; r++) {
+      let absenTgl = allAbsen[r][1];
+      if (absenTgl instanceof Date) absenTgl = Utilities.formatDate(absenTgl, "Asia/Jakarta", "dd/MM/yyyy");
+      else absenTgl = String(absenTgl).replace(/'/g, "");
+      if (allAbsen[r][4] === idQR && absenTgl === tglStr) { rowIndex = r + 1; break; }
+    }
+
+    if (rowIndex > -1) {
+      const statusNow = String(sheetAbsen.getRange(rowIndex, 11).getValue() || "").toUpperCase().trim();
+      if (statusNow === "HADIR") { skipped++; continue; }
+      sheetAbsen.getRange(rowIndex, 7).setValue("-");
+      sheetAbsen.getRange(rowIndex, 8).setValue("-");
+      sheetAbsen.getRange(rowIndex, 9).setValue("-");
+      sheetAbsen.getRange(rowIndex, 10).setValue("MANUAL ADMIN - CUTI");
+      sheetAbsen.getRange(rowIndex, 11).setValue("CUTI");
+      sheetAbsen.getRange(rowIndex, 12).setValue(note);
+      updated++;
+    } else {
+      sheetAbsen.appendRow([new Date(), `'${tglStr}`, blnStr, thnStr, idQR, namaPgw, "-", "-", "-", "MANUAL ADMIN - CUTI", "CUTI", note, "", ""]);
+      inserted++;
+    }
+  }
+
+  return {
+    status: true,
+    message: `Cuti berhasil diset. Baru: ${inserted}, diperbarui: ${updated}, dilewati(HADIR): ${skipped}.`
+  };
+}
+
 function hitungJarak(lat1, lon1, lat2, lon2) {
   var R = 6371e3; var p1 = lat1 * Math.PI/180; var p2 = lat2 * Math.PI/180;
   var dp = (lat2-lat1) * Math.PI/180; var dl = (lon2-lon1) * Math.PI/180;
   var a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2);
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   return R * c;
+}
+
+function parseTanggalAbsensi(value) {
+  if (value instanceof Date) return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  let s = String(value || "").replace(/'/g, "").trim();
+  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return null;
+  return new Date(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10));
+}
+
+function getDaftarCutiBulanIni() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const dataAbsen = ss.getSheetByName("Absensi").getDataRange().getValues();
+  const dataPegawai = ss.getSheetByName("Pegawai").getDataRange().getValues();
+
+  const now = new Date();
+  const bulanNow = now.getMonth();
+  const tahunNow = now.getFullYear();
+  const bulanLabel = Utilities.formatDate(now, "Asia/Jakarta", "MMMM");
+
+  let pegawaiMap = {};
+  for (let i = 1; i < dataPegawai.length; i++) {
+    pegawaiMap[dataPegawai[i][0]] = { nama: dataPegawai[i][1] || "-", jabatan: dataPegawai[i][3] || "-" };
+  }
+
+  let cutiMap = {};
+  for (let i = 1; i < dataAbsen.length; i++) {
+    let ket = String(dataAbsen[i][10] || "").toUpperCase().trim();
+    if (ket !== "CUTI") continue;
+
+    let d = parseTanggalAbsensi(dataAbsen[i][1]);
+    if (!d || d.getMonth() !== bulanNow || d.getFullYear() !== tahunNow) continue;
+
+    let idQR = dataAbsen[i][4];
+    if (!cutiMap[idQR]) cutiMap[idQR] = { tanggal: [], nama: pegawaiMap[idQR] ? pegawaiMap[idQR].nama : (dataAbsen[i][5] || "-"), jabatan: pegawaiMap[idQR] ? pegawaiMap[idQR].jabatan : "-" };
+    cutiMap[idQR].tanggal.push(new Date(d));
+  }
+
+  let hasil = [];
+  Object.keys(cutiMap).forEach(idQR => {
+    let dates = cutiMap[idQR].tanggal
+      .sort((a, b) => a - b)
+      .map(d => Utilities.formatDate(d, "Asia/Jakarta", "dd/MM/yyyy"));
+
+    let uniqueDates = Array.from(new Set(dates));
+    let periods = [];
+    let start = null, prev = null;
+    uniqueDates.forEach((ds, idx) => {
+      let parts = ds.split('/');
+      let current = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+      if (!start) { start = current; prev = current; }
+      else {
+        let nextExpected = new Date(prev);
+        nextExpected.setDate(nextExpected.getDate() + 1);
+        if (current.getTime() !== nextExpected.getTime()) {
+          periods.push(`${Utilities.formatDate(start, "Asia/Jakarta", "dd/MM")} - ${Utilities.formatDate(prev, "Asia/Jakarta", "dd/MM")}`);
+          start = current;
+        }
+        prev = current;
+      }
+      if (idx === uniqueDates.length - 1) {
+        periods.push(`${Utilities.formatDate(start, "Asia/Jakarta", "dd/MM")} - ${Utilities.formatDate(prev, "Asia/Jakarta", "dd/MM")}`);
+      }
+    });
+
+    hasil.push({
+      id_qr: idQR,
+      nama: cutiMap[idQR].nama,
+      jabatan: cutiMap[idQR].jabatan,
+      total_hari: uniqueDates.length,
+      periode: periods.join(", ")
+    });
+  });
+
+  hasil.sort((a, b) => b.total_hari - a.total_hari || a.nama.localeCompare(b.nama));
+
+  return {
+    bulan: bulanLabel,
+    tahun: tahunNow,
+    data: hasil
+  };
 }
 
 // 5. FITUR ADMIN HARIAN
@@ -438,7 +577,7 @@ function getPegawaiEligibleKegiatan(tglStr) {
   const settings = getPengaturan();
   
   let eligible = [];
-  let counts = { tersedia: 0, sakit: 0, izin: 0, tl: 0 };
+  let counts = { tersedia: 0, sakit: 0, izin: 0, tl: 0, cuti: 0 };
   
   dPgw.forEach(p => {
     let statusAbsen = "BELUM ABSEN";
@@ -453,6 +592,7 @@ function getPegawaiEligibleKegiatan(tglStr) {
     if (statusAbsen === "SAKIT") counts.sakit++;
     else if (statusAbsen === "IZIN") counts.izin++;
     else if (statusAbsen === "TL" || statusAbsen === "TUGAS LUAR") counts.tl++;
+    else if (statusAbsen === "CUTI") counts.cuti++;
     else {
       counts.tersedia++;
       eligible.push({ id_qr: p[0], nama: p[1], nip: p[2] && p[2] !== '-' ? p[2] : "", jabatan: p[3], golongan: p[6] || "-" });
