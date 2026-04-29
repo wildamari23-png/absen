@@ -41,23 +41,34 @@ function initSetup() {
     let sheet = ss.insertSheet("Pengaturan");
     sheet.appendRow(["Key", "Value"]);
     sheet.getRange("A1:B1").setFontWeight("bold").setBackground("#003366").setFontColor("#FFFFFF");
-
-    const defaults = [
-      ["App_Name", "PORTAL ABSENSI"], ["App_Logo", ""],
-      ["Admin_User", "admin"], ["Admin_Pass", "sintang2026"],
-      ["Nama_Puskesmas", "UPTD PUSKESMAS TANJUNG PURI SINTANG"],
-      ["Lat_Puskesmas", "0.0636"], ["Lng_Puskesmas", "111.4988"], ["Rad_Puskesmas", "100"],
-      ["Lat_Pol_TebingRaya", "0.0650"], ["Lng_Pol_TebingRaya", "111.5000"], ["Rad_Pol_TebingRaya", "100"],
-      ["Lat_Pol_MunggukBantok", "0.0650"], ["Lng_Pol_MunggukBantok", "111.5000"], ["Rad_Pol_MunggukBantok", "100"],
-      ["Lat_Pol_KebiauBaru", "0.0650"], ["Lng_Pol_KebiauBaru", "111.5000"], ["Rad_Pol_KebiauBaru", "100"],
-      ["Lat_Pol_JeroraSatu", "0.0650"], ["Lng_Pol_JeroraSatu", "111.5000"], ["Rad_Pol_JeroraSatu", "100"],
-      ["Jam_Masuk_Mulai", "06:00"], ["Jam_Masuk_Akhir", "10:00"],
-      ["Jam_Pulang_Mulai", "12:00"], ["Jam_Pulang_Akhir", "23:59"],
-      ["Kepala_Nama", "dr. ANDAR JIMMY PINTABAR, M.A.P.,M.HKes"],
-      ["Kepala_NIP", "NIP. 198610292014021002"]
-    ];
-    defaults.forEach(d => sheet.appendRow(d));
   }
+  ensurePengaturanDefaults_();
+}
+
+function ensurePengaturanDefaults_() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Pengaturan");
+  const data = sheet.getDataRange().getValues();
+  const existing = new Set();
+  for (let i = 1; i < data.length; i++) existing.add(String(data[i][0]).trim());
+
+  const defaults = [
+    ["App_Name", "PORTAL ABSENSI"], ["App_Logo", ""], ["App_Header_Name", "Sistem Digital"], ["App_Login_Bg", ""],
+    ["Admin_User", "admin"], ["Admin_Pass", "sintang2026"],
+    ["Nama_Puskesmas", "UPTD PUSKESMAS TANJUNG PURI SINTANG"],
+    ["Lat_Puskesmas", "0.0636"], ["Lng_Puskesmas", "111.4988"], ["Rad_Puskesmas", "100"],
+    ["Lat_Pol_TebingRaya", "0.0650"], ["Lng_Pol_TebingRaya", "111.5000"], ["Rad_Pol_TebingRaya", "100"],
+    ["Lat_Pol_MunggukBantok", "0.0650"], ["Lng_Pol_MunggukBantok", "111.5000"], ["Rad_Pol_MunggukBantok", "100"],
+    ["Lat_Pol_KebiauBaru", "0.0650"], ["Lng_Pol_KebiauBaru", "111.5000"], ["Rad_Pol_KebiauBaru", "100"],
+    ["Lat_Pol_JeroraSatu", "0.0650"], ["Lng_Pol_JeroraSatu", "111.5000"], ["Rad_Pol_JeroraSatu", "100"],
+    ["Jam_Masuk_Mulai", "06:00"], ["Jam_Masuk_Akhir", "10:00"],
+    ["Jam_Pulang_Mulai", "12:00"], ["Jam_Pulang_Akhir", "23:59"],
+    ["Kepala_Nama", "dr. ANDAR JIMMY PINTABAR, M.A.P.,M.HKes"],
+    ["Kepala_NIP", "NIP. 198610292014021002"]
+  ];
+
+  defaults.forEach(d => {
+    if (!existing.has(d[0])) sheet.appendRow(d);
+  });
 }
 
 // 2. LOGIN & PENGATURAN
