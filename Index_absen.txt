@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Absensi Digital UPTD Puskesmas Sintang</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: { extend: { colors: { 'pusk-blue': '#003366', 'pusk-yellow': '#FFD700' } } }
         }
     </script>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -27,22 +27,22 @@
         .page-section { display: none; animation: fadeIn 0.4s ease-out; }
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        
+
         .swal2-select, .swal2-input, .swal2-textarea { font-size: 14px !important; border-radius: 8px !important; }
         .action-card { transition: all 0.3s ease; }
         .action-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 51, 102, 0.15); }
-        
+
         /* ========================================= */
         /* DESAIN ID CARD MODERN (ANTI POTONG & PRESISI) */
         /* ========================================= */
         .universal-id-card {
             background-color: #ffffff !important;
             width: 6.5cm; /* Ukuran Standar Name Tag B1 */
-            height: 10.5cm; 
+            height: 10.5cm;
             box-sizing: border-box;
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
+            position: relative;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
@@ -57,11 +57,11 @@
             border-bottom: 4px solid #FFD700 !important;
             flex-shrink: 0;
         }
-        .id-header h3 { 
-            font-size: 12px; 
-            margin: 0 0 3px 0; 
-            font-weight: 900; 
-            line-height: 1.3; 
+        .id-header h3 {
+            font-size: 12px;
+            margin: 0 0 3px 0;
+            font-weight: 900;
+            line-height: 1.3;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -82,29 +82,29 @@
             padding: 10px 15px;
             background-color: #ffffff !important;
         }
-        .id-qr { 
-            margin: 0 auto 12px; 
-            padding: 8px; 
-            background: #fff !important; 
+        .id-qr {
+            margin: 0 auto 12px;
+            padding: 8px;
+            background: #fff !important;
             border-radius: 10px;
             border: 2px solid #e2e8f0;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .nama-pegawai { 
-            font-weight: 900; 
-            font-size: 13px; 
-            color: #0f172a !important; 
-            text-transform: uppercase; 
-            line-height: 1.3; 
+        .nama-pegawai {
+            font-weight: 900;
+            font-size: 13px;
+            color: #0f172a !important;
+            text-transform: uppercase;
+            line-height: 1.3;
             text-align: center;
             width: 100%;
             word-wrap: break-word;
             margin-bottom: 4px;
         }
-        .nip-pegawai { 
-            color: #475569 !important; 
-            font-size: 11px; 
-            font-family: 'Courier New', Courier, monospace; 
+        .nip-pegawai {
+            color: #475569 !important;
+            font-size: 11px;
+            font-family: 'Courier New', Courier, monospace;
             font-weight: 700;
             text-align: center;
         }
@@ -129,25 +129,25 @@
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
             @page { margin: 15mm; size: A4 portrait; }
-            #printArea { 
-                position: absolute; left: 0; top: 0; width: 100%; 
+            #printArea {
+                position: absolute; left: 0; top: 0; width: 100%;
                 display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: 10mm; padding: 0;
             }
-            .universal-id-card { 
-                page-break-inside: avoid; 
-                border: 1px solid #cbd5e1 !important; 
+            .universal-id-card {
+                page-break-inside: avoid;
+                border: 1px solid #cbd5e1 !important;
                 box-shadow: none !important;
-                -webkit-print-color-adjust: exact; 
+                -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
         }
-        
+
         .custom-checkbox { width: 1.2rem; height: 1.2rem; border-radius: 0.25rem; accent-color: #003366;}
-        
+
         /* Animasi Bouncing di Login */
         .animate-bounce-slow { animation: bounce 3s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1); } 50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); } }
-        
+
         /* Animasi Form Luar Radius */
         .pulse-glow { animation: pulseGlow 2s infinite; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(0, 51, 102, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(0, 51, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 51, 102, 0); } }
@@ -162,7 +162,7 @@
             animation: shimmer 3.5s linear infinite;
         }
         @keyframes shimmer { to { background-position: 200% center; } }
-        
+
         .glow-border { position: relative; border-radius: 50%; }
         .glow-border::before {
             content: ""; position: absolute; inset: -2px; border-radius: 50%;
@@ -195,7 +195,7 @@
                         <p id="appHeaderName" class="text-pusk-yellow text-[10px] font-bold tracking-widest uppercase opacity-90 transition-opacity group-hover:opacity-100">Sistem Digital</p>
                     </div>
                 </div>
-                
+
                 <div class="hidden md:flex space-x-1 items-center" id="adminMenu" style="display:none;">
                     <button onclick="navTo('dashView')" class="text-white hover:bg-blue-800 px-3 py-2 rounded-lg text-sm font-semibold transition"><i class="fa-solid fa-chart-line mr-1"></i> Dashboard</button>
                     <button onclick="navTo('harianView')" class="text-white hover:bg-blue-800 px-3 py-2 rounded-lg text-sm font-semibold transition"><i class="fa-solid fa-calendar-check mr-1"></i> Harian</button>
@@ -205,7 +205,7 @@
                     <button onclick="navTo('settingView')" class="text-white hover:bg-blue-800 px-3 py-2 rounded-lg text-sm font-semibold transition"><i class="fa-solid fa-gear mr-1"></i> Pengaturan</button>
                     <button onclick="logoutAdmin()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow transition ml-2"><i class="fa-solid fa-power-off"></i></button>
                 </div>
-                
+
                 <div class="md:hidden flex items-center">
                     <button onclick="navTo('loginView')" id="mobileLoginBtn" class="text-pusk-yellow hover:text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-lock"></i> Admin</button>
                 </div>
@@ -214,7 +214,7 @@
     </header>
 
     <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
-        
+
         <!-- VIEW: SCANNER ABSENSI -->
         <section id="scanView" class="page-section active">
             <div class="flex flex-col items-center justify-center min-h-[75vh]">
@@ -236,21 +236,47 @@
                     </div>
 
                     <h3 class="text-left text-sm font-bold text-gray-800 mb-3 ml-1 uppercase tracking-wider">Pilih Tipe Absensi</h3>
-                    <div class="grid grid-cols-2 gap-4 mb-2 relative z-10">
-                        <label for="qr-input-masuk" class="action-card bg-gradient-to-br from-pusk-blue to-blue-800 text-white rounded-2xl p-5 cursor-pointer flex flex-col items-center justify-center border border-blue-900 shadow-md">
-                            <i class="fa-solid fa-arrow-right-to-bracket text-3xl text-pusk-yellow mb-3"></i>
-                            <span class="font-bold text-sm">Absen MASUK</span>
-                        </label>
-                        <input type="file" id="qr-input-masuk" accept="image/*" capture="environment" class="hidden" onchange="handleQRScan(event, 'MASUK')">
-
-                        <label for="qr-input-pulang" class="action-card bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-2xl p-5 cursor-pointer flex flex-col items-center justify-center border border-orange-600 shadow-md">
-                            <i class="fa-solid fa-person-walking-arrow-right text-3xl mb-3"></i>
-                            <span class="font-bold text-sm">Absen PULANG</span>
-                        </label>
-                        <input type="file" id="qr-input-pulang" accept="image/*" capture="environment" class="hidden" onchange="handleQRScan(event, 'PULANG')">
+                    <div class="grid grid-cols-2 gap-4 mb-3 relative z-10">
+                        <button onclick="mulaiLiveScan('MASUK')" class="action-card bg-gradient-to-br from-emerald-500 to-green-700 text-white rounded-2xl p-5 cursor-pointer flex flex-col items-center justify-center border border-emerald-700 shadow-md">
+                            <i class="fa-solid fa-camera-retro text-3xl mb-3"></i>
+                            <span class="font-bold text-sm">Live Scan MASUK</span>
+                        </button>
+                        <button onclick="mulaiLiveScan('PULANG')" class="action-card bg-gradient-to-br from-rose-500 to-red-700 text-white rounded-2xl p-5 cursor-pointer flex flex-col items-center justify-center border border-rose-700 shadow-md">
+                            <i class="fa-solid fa-camera text-3xl mb-3"></i>
+                            <span class="font-bold text-sm">Live Scan PULANG</span>
+                        </button>
                     </div>
-                    <p class="text-[10px] text-gray-400 mt-4"><i class="fa-solid fa-camera mr-1"></i> Klik kartu di atas untuk memfoto QRCode ID Card.</p>
-                    <div id="reader" style="display:none;"></div>
+                    <p class="text-[10px] text-gray-400 mt-4"><i class="fa-solid fa-circle-info mr-1"></i> Scanner kini khusus Live Camera. Jika browser menolak kamera di iframe, scanner otomatis dibuka di tab/popup terpisah (out-frame).</p>
+                </div>
+                <div class="glass-panel mt-6 p-5 rounded-3xl w-full max-w-4xl shadow-xl border border-cyan-100">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center"><i class="fa-solid fa-circle-info"></i></div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-cyan-900">Panduan Absen Live Scan (Cepat & Akurat)</h3>
+                            <p class="text-xs text-gray-500 font-semibold">Ikuti langkah ini agar scan QR sukses di percobaan pertama.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="bg-cyan-50 border border-cyan-100 rounded-2xl p-4">
+                            <p class="text-[10px] font-bold text-cyan-600 uppercase tracking-widest mb-1">Langkah 1</p>
+                            <h4 class="font-extrabold text-cyan-900 text-sm mb-1">Pastikan GPS Aktif</h4>
+                            <p class="text-xs text-gray-600 leading-relaxed">Nyalakan lokasi presisi tinggi dan beri izin lokasi di browser sebelum scan.</p>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
+                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Langkah 2</p>
+                            <h4 class="font-extrabold text-emerald-900 text-sm mb-1">Klik Live Scan</h4>
+                            <p class="text-xs text-gray-600 leading-relaxed">Pilih tombol <b>Live Scan MASUK</b> atau <b>Live Scan PULANG</b> sesuai kebutuhan.</p>
+                        </div>
+                        <div class="bg-violet-50 border border-violet-100 rounded-2xl p-4">
+                            <p class="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-1">Langkah 3</p>
+                            <h4 class="font-extrabold text-violet-900 text-sm mb-1">Arahkan Kamera ke QR</h4>
+                            <p class="text-xs text-gray-600 leading-relaxed">Jaga jarak ±15–30 cm, hindari blur, dan pastikan cahaya cukup agar terbaca cepat.</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 flex items-start gap-3">
+                        <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5"></i>
+                        <p class="text-xs text-amber-800 font-semibold leading-relaxed">Jika kamera ditolak karena halaman berada di iframe, sistem otomatis membuka scanner di tab/popup terpisah (out-frame). Izinkan popup untuk hasil terbaik.</p>
+                    </div>
                 </div>
                 <button onclick="navTo('loginView')" class="mt-8 text-xs font-semibold text-gray-400 hover:text-pusk-blue transition py-2 px-4 rounded-full hover:bg-gray-200"><i class="fa-solid fa-shield-halved mr-2"></i> Akses Administrator</button>
             </div>
@@ -260,7 +286,7 @@
         <section id="loginView" class="page-section">
             <div class="flex flex-col items-center justify-center min-h-[75vh]">
                 <div class="glass-panel rounded-[2rem] w-full max-w-4xl shadow-2xl border border-white/50 relative overflow-hidden flex flex-col md:flex-row">
-                    
+
                     <!-- Sisi Kiri: Gambar Cover Menarik -->
                     <div class="hidden md:block md:w-1/2 relative overflow-hidden bg-pusk-blue">
                         <img id="loginBgImg" src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000&auto=format&fit=crop" alt="Login Background" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition-transform duration-[10s] hover:scale-110">
@@ -275,7 +301,7 @@
                     <!-- Sisi Kanan: Form Login -->
                     <div class="w-full md:w-1/2 p-10 lg:p-12 relative flex flex-col justify-center bg-white/60 backdrop-blur-md">
                         <div class="absolute -top-16 -right-16 w-48 h-48 bg-pusk-blue opacity-10 rounded-full blur-3xl"></div>
-                        
+
                         <div class="text-center mb-8 relative z-10">
                             <div class="w-24 h-24 mx-auto mb-4 animate-bounce-slow">
                                 <div class="bg-white p-2 rounded-full shadow-xl flex items-center justify-center border-[3px] border-pusk-yellow w-full h-full overflow-hidden">
@@ -286,7 +312,7 @@
                             <h2 id="loginAppName" class="text-2xl font-extrabold text-pusk-blue tracking-wide">PORTAL ABSENSI</h2>
                             <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Administrator Area</p>
                         </div>
-                        
+
                         <div class="space-y-5 relative z-10">
                             <div>
                                 <div class="relative">
@@ -359,7 +385,7 @@
                     <p class="text-sm text-gray-500">Cetak lembar tanda tangan manual (hitam-putih formal) untuk kegiatan.</p>
                 </div>
             </div>
-            
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Form Filter -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-1 h-fit">
@@ -383,17 +409,18 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-md font-bold text-gray-800">Daftar Pegawai Bisa Ikut</h3>
-                        <span class="text-xs text-gray-400 italic">*(Tidak termasuk Izin/Sakit/TL)*</span>
+                        <span class="text-xs text-gray-400 italic">*(Tidak termasuk Izin/Sakit/TL/Cuti)*</span>
                     </div>
 
                     <!-- Statistik Card Kegiatan -->
-                    <div class="grid grid-cols-4 gap-3 mb-4">
+                    <div class="grid grid-cols-5 gap-3 mb-4">
                         <div class="bg-indigo-50 border border-indigo-100 p-2 rounded-xl text-center"><p class="text-[10px] font-bold text-indigo-500 uppercase">Tersedia</p><p class="text-xl font-extrabold text-indigo-700" id="kegCountTersedia">0</p></div>
                         <div class="bg-blue-50 border border-blue-100 p-2 rounded-xl text-center"><p class="text-[10px] font-bold text-blue-500 uppercase">TL</p><p class="text-xl font-extrabold text-blue-700" id="kegCountTL">0</p></div>
                         <div class="bg-yellow-50 border border-yellow-100 p-2 rounded-xl text-center"><p class="text-[10px] font-bold text-yellow-600 uppercase">Sakit</p><p class="text-xl font-extrabold text-yellow-700" id="kegCountSakit">0</p></div>
                         <div class="bg-orange-50 border border-orange-100 p-2 rounded-xl text-center"><p class="text-[10px] font-bold text-orange-500 uppercase">Izin</p><p class="text-xl font-extrabold text-orange-700" id="kegCountIzin">0</p></div>
+                        <div class="bg-purple-50 border border-purple-100 p-2 rounded-xl text-center"><p class="text-[10px] font-bold text-purple-500 uppercase">Cuti</p><p class="text-xl font-extrabold text-purple-700" id="kegCountCuti">0</p></div>
                     </div>
-                    
+
                     <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4 flex flex-col md:flex-row gap-3 items-center justify-between">
                         <label class="flex items-center gap-3 cursor-pointer text-sm font-bold text-pusk-blue w-full md:w-auto">
                             <input type="checkbox" id="checkAllKeg" class="custom-checkbox" onchange="toggleAllKeg(this)">
@@ -430,7 +457,7 @@
                     <button onclick="cetakPDFHarian()" class="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md font-bold hover:bg-blue-700 transition"><i class="fa-solid fa-download mr-1"></i> PDF Hari Ini</button>
                 </div>
             </div>
-            
+
            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
     <!-- Total Pegawai -->
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
@@ -452,9 +479,9 @@
         <div><p class="text-xs text-gray-500 font-bold uppercase">Belum Absen Pulang</p><h4 class="text-2xl font-extrabold text-amber-600" id="statBelumPulang">0</h4></div>
         <div class="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center"><i class="fa-solid fa-person-walking-arrow-right"></i></div>
     </div>
-    <!-- Izin/Sakit/TL -->
+    <!-- Izin/Sakit/TL/Cuti -->
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-        <div><p class="text-xs text-gray-500 font-bold uppercase">Izin/Sakit/TL</p><h4 class="text-2xl font-extrabold text-orange-500" id="statLain">0</h4></div>
+        <div><p class="text-xs text-gray-500 font-bold uppercase">Izin/Sakit/TL/Cuti</p><h4 class="text-2xl font-extrabold text-orange-500" id="statLain">0</h4></div>
         <div class="w-10 h-10 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center"><i class="fa-solid fa-notes-medical"></i></div>
     </div>
 </div>
@@ -478,6 +505,7 @@
     <option value="BELUM ABSEN">Belum Absen</option>
     <option value="SAKIT">Sakit</option>
     <option value="IZIN">Izin</option>
+    <option value="CUTI">Cuti</option>
     <option value="TL">TL</option>
     <option value="ALPA">Alpa</option>
 </select>
@@ -538,24 +566,24 @@
         <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Cari Nama / NIP</label>
         <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            <input type="text" id="searchPegawai" 
-                   placeholder="Cari nama atau NIP pegawai..." 
-                   onkeyup="renderTablePegawai(true)" 
+            <input type="text" id="searchPegawai"
+                   placeholder="Cari nama atau NIP pegawai..."
+                   onkeyup="renderTablePegawai(true)"
                    class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-pusk-blue shadow-sm text-sm">
         </div>
     </div>
-    
+
     <!-- Filter Lokasi -->
     <div class="w-full md:w-72">
         <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Lokasi Tugas</label>
-        <select id="filterLokasi" 
-                onchange="renderTablePegawai(true)" 
+        <select id="filterLokasi"
+                onchange="renderTablePegawai(true)"
                 class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-pusk-blue shadow-sm">
             <option value="SEMUA">Semua Lokasi</option>
         </select>
     </div>
 </div>
-            
+
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-100">
@@ -593,7 +621,7 @@
         <section id="settingView" class="page-section">
             <h2 class="text-2xl font-extrabold text-pusk-blue mb-2">Pengaturan Sistem</h2>
             <p class="text-sm text-gray-500 mb-8">Konfigurasi branding aplikasi, nama instansi, dan kordinat GPS.</p>
-            
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <!-- Branding Aplikasi -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2 flex flex-col md:flex-row gap-6 items-center">
@@ -625,7 +653,7 @@
                     <p class="text-xs text-gray-600 mb-4 leading-relaxed">Sistem ini mengunci 1 HP hanya untuk 1 Pegawai. Anda dapat mereset kunci perangkat pada HP ini dengan menekan tombol di bawah.</p>
                     <button onclick="resetDeviceBinding()" class="w-full md:w-auto px-6 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 py-3 rounded-xl transition"><i class="fa-solid fa-unlock-keyhole mr-2"></i> Reset Kunci HP Ini</button>
                 </div>
-                
+
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h3 class="text-lg font-extrabold text-gray-800 mb-5 pb-3 border-b border-gray-100"><i class="fa-solid fa-hospital-user text-pusk-blue mr-2"></i> Identitas Instansi</h3>
                     <div class="space-y-4">
@@ -653,15 +681,64 @@
                     <button onclick="getCurrentLocFor('Pusk')" class="w-full text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 py-2.5 rounded-xl transition"><i class="fa-solid fa-location-crosshairs mr-1"></i> Ambil Koordinat Sekarang</button>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
-                    <h3 class="text-lg font-extrabold text-gray-800 mb-5 pb-3 border-b border-gray-100"><i class="fa-solid fa-house-medical-circle-check text-pusk-blue mr-2"></i> Area Absen Polindes</h3>
-                    <p class="text-xs text-gray-500 mb-4"><i class="fa-solid fa-info-circle text-blue-500 mr-1"></i> Khusus petugas Polindes, titik kordinat tetap terekam namun radius blokir ditiadakan (Bypass).</p>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 ml-1">Latitude</label><input type="text" id="setLatPol" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-mono"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 ml-1">Longitude</label><input type="text" id="setLngPol" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-mono"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 ml-1">Radius (m)</label><input type="number" id="setRadPol" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold"></div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-extrabold text-gray-800 mb-5 pb-3 border-b border-gray-100"><i class="fa-solid fa-clock text-pusk-blue mr-2"></i> Kunci Jam Absensi</h3>
+                    <p class="text-xs text-gray-500 mb-4">Atur jam operasional scan masuk/pulang. Di luar rentang ini, scan akan ditolak otomatis.</p>
+                    <div class="space-y-4">
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-emerald-700 mb-2 uppercase">Jam Absen Masuk</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-[10px] font-bold text-gray-600 mb-1">Mulai</label><input type="time" id="setJamMasukMulai" class="w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg text-sm font-bold"></div>
+                                <div><label class="block text-[10px] font-bold text-gray-600 mb-1">Akhir</label><input type="time" id="setJamMasukAkhir" class="w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg text-sm font-bold"></div>
+                            </div>
+                        </div>
+                        <div class="bg-orange-50 border border-orange-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-orange-700 mb-2 uppercase">Jam Absen Pulang</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-[10px] font-bold text-gray-600 mb-1">Mulai</label><input type="time" id="setJamPulangMulai" class="w-full px-3 py-2 bg-white border border-orange-200 rounded-lg text-sm font-bold"></div>
+                                <div><label class="block text-[10px] font-bold text-gray-600 mb-1">Akhir</label><input type="time" id="setJamPulangAkhir" class="w-full px-3 py-2 bg-white border border-orange-200 rounded-lg text-sm font-bold"></div>
+                            </div>
+                        </div>
                     </div>
-                    <button onclick="getCurrentLocFor('Pol')" class="w-full md:w-auto px-6 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 py-2.5 rounded-xl transition"><i class="fa-solid fa-location-crosshairs mr-1"></i> Ambil Koordinat Sekarang</button>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
+                    <h3 class="text-lg font-extrabold text-gray-800 mb-5 pb-3 border-b border-gray-100"><i class="fa-solid fa-house-medical-circle-check text-pusk-blue mr-2"></i> Tagging Lokasi Polindes</h3>
+                    <p class="text-xs text-gray-500 mb-4"><i class="fa-solid fa-info-circle text-blue-500 mr-1"></i> Isi koordinat/radius per lokasi induk Polindes agar scan menyesuaikan otomatis.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-purple-50 border border-purple-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-purple-700 mb-2 uppercase">Polindes Tebing Raya</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="text" id="setLatPolTebing" placeholder="Lat" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="text" id="setLngPolTebing" placeholder="Lng" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="number" id="setRadPolTebing" placeholder="Rad(m)" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold">
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-purple-700 mb-2 uppercase">Polindes Mungguk Bantok</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="text" id="setLatPolMungguk" placeholder="Lat" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="text" id="setLngPolMungguk" placeholder="Lng" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="number" id="setRadPolMungguk" placeholder="Rad(m)" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold">
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-purple-700 mb-2 uppercase">Polindes Kebiau Baru</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="text" id="setLatPolKebiau" placeholder="Lat" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="text" id="setLngPolKebiau" placeholder="Lng" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="number" id="setRadPolKebiau" placeholder="Rad(m)" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold">
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-purple-700 mb-2 uppercase">Polindes Jerora Satu</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="text" id="setLatPolJerora" placeholder="Lat" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="text" id="setLngPolJerora" placeholder="Lng" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="number" id="setRadPolJerora" placeholder="Rad(m)" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="mt-8 flex justify-end">
@@ -672,10 +749,10 @@
         <!-- VIEW: LAPORAN BULANAN (PDF) -->
         <section id="laporanView" class="page-section">
             <h2 class="text-2xl font-extrabold text-pusk-blue mb-2">Cetak Dokumen Rekapitulasi Bulanan</h2>
-            
+
             <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mt-6 relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-8 opacity-5 text-9xl text-pusk-blue"><i class="fa-solid fa-file-pdf"></i></div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-end relative z-10 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Pilih Bulan</label>
@@ -723,7 +800,7 @@
                 <input type="hidden" id="inIdQR">
                 <div><label class="block text-xs font-bold text-gray-600 uppercase mb-2">Nama Lengkap & Gelar</label><input type="text" id="inNama" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pusk-blue outline-none" placeholder="Contoh: dr. Budi Santoso"></div>
                 <div><label class="block text-xs font-bold text-gray-600 uppercase mb-2">NIP</label><input type="text" id="inNip" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pusk-blue outline-none" placeholder="Kosongkan jika non-ASN"></div>
-                
+
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Pangkat / Golongan</label>
                     <select id="inGolongan" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-sm">
@@ -756,7 +833,7 @@
                             <option value="Kontrak BLUD" selected>Kontrak BLUD</option><option value="Magang">Magang</option><option value="Mahasiswa Magang">Mahasiswa Magang</option>
                         </select>
                     </div>
-                    <div><label class="block text-xs font-bold text-gray-600 uppercase mb-2">Lokasi Induk</label><select id="inLokasi" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-sm"><option value="Puskesmas">Puskesmas</option><option value="Polindes">Polindes</option></select></div>
+                    <div><label class="block text-xs font-bold text-gray-600 uppercase mb-2">Lokasi Induk</label><select id="inLokasi" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-sm"><option value="Puskesmas">Puskesmas</option><option value="Polindes Tebing Raya">Polindes Tebing Raya</option><option value="Polindes Mungguk Bantok">Polindes Mungguk Bantok</option><option value="Polindes Kebiau Baru">Polindes Kebiau Baru</option><option value="Polindes Jerora Satu">Polindes Jerora Satu</option></select></div>
                 </div>
             </div>
             <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
@@ -793,10 +870,11 @@
         // Deklarasi Variabel Global & Pagination State
         let isAdminLoggedIn = false;
         let currentUserLat = null, currentUserLng = null;
-        
-        let listPegawaiRaw = [], dataAbsenHarianRaw = [], dataPegawaiKegiatan = []; 
+
+        let listPegawaiRaw = [], dataAbsenHarianRaw = [], dataPegawaiKegiatan = [];
         let filteredHarian = [], filteredPegawai = [];
-        
+        let popupScannerWindow = null;
+
         let currentPgHarian = 1, rowsPerPageHarian = 10;
         let currentPgPegawai = 1, rowsPerPagePegawai = 10;
 
@@ -815,13 +893,14 @@
             document.getElementById('kegTgl').value = todayStr;
             jalankanJam();
             muatIdentitasAplikasi();
+            window.addEventListener('message', handlePopupScanMessage);
         });
 
         // 1. Fungsi Core / Init
         function jalankanJam() {
             const elTime = document.getElementById('liveTime'), elDate = document.getElementById('liveDate');
             setInterval(() => {
-                const now = new Date(); 
+                const now = new Date();
                 elTime.innerText = now.toLocaleTimeString('id-ID', { hour12: false });
                 elDate.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             }, 1000);
@@ -846,7 +925,7 @@
                     document.getElementById('appNameTitle').innerText = res.App_Name;
                     document.getElementById('loginAppName').innerText = res.App_Name;
                 }
-                
+
                 if(res.App_Header_Name) {
                     document.getElementById('appHeaderName').innerText = res.App_Header_Name;
                     document.getElementById('previewAppSubText').innerText = res.App_Header_Name;
@@ -855,14 +934,14 @@
                     document.getElementById('appHeaderName').innerText = singkatan;
                     document.getElementById('previewAppSubText').innerText = singkatan;
                 }
-                
+
                 if(res.App_Logo && res.App_Logo.trim() !== "") {
                     document.getElementById('appLogoIcon').classList.add('hidden');
                     document.getElementById('loginLogoIcon').classList.add('hidden');
                     let img = document.getElementById('appLogoImg'); img.src = res.App_Logo; img.classList.remove('hidden');
                     let imgLog = document.getElementById('loginLogoImg'); imgLog.src = res.App_Logo; imgLog.classList.remove('hidden');
                 } else {
-                    document.getElementById('appLogoIcon').classList.remove('hidden'); 
+                    document.getElementById('appLogoIcon').classList.remove('hidden');
                     document.getElementById('loginLogoIcon').classList.remove('hidden');
                     document.getElementById('appLogoImg').classList.add('hidden');
                     document.getElementById('loginLogoImg').classList.add('hidden');
@@ -883,48 +962,71 @@
                 document.getElementById('setAppLogo').value = res.App_Logo || '';
                 document.getElementById('setAppLoginBg').value = res.App_Login_Bg || '';
                 document.getElementById('setNamaPusk').value = res.Nama_Puskesmas || '';
-                document.getElementById('setKapusNama').value = res.Kepala_Nama || ''; 
+                document.getElementById('setKapusNama').value = res.Kepala_Nama || '';
                 document.getElementById('setKapusNip').value = res.Kepala_NIP || '';
-                document.getElementById('setLatPusk').value = res.Lat_Puskesmas || ''; 
-                document.getElementById('setLngPusk').value = res.Lng_Puskesmas || ''; 
+                document.getElementById('setLatPusk').value = res.Lat_Puskesmas || '';
+                document.getElementById('setLngPusk').value = res.Lng_Puskesmas || '';
                 document.getElementById('setRadPusk').value = res.Rad_Puskesmas || '';
-                document.getElementById('setLatPol').value = res.Lat_Polindes || ''; 
-                document.getElementById('setLngPol').value = res.Lng_Polindes || ''; 
-                document.getElementById('setRadPol').value = res.Rad_Polindes || '';
+                document.getElementById('setLatPolTebing').value = res.Lat_Pol_TebingRaya || '';
+                document.getElementById('setLngPolTebing').value = res.Lng_Pol_TebingRaya || '';
+                document.getElementById('setRadPolTebing').value = res.Rad_Pol_TebingRaya || '';
+                document.getElementById('setLatPolMungguk').value = res.Lat_Pol_MunggukBantok || '';
+                document.getElementById('setLngPolMungguk').value = res.Lng_Pol_MunggukBantok || '';
+                document.getElementById('setRadPolMungguk').value = res.Rad_Pol_MunggukBantok || '';
+                document.getElementById('setLatPolKebiau').value = res.Lat_Pol_KebiauBaru || '';
+                document.getElementById('setLngPolKebiau').value = res.Lng_Pol_KebiauBaru || '';
+                document.getElementById('setRadPolKebiau').value = res.Rad_Pol_KebiauBaru || '';
+                document.getElementById('setLatPolJerora').value = res.Lat_Pol_JeroraSatu || '';
+                document.getElementById('setLngPolJerora').value = res.Lng_Pol_JeroraSatu || '';
+                document.getElementById('setRadPolJerora').value = res.Rad_Pol_JeroraSatu || '';
+                document.getElementById('setJamMasukMulai').value = res.Jam_Masuk_Mulai || '06:00';
+                document.getElementById('setJamMasukAkhir').value = res.Jam_Masuk_Akhir || '10:00';
+                document.getElementById('setJamPulangMulai').value = res.Jam_Pulang_Mulai || '12:00';
+                document.getElementById('setJamPulangAkhir').value = res.Jam_Pulang_Akhir || '23:59';
             }).getPengaturan();
         }
 
         function simpanSetting() {
-            let data = { 
-                App_Name: document.getElementById('setAppName').value, 
+            let data = {
+                App_Name: document.getElementById('setAppName').value,
                 App_Header_Name: document.getElementById('setAppHeaderName').value,
                 App_Logo: document.getElementById('setAppLogo').value,
                 App_Login_Bg: document.getElementById('setAppLoginBg').value,
-                Nama_Puskesmas: document.getElementById('setNamaPusk').value, 
-                Kepala_Nama: document.getElementById('setKapusNama').value, 
+                Nama_Puskesmas: document.getElementById('setNamaPusk').value,
+                Kepala_Nama: document.getElementById('setKapusNama').value,
                 Kepala_NIP: document.getElementById('setKapusNip').value,
-                Lat_Puskesmas: document.getElementById('setLatPusk').value, 
-                Lng_Puskesmas: document.getElementById('setLngPusk').value, 
-                Rad_Puskesmas: document.getElementById('setRadPusk').value, 
-                Lat_Polindes: document.getElementById('setLatPol').value, 
-                Lng_Polindes: document.getElementById('setLngPol').value, 
-                Rad_Polindes: document.getElementById('setRadPol').value 
+                Lat_Puskesmas: document.getElementById('setLatPusk').value,
+                Lng_Puskesmas: document.getElementById('setLngPusk').value,
+                Rad_Puskesmas: document.getElementById('setRadPusk').value,
+                Lat_Pol_TebingRaya: document.getElementById('setLatPolTebing').value,
+                Lng_Pol_TebingRaya: document.getElementById('setLngPolTebing').value,
+                Rad_Pol_TebingRaya: document.getElementById('setRadPolTebing').value,
+                Lat_Pol_MunggukBantok: document.getElementById('setLatPolMungguk').value,
+                Lng_Pol_MunggukBantok: document.getElementById('setLngPolMungguk').value,
+                Rad_Pol_MunggukBantok: document.getElementById('setRadPolMungguk').value,
+                Lat_Pol_KebiauBaru: document.getElementById('setLatPolKebiau').value,
+                Lng_Pol_KebiauBaru: document.getElementById('setLngPolKebiau').value,
+                Rad_Pol_KebiauBaru: document.getElementById('setRadPolKebiau').value,
+                Lat_Pol_JeroraSatu: document.getElementById('setLatPolJerora').value,
+                Lng_Pol_JeroraSatu: document.getElementById('setLngPolJerora').value,
+                Rad_Pol_JeroraSatu: document.getElementById('setRadPolJerora').value,
+                Jam_Masuk_Mulai: document.getElementById('setJamMasukMulai').value,
+                Jam_Masuk_Akhir: document.getElementById('setJamMasukAkhir').value,
+                Jam_Pulang_Mulai: document.getElementById('setJamPulangMulai').value,
+                Jam_Pulang_Akhir: document.getElementById('setJamPulangAkhir').value
             };
             Swal.fire({title:'Menyimpan...', didOpen:()=>Swal.showLoading()});
-            google.script.run.withSuccessHandler(res => { 
-                Swal.fire('Tersimpan', res.message, 'success'); 
-                muatIdentitasAplikasi(); 
+            google.script.run.withSuccessHandler(res => {
+                Swal.fire('Tersimpan', res.message, 'success');
+                muatIdentitasAplikasi();
             }).simpanPengaturan(data);
         }
 
         function getCurrentLocFor(tipe) {
             if(!currentUserLat) return Swal.fire('Error', 'GPS belum terkunci.', 'error');
-            if(tipe === 'Pusk') { 
-                document.getElementById('setLatPusk').value = currentUserLat; 
-                document.getElementById('setLngPusk').value = currentUserLng; 
-            } else { 
-                document.getElementById('setLatPol').value = currentUserLat; 
-                document.getElementById('setLngPol').value = currentUserLng; 
+            if(tipe === 'Pusk') {
+                document.getElementById('setLatPusk').value = currentUserLat;
+                document.getElementById('setLngPusk').value = currentUserLng;
             }
             Swal.fire({icon:'success', title:'Disalin!', toast:true, position:'top-end', timer:2000, showConfirmButton:false});
         }
@@ -945,7 +1047,7 @@
                         document.getElementById('gpsTitle').classList.replace('text-gray-800', 'text-green-700');
                         document.getElementById('gpsDetails').innerHTML = `Akurasi: <b class="text-green-700">${acc}m</b>. Siap absen.`;
                     },
-                    (err) => { 
+                    (err) => {
                         document.getElementById('gpsIcon').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
                         document.getElementById('gpsIcon').classList.replace('bg-gray-100', 'bg-red-100');
                         document.getElementById('gpsIcon').classList.replace('text-gray-500', 'text-red-500');
@@ -957,48 +1059,140 @@
         }
 
         // 2. Keamanan & Scan Absensi User
+        function handlePopupScanMessage(event) {
+            if (event.origin !== window.location.origin) return;
+            const payload = event.data || {};
+            if (payload.type !== 'PUSK_QR_RESULT') return;
+            if (!payload.decodedText || !payload.actionType) return;
+            handleScanResult(payload.decodedText, payload.actionType);
+        }
+
+        function mulaiLiveScan(actionType) {
+            if(!currentUserLat || !currentUserLng) {
+                Swal.fire('Peringatan GPS', 'Menunggu sinyal GPS...', 'warning');
+                return;
+            }
+            bukaScannerOutFrame(actionType);
+        }
+
+        function bukaScannerOutFrame(actionType) {
+            const popupHtml = `
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Scanner QR - Absensi</title>
+  <script src="https://unpkg.com/html5-qrcode"><\/script>
+  <style>
+    body{margin:0;background:#0f172a;color:#e2e8f0;font-family:Arial,sans-serif}
+    .wrap{max-width:680px;margin:0 auto;padding:20px}
+    h1{font-size:18px;margin:0 0 12px}
+    #reader{border-radius:12px;overflow:hidden;background:#000}
+    .card{background:#1e293b;padding:12px;border-radius:12px;margin-bottom:12px}
+    .btn{padding:10px 12px;border:none;border-radius:10px;background:#ef4444;color:#fff;font-weight:700;cursor:pointer}
+    .small{font-size:12px;opacity:.85}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Live Scan ${actionType}</h1>
+      <div class="small">Arahkan kamera ke QR ID Card. Setelah terbaca, jendela akan otomatis tertutup.</div>
+    </div>
+    <div id="reader"></div>
+    <div style="margin-top:12px"><button class="btn" id="btnStop">Tutup Scanner</button></div>
+  </div>
+  <script>
+    let scanner;
+    function kirimHasil(text) {
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage({ type: 'PUSK_QR_RESULT', decodedText: text, actionType: '${actionType}' }, window.location.origin);
+        }
+      } catch(_) {}
+      setTimeout(() => window.close(), 250);
+    }
+    async function runScanner() {
+      scanner = new Html5Qrcode('reader');
+      try {
+        await scanner.start(
+          { facingMode: { exact: 'environment' } },
+          { fps: 12, qrbox: { width: 250, height: 250 } },
+          (decodedText) => {
+            scanner.stop().finally(() => kirimHasil(decodedText));
+          }
+        );
+      } catch (e1) {
+        await scanner.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          (decodedText) => {
+            scanner.stop().finally(() => kirimHasil(decodedText));
+          }
+        );
+      }
+    }
+    document.getElementById('btnStop').addEventListener('click', async () => {
+      try { if (scanner) await scanner.stop(); } catch(_) {}
+      window.close();
+    });
+    runScanner().catch(() => alert('Kamera gagal diakses. Pastikan izin kamera aktif.'));
+  <\/script>
+</body>
+</html>`;
+
+            popupScannerWindow = window.open('', 'puskesmasLiveScanner', 'width=720,height=860,resizable=yes,scrollbars=yes');
+            if (!popupScannerWindow) {
+                Swal.fire('Popup Diblokir', 'Izinkan popup browser untuk membuka scanner out-frame.', 'warning');
+                return;
+            }
+            popupScannerWindow.document.open();
+            popupScannerWindow.document.write(popupHtml);
+            popupScannerWindow.document.close();
+            popupScannerWindow.focus();
+        }
+
         function resetDeviceBinding() {
             Swal.fire({ title: 'Reset Kunci HP?', text: 'Ini akan menghapus ikatan QR Code pada HP ini. Siapapun bisa absen lagi menggunakan HP ini.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Reset'
             }).then((result) => { if(result.isConfirmed) { localStorage.removeItem('pusk_sintang_bound_qr'); Swal.fire('Berhasil', 'Kunci perangkat di HP ini telah dihapus.', 'success'); } });
         }
 
-        function handleQRScan(e, actionType) {
-            if (e.target.files.length == 0) return;
-            if(!currentUserLat || !currentUserLng) { Swal.fire('Peringatan GPS', 'Menunggu sinyal GPS...', 'warning'); e.target.value = ''; return; }
-
-            const imageFile = e.target.files[0]; const html5QrCode = new Html5Qrcode("reader");
-            Swal.fire({ title: 'Menganalisis QR...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            html5QrCode.scanFile(imageFile, true).then(decodedText => {
-                let boundQr = localStorage.getItem('pusk_sintang_bound_qr');
-                if (boundQr && boundQr !== decodedText) {
-                    Swal.fire({ icon: 'error', title: 'Titip Absen Ditolak! 🚫', text: 'HP ini sudah dikunci untuk akun pegawai lain. Anda harus menggunakan HP Anda sendiri.', confirmButtonColor: '#d33' });
-                    e.target.value = ''; return;
-                }
-                if (!boundQr) {
-                    Swal.fire({
-                        title: 'Kunci Perangkat', html: '<p class="text-sm">Ini adalah absen pertama Anda di HP ini.<br><br>Sistem akan <b>MENGUNCI</b> HP ini khusus untuk akun Anda.</p>', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Kunci & Absen', confirmButtonColor: '#003366'
-                    }).then((result) => {
-                        if (result.isConfirmed) { localStorage.setItem('pusk_sintang_bound_qr', decodedText); prosesKeBackend(decodedText, actionType, e); } 
-                        else { e.target.value = ''; }
-                    });
-                } else { prosesKeBackend(decodedText, actionType, e); }
-            }).catch(err => { Swal.fire('QR Tidak Valid', 'Barcode tidak terbaca.', 'error'); e.target.value = ''; });
+        function handleScanResult(decodedText, actionType, onFinish = null) {
+            let boundQr = localStorage.getItem('pusk_sintang_bound_qr');
+            if (boundQr && boundQr !== decodedText) {
+                Swal.fire({ icon: 'error', title: 'Titip Absen Ditolak! 🚫', text: 'HP ini sudah dikunci untuk akun pegawai lain. Anda harus menggunakan HP Anda sendiri.', confirmButtonColor: '#d33' });
+                if (onFinish) onFinish();
+                return;
+            }
+            if (!boundQr) {
+                Swal.fire({
+                    title: 'Kunci Perangkat', html: '<p class="text-sm">Ini adalah absen pertama Anda di HP ini.<br><br>Sistem akan <b>MENGUNCI</b> HP ini khusus untuk akun Anda.</p>', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Kunci & Absen', confirmButtonColor: '#003366'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.setItem('pusk_sintang_bound_qr', decodedText);
+                        prosesKeBackend(decodedText, actionType, onFinish);
+                    } else if (onFinish) onFinish();
+                });
+                return;
+            }
+            prosesKeBackend(decodedText, actionType, onFinish);
         }
 
-        function prosesKeBackend(decodedText, actionType, e) {
+        function prosesKeBackend(decodedText, actionType, onFinish = null) {
             let actionText = actionType === 'MASUK' ? 'Check-In' : 'Check-Out';
             Swal.fire({ title: `Memproses ${actionText}...`, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
+
             google.script.run.withSuccessHandler(function(res) {
-                if(res.status === 'SUCCESS_MASUK') { Swal.fire({ icon: 'success', title: 'Absen Masuk Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-pusk-blue">${res.waktu}</span><p class="mt-2 text-gray-600">${res.message}</p></div>`, confirmButtonColor: '#003366'}); } 
-                else if (res.status === 'SUCCESS_PULANG') { Swal.fire({ icon: 'success', title: 'Absen Pulang Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-orange-600">${res.waktu}</span><p class="text-sm font-bold text-gray-500 mt-2">TOTAL JAM: ${res.jamKerja}</p><p class="text-gray-600 mt-2">${res.message}</p></div>`, confirmButtonColor: '#003366'}); }
+                const lokasiInfo = `<p class="mt-2 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg py-1 px-2">Lokasi Tugas Induk: ${res.lokasiInduk || '-'}<br>Tagging Lokasi: ${res.lokasiTag || '-'}</p>`;
+                if(res.status === 'SUCCESS_MASUK') { Swal.fire({ icon: 'success', title: 'Absen Masuk Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-pusk-blue">${res.waktu}</span><p class="mt-2 text-gray-600">${res.message}</p>${lokasiInfo}</div>`, confirmButtonColor: '#003366'}); }
+                else if (res.status === 'SUCCESS_PULANG') { Swal.fire({ icon: 'success', title: 'Absen Pulang Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-orange-600">${res.waktu}</span><p class="text-sm font-bold text-gray-500 mt-2">TOTAL JAM: ${res.jamKerja}</p><p class="text-gray-600 mt-2">${res.message}</p>${lokasiInfo}</div>`, confirmButtonColor: '#003366'}); }
                 else if (res.status === 'OUT_OF_RADIUS') {
                     tampilkanFormLuarRadius(res.idQR, res.nama);
                 }
                 else { Swal.fire({ icon: 'error', title: 'Gagal', text: res.message }); }
-                e.target.value = ''; 
-            }).withFailureHandler(function(err) { Swal.fire('Error', 'Jaringan lambat.', 'error'); e.target.value = ''; })
+                if (onFinish) onFinish();
+            }).withFailureHandler(function(err) { Swal.fire('Error', 'Jaringan lambat.', 'error'); if (onFinish) onFinish(); })
             .prosesAbsen(decodedText, currentUserLat, currentUserLng, actionType);
         }
 
@@ -1009,7 +1203,7 @@
                     <div class="text-left bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden pulse-glow">
                         <div class="absolute -top-6 -right-6 w-24 h-24 bg-blue-100 rounded-full opacity-50 blur-xl"></div>
                         <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-orange-100 rounded-full opacity-50 blur-xl"></div>
-                        
+
                         <div class="flex items-center gap-4 mb-5 relative z-10">
                             <div class="w-12 h-12 rounded-full bg-pusk-blue text-white flex items-center justify-center text-xl shadow-md">
                                 <i class="fa-solid fa-user-clock"></i>
@@ -1019,7 +1213,7 @@
                                 <p class="text-sm font-extrabold text-pusk-blue leading-tight">${nama}</p>
                             </div>
                         </div>
-                        
+
                         <div class="relative z-10 space-y-4">
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-600 mb-1.5 uppercase tracking-wider ml-1"><i class="fa-solid fa-clipboard-question mr-1"></i> Status Kehadiran</label>
@@ -1054,7 +1248,7 @@
         // 3. Login Admin
         function togglePassword() {
             let p = document.getElementById("logPass"); let icon = document.getElementById("eyeIcon");
-            if (p.type === "password") { p.type = "text"; icon.classList.replace("fa-eye", "fa-eye-slash"); } 
+            if (p.type === "password") { p.type = "text"; icon.classList.replace("fa-eye", "fa-eye-slash"); }
             else { p.type = "password"; icon.classList.replace("fa-eye-slash", "fa-eye"); }
         }
 
@@ -1063,7 +1257,7 @@
             if(!u || !p) return Swal.fire('Perhatian', 'Isi Username & Password.', 'warning');
             Swal.fire({title: 'Memverifikasi...', didOpen: () => Swal.showLoading()});
             google.script.run.withSuccessHandler(res => {
-                if(res.status) { Swal.close(); isAdminLoggedIn = true; navTo('dashView'); document.getElementById('adminMenu').style.display = 'flex'; } 
+                if(res.status) { Swal.close(); isAdminLoggedIn = true; navTo('dashView'); document.getElementById('adminMenu').style.display = 'flex'; }
                 else Swal.fire('Ditolak', res.message, 'error');
             }).cekLogin(u, p);
         }
@@ -1080,22 +1274,22 @@
         function drawPagination(containerId, totalPages, currentPg, funcName) {
             let html = '';
             if(totalPages <= 1) { document.getElementById(containerId).innerHTML = ''; return; }
-            
+
             html += `<button onclick="${funcName}(${currentPg - 1})" class="px-2 py-1 border border-gray-200 rounded text-gray-600 bg-white hover:bg-gray-50 ${currentPg === 1 ? 'opacity-50 pointer-events-none' : ''}"><i class="fa-solid fa-chevron-left"></i></button>`;
-            
+
             let startP = Math.max(1, currentPg - 2);
             let endP = Math.min(totalPages, currentPg + 2);
             if(startP > 1) html += `<button onclick="${funcName}(1)" class="px-3 py-1 border border-gray-200 rounded text-gray-600 bg-white hover:bg-gray-50">1</button><span class="px-1 text-gray-400">...</span>`;
-            
+
             for(let i=startP; i<=endP; i++) {
                 if(i === currentPg) html += `<button class="px-3 py-1 border border-pusk-blue rounded bg-pusk-blue text-white font-bold">${i}</button>`;
                 else html += `<button onclick="${funcName}(${i})" class="px-3 py-1 border border-gray-200 rounded text-gray-600 bg-white hover:bg-gray-50">${i}</button>`;
             }
-            
+
             if(endP < totalPages) html += `<span class="px-1 text-gray-400">...</span><button onclick="${funcName}(${totalPages})" class="px-3 py-1 border border-gray-200 rounded text-gray-600 bg-white hover:bg-gray-50">${totalPages}</button>`;
-            
+
             html += `<button onclick="${funcName}(${currentPg + 1})" class="px-2 py-1 border border-gray-200 rounded text-gray-600 bg-white hover:bg-gray-50 ${currentPg === totalPages ? 'opacity-50 pointer-events-none' : ''}"><i class="fa-solid fa-chevron-right"></i></button>`;
-            
+
             document.getElementById(containerId).innerHTML = html;
         }
 
@@ -1106,7 +1300,7 @@
             const tgl = document.getElementById('filterTglHarian').value;
             if(!tgl) return;
             document.getElementById('tbHarian').innerHTML = `<tr><td colspan="6" class="text-center py-10"><i class="fa-solid fa-spinner fa-spin text-pusk-blue fa-2x"></i></td></tr>`;
-            
+
             google.script.run.withSuccessHandler(function(res) {
                 dataAbsenHarianRaw = res.data;
                 window.kapusParams = { puskesmas: res.namaPuskesmas, nama: res.kapusNama, nip: res.kapusNip };
@@ -1120,7 +1314,7 @@
             if(resetPg) currentPgHarian = 1;
             const filterKet = document.getElementById('filterKetHarian').value;
             const searchVal = document.getElementById('searchHarian').value.toLowerCase();
-            
+
             filteredHarian = dataAbsenHarianRaw;
             if(filterKet !== "ALL") filteredHarian = filteredHarian.filter(d => d.keterangan.toUpperCase() === filterKet.toUpperCase());
             if(searchVal) filteredHarian = filteredHarian.filter(d => d.nama.toLowerCase().includes(searchVal) || d.jabatan.toLowerCase().includes(searchVal));
@@ -1162,34 +1356,35 @@ document.getElementById('statLain').innerText       = cLain;
             let pagedData = filteredHarian.slice(sIdx, eIdx);
 
             let html = '';
-            if(tRows === 0) { html = `<tr><td colspan="6" class="text-center py-10 text-gray-500 font-medium">Tidak ada data.</td></tr>`; } 
+            if(tRows === 0) { html = `<tr><td colspan="6" class="text-center py-10 text-gray-500 font-medium">Tidak ada data.</td></tr>`; }
             else {
                 pagedData.forEach(d => {
-                   let badgeClass = "bg-gray-100 text-gray-600"; 
+                   let badgeClass = "bg-gray-100 text-gray-600";
 if(d.keterangan === "HADIR") badgeClass = "bg-green-50 text-green-700 border border-green-200";
 else if(d.keterangan === "BELUM ABSEN PULANG") badgeClass = "bg-amber-100 text-amber-700 border border-amber-200 font-medium";
 else if(d.keterangan === "SAKIT" || d.keterangan === "IZIN" || d.keterangan === "TL" || d.keterangan === "TUGAS LUAR") badgeClass = "bg-blue-50 text-blue-700 border border-blue-200";
+else if(d.keterangan === "CUTI") badgeClass = "bg-purple-50 text-purple-700 border border-purple-200";
 else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border border-red-200";
                     let eIdQr = d.id_qr || '';
                     let eNama = (d.nama || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
                    html += `<tr class="hover:bg-gray-50 transition border-b border-gray-100">
     <td class="px-4 py-3"><div class="font-extrabold text-gray-800 text-[12px]">${d.nama}</div><div class="text-[10px] text-gray-400 uppercase tracking-wider">${d.jabatan}</div></td>
-    
+
     <!-- JAM MASUK - BADGE HIJAU MODERN -->
     <td class="px-4 py-3 text-center">
         <span class="inline-flex items-center px-3 py-1 text-xs font-mono font-bold rounded-2xl bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-inner">
             ${d.wktMasuk || '-'}
         </span>
     </td>
-    
+
     <!-- JAM PULANG - BADGE ORANGE MODERN -->
     <td class="px-4 py-3 text-center">
         <span class="inline-flex items-center px-3 py-1 text-xs font-mono font-bold rounded-2xl bg-orange-100 text-orange-700 border border-orange-200 shadow-inner">
             ${d.wktPulang || '-'}
         </span>
     </td>
-    
+
     <td class="px-4 py-3 text-center">
         <span class="px-3 py-1 rounded-2xl text-[10px] font-bold uppercase ${badgeClass}">${d.keterangan}</span>
     </td>
@@ -1199,7 +1394,7 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
                 });
             }
             document.getElementById('tbHarian').innerHTML = html;
-            
+
             // Render Paginasi Info & Button
             document.getElementById('infoPageHarian').innerText = tRows === 0 ? `0 dari 0` : `${sIdx + 1}-${Math.min(eIdx, tRows)} dari ${tRows}`;
             drawPagination('pagControlsHarian', tPages, currentPgHarian, 'gantiHalHarian');
@@ -1214,27 +1409,79 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
                     <div class="text-left mb-3"><p class="text-xs font-bold text-gray-500 uppercase">Pegawai</p><p class="text-sm font-extrabold text-pusk-blue">${nama}</p></div>
                     <div class="text-left">
                         <label class="block text-xs font-bold text-gray-600 mb-1 ml-1">Pilih Status Baru</label>
-                        <select id="swal-manual-status" class="swal2-select w-full mb-3 !mx-0 !mt-0" onchange="toggleManualAlasan(this.value)">
+                        <select id="swal-manual-status" class="swal2-select w-full mb-3 !mx-0 !mt-0" onchange="toggleManualFields(this.value)">
                             <option value="HADIR_MASUK">Hadir (Set Jam Masuk Saat Ini)</option><option value="HADIR_PULANG">Hadir (Set Jam Pulang Saat Ini)</option>
-                            <option value="SAKIT">Sakit</option><option value="IZIN">Izin</option><option value="TL">Tugas Luar (TL)</option><option value="ALPA">Alpa</option>
+                            <option value="SAKIT">Sakit</option><option value="IZIN">Izin</option><option value="TL">Tugas Luar (TL)</option><option value="CUTI">Cuti (Rentang Tanggal)</option><option value="ALPA">Alpa</option>
                         </select>
                         <div id="manual-alasan-container" style="display:none;"><label class="block text-xs font-bold text-gray-600 mb-1 ml-1">Catatan Tambahan</label><input type="text" id="swal-manual-alasan" class="swal2-input w-full !mx-0 !mt-0" placeholder="Masukkan keterangan..."></div>
+                        <div id="manual-cuti-container" style="display:none;">
+                            <label class="block text-xs font-bold text-purple-700 mb-1 ml-1 mt-2">Periode Cuti</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="date" id="swal-cuti-mulai" class="swal2-input w-full !mx-0 !mt-0">
+                                <input type="date" id="swal-cuti-selesai" class="swal2-input w-full !mx-0 !mt-0">
+                            </div>
+                            <p class="text-[10px] text-purple-600 mt-1 ml-1 font-semibold"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Sistem akan mengisi status CUTI otomatis dari tanggal mulai s/d tanggal akhir.</p>
+                            <div id="cuti-day-counter" class="mt-2 ml-1 inline-flex items-center gap-2 bg-gradient-to-r from-purple-50 to-fuchsia-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-full text-[11px] font-extrabold">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                <span id="cuti-day-counter-text">Total cuti: 1 hari</span>
+                            </div>
+                        </div>
                     </div>
                 `,
                 showCancelButton: true, confirmButtonText: 'Simpan Status', confirmButtonColor: '#003366', cancelButtonText: 'Batal',
-                didOpen: () => { toggleManualAlasan(document.getElementById('swal-manual-status').value); },
-                preConfirm: () => { return { status: document.getElementById('swal-manual-status').value, alasan: document.getElementById('swal-manual-alasan').value } }
+                didOpen: () => {
+                    document.getElementById('swal-cuti-mulai').value = tgl;
+                    document.getElementById('swal-cuti-selesai').value = tgl;
+                    document.getElementById('swal-cuti-mulai').addEventListener('change', updateCutiDayCounter);
+                    document.getElementById('swal-cuti-selesai').addEventListener('change', updateCutiDayCounter);
+                    updateCutiDayCounter();
+                    toggleManualFields(document.getElementById('swal-manual-status').value);
+                },
+                preConfirm: () => {
+                    const status = document.getElementById('swal-manual-status').value;
+                    const alasan = document.getElementById('swal-manual-alasan').value;
+                    const cutiMulai = document.getElementById('swal-cuti-mulai').value;
+                    const cutiSelesai = document.getElementById('swal-cuti-selesai').value;
+                    if (status === 'CUTI') {
+                        if (!cutiMulai || !cutiSelesai) { Swal.showValidationMessage('Tanggal mulai & akhir cuti wajib diisi.'); return false; }
+                        if (cutiMulai > cutiSelesai) { Swal.showValidationMessage('Tanggal mulai cuti tidak boleh melebihi tanggal akhir.'); return false; }
+                    }
+                    return { status, alasan, cutiMulai, cutiSelesai };
+                }
             }).then(res => {
                 if(res.isConfirmed) {
                     Swal.fire({title:'Menyimpan...', didOpen:()=>Swal.showLoading()});
-                    google.script.run.withSuccessHandler(r => { Swal.fire('Berhasil', r.message, 'success'); loadAbsenHarian(); }).setManualAbsenAdmin(idQR, tgl, res.value.status, res.value.alasan);
+                    if (res.value.status === 'CUTI') {
+                        google.script.run.withSuccessHandler(r => { Swal.fire('Berhasil', r.message, 'success'); loadAbsenHarian(); })
+                        .setCutiRangeAdmin(idQR, res.value.cutiMulai, res.value.cutiSelesai, res.value.alasan);
+                    } else {
+                        google.script.run.withSuccessHandler(r => { Swal.fire('Berhasil', r.message, 'success'); loadAbsenHarian(); })
+                        .setManualAbsenAdmin(idQR, tgl, res.value.status, res.value.alasan);
+                    }
                 }
             });
         }
-        
-        function toggleManualAlasan(val) {
-            if(val !== 'HADIR_MASUK' && val !== 'HADIR_PULANG' && val !== 'ALPA') document.getElementById('manual-alasan-container').style.display = 'block';
-            else document.getElementById('manual-alasan-container').style.display = 'none';
+
+        function toggleManualFields(val) {
+            const alasanEl = document.getElementById('manual-alasan-container');
+            const cutiEl = document.getElementById('manual-cuti-container');
+            const tampilAlasan = (val !== 'HADIR_MASUK' && val !== 'HADIR_PULANG' && val !== 'ALPA');
+            if (alasanEl) alasanEl.style.display = tampilAlasan ? 'block' : 'none';
+            if (cutiEl) cutiEl.style.display = val === 'CUTI' ? 'block' : 'none';
+            if (val === 'CUTI') updateCutiDayCounter();
+        }
+
+        function updateCutiDayCounter() {
+            const startEl = document.getElementById('swal-cuti-mulai');
+            const endEl = document.getElementById('swal-cuti-selesai');
+            const textEl = document.getElementById('cuti-day-counter-text');
+            if (!startEl || !endEl || !textEl) return;
+            if (!startEl.value || !endEl.value) { textEl.innerText = 'Total cuti: -'; return; }
+            const s = new Date(startEl.value + 'T00:00:00');
+            const e = new Date(endEl.value + 'T00:00:00');
+            if (isNaN(s.getTime()) || isNaN(e.getTime()) || s > e) { textEl.innerText = 'Total cuti: tanggal belum valid'; return; }
+            const total = Math.floor((e - s) / 86400000) + 1;
+            textEl.innerText = `Total cuti: ${total} hari`;
         }
 
         function terapkanBulkAlpa() {
@@ -1251,9 +1498,10 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
             if(!tgl) return Swal.fire('Error', 'Pilih tanggal!', 'error');
             document.getElementById('listPegawaiKegiatan').innerHTML = `<p class="col-span-2 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Mencari pegawai...</p>`;
             google.script.run.withSuccessHandler(res => {
-                dataPegawaiKegiatan = res.eligibleData; window.kapusParams = { puskesmas: res.namaPuskesmas, nama: res.kapusNama, nip: res.kapusNip }; 
+                dataPegawaiKegiatan = res.eligibleData; window.kapusParams = { puskesmas: res.namaPuskesmas, nama: res.kapusNama, nip: res.kapusNip };
                 document.getElementById('kegCountTersedia').innerText = res.counts.tersedia; document.getElementById('kegCountTL').innerText = res.counts.tl;
                 document.getElementById('kegCountSakit').innerText = res.counts.sakit; document.getElementById('kegCountIzin').innerText = res.counts.izin;
+                document.getElementById('kegCountCuti').innerText = res.counts.cuti || 0;
                 renderListKegiatan();
             }).getPegawaiEligibleKegiatan(tgl);
         }
@@ -1262,15 +1510,15 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
             let html = '';
             let searchVal = document.getElementById('searchKegiatan').value.toLowerCase();
             let filteredPegawai = dataPegawaiKegiatan;
-            
+
             if(searchVal) {
                 filteredPegawai = filteredPegawai.filter(p => p.nama.toLowerCase().includes(searchVal) || p.jabatan.toLowerCase().includes(searchVal));
             }
 
-            if(dataPegawaiKegiatan.length === 0) { 
-                html = `<p class="col-span-2 text-center py-4 text-red-500 font-bold">Tidak ada pegawai tersedia.</p>`; 
+            if(dataPegawaiKegiatan.length === 0) {
+                html = `<p class="col-span-2 text-center py-4 text-red-500 font-bold">Tidak ada pegawai tersedia.</p>`;
             } else if (filteredPegawai.length === 0) {
-                html = `<p class="col-span-2 text-center py-4 text-gray-500 font-medium">Pegawai tidak ditemukan.</p>`; 
+                html = `<p class="col-span-2 text-center py-4 text-gray-500 font-medium">Pegawai tidak ditemukan.</p>`;
             } else {
                 filteredPegawai.forEach((p) => {
                     let origIdx = dataPegawaiKegiatan.findIndex(orig => orig.id_qr === p.id_qr);
@@ -1287,18 +1535,18 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
             if(!tgl || !namaKeg) return Swal.fire('Error', 'Tanggal dan Nama wajib diisi!', 'warning');
             let selectedIdx = []; document.querySelectorAll('.keg-check:checked').forEach(c => selectedIdx.push(c.value));
             if(selectedIdx.length === 0) return Swal.fire('Error', 'Pilih minimal 1 pegawai!', 'warning');
-            
+
             let selectedPegawai = selectedIdx.map(i => dataPegawaiKegiatan[i]);
             Swal.fire({title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-            
+
             google.script.run.withSuccessHandler(function(res) { generatePDFDaftarHadir(tgl, namaKeg, selectedPegawai); }).simpanKegiatanManual(tgl, namaKeg, selectedPegawai);
         }
 
     function generatePDFDaftarHadir(tgl, namaKeg, list) {
-    const { jsPDF } = window.jspdf; 
-    const doc = new jsPDF({ orientation: "portrait" }); 
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "portrait" });
     const pageWidth = doc.internal.pageSize.width;
-    
+
     // Format Tanggal Profesional
     const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
@@ -1307,7 +1555,7 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
     let tglFormatted = `${dayNames[d.getDay()]}, ${parseInt(parts[2])} ${monthNames[parseInt(parts[1])-1]} ${parts[0]}`;
 
     // ==================== HEADER ====================
-    doc.setFontSize(13); 
+    doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
     doc.text("DAFTAR HADIR KEGIATAN", pageWidth/2, 18, { align: 'center' });
 
@@ -1334,45 +1582,45 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
         let nipText = row.nip ? `\n${row.nip}` : "";
         let golText = row.golongan && row.golongan !== "-" ? `\n${row.golongan}` : "";
         let namaGabung = row.nama + golText + nipText;
-        
-        let sig = (index % 2 === 0) 
-            ? `${index+1}. ......................` 
+
+        let sig = (index % 2 === 0)
+            ? `${index+1}. ......................`
             : `                  ${index+1}. ......................`;
-        
-        tableData.push([ 
-            index + 1, 
-            namaGabung, 
-            row.jabatan, 
-            sig 
+
+        tableData.push([
+            index + 1,
+            namaGabung,
+            row.jabatan,
+            sig
         ]);
     });
 
-    doc.autoTable({ 
+    doc.autoTable({
         startY: doc.lastAutoTable.finalY + 4,   // lebih rapat ke atas
-        head: [['NO', 'NAMA / PANGKAT / GOL / NIP', 'JABATAN', 'TANDA TANGAN']], 
-        body: tableData, 
-        theme: 'grid', 
-        headStyles: { 
-            fillColor: [255, 255, 255], 
-            textColor: [0, 0, 0], 
-            lineColor: [0, 0, 0], 
-            lineWidth: 0.1, 
-            fontStyle: 'bold', 
+        head: [['NO', 'NAMA / PANGKAT / GOL / NIP', 'JABATAN', 'TANDA TANGAN']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: {
+            fillColor: [255, 255, 255],
+            textColor: [0, 0, 0],
+            lineColor: [0, 0, 0],
+            lineWidth: 0.1,
+            fontStyle: 'bold',
             halign: 'center',
-            minCellHeight: 11 
-        }, 
-        styles: { 
+            minCellHeight: 11
+        },
+        styles: {
             fontSize: 8.5,        // font dikecilkan lagi
             cellPadding: 2.5,     // padding lebih pepet
-            valign: 'middle', 
-            lineColor: [0, 0, 0], 
-            lineWidth: 0.1, 
-            textColor: [0, 0, 0] 
-        }, 
-        columnStyles: { 
-            0: { halign: 'center', cellWidth: 13 },      
-            1: { cellWidth: 80 },                        
-            2: { cellWidth: 40 },                        
+            valign: 'middle',
+            lineColor: [0, 0, 0],
+            lineWidth: 0.1,
+            textColor: [0, 0, 0]
+        },
+        columnStyles: {
+            0: { halign: 'center', cellWidth: 13 },
+            1: { cellWidth: 80 },
+            2: { cellWidth: 40 },
             3: { cellWidth: 48 }                         // TTD dikecilkan (tidak mentok di samping)
         }
     });
@@ -1389,7 +1637,7 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
     doc.setFont("helvetica", "bold");
     let strPrefix = (window.kapusParams.puskesmas || "PUSKESMAS").toUpperCase().replace("UPTD ", "");
     doc.text(`KEPALA ${strPrefix}`, rightX, finalY + 24, { align: 'center' });
-    
+
     doc.text(window.kapusParams.nama, rightX, finalY + 38, { align: 'center' });
     doc.setLineWidth(0.4);
     doc.line(rightX - 38, finalY + 39, rightX + 38, finalY + 39);
@@ -1414,7 +1662,7 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
 function populateLokasiFilter() {
     const select = document.getElementById('filterLokasi');
     const lokasiSet = new Set();
-    
+
     listPegawaiRaw.forEach(p => {
         if (p[5] && p[5].toString().trim() !== '') {
             lokasiSet.add(p[5].toString().trim());
@@ -1422,7 +1670,7 @@ function populateLokasiFilter() {
     });
 
     select.innerHTML = '<option value="SEMUA">Semua Lokasi</option>';
-    
+
     Array.from(lokasiSet).sort().forEach(lok => {
         let opt = document.createElement('option');
         opt.value = lok;
@@ -1435,7 +1683,7 @@ function populateLokasiFilter() {
 
 function renderTablePegawai(resetPg = false) {
     if(resetPg) currentPgPegawai = 1;
-    
+
     const searchVal = document.getElementById('searchPegawai').value.toLowerCase().trim();
     const filterLok = document.getElementById('filterLokasi').value;
 
@@ -1451,8 +1699,8 @@ function renderTablePegawai(resetPg = false) {
 
     // Filter Search (Nama atau NIP)
     if(searchVal) {
-        filteredPegawai = filteredPegawai.filter(p => 
-            (p[1] || '').toString().toLowerCase().includes(searchVal) || 
+        filteredPegawai = filteredPegawai.filter(p =>
+            (p[1] || '').toString().toLowerCase().includes(searchVal) ||
             (p[2] || '').toString().toLowerCase().includes(searchVal)
         );
     }
@@ -1463,15 +1711,15 @@ function renderTablePegawai(resetPg = false) {
     let eIdx = rowsPerPagePegawai === 'ALL' ? tRows : sIdx + parseInt(rowsPerPagePegawai);
     let pagedData = filteredPegawai.slice(sIdx, eIdx);
 
-    let html = ''; 
-    if(tRows === 0) { 
-        html = `<tr><td colspan="4" class="text-center py-10 text-gray-500">Data tidak ditemukan</td></tr>`; 
+    let html = '';
+    if(tRows === 0) {
+        html = `<tr><td colspan="4" class="text-center py-10 text-gray-500">Data tidak ditemukan</td></tr>`;
     }
     else {
         pagedData.forEach(p => {
             let golVal = p[6] && p[6] !== "-" ? p[6] : "-";
             let badgeLoc = p[5].includes("Polindes") ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700';
-            
+
             let eId = p[0] || '';
             let eNama = (p[1] || '').toString().replace(/'/g, "\\'").replace(/"/g, "&quot;");
             let eNip = (p[2] || '').toString().replace(/'/g, "\\'").replace(/"/g, "&quot;");
@@ -1492,7 +1740,7 @@ function renderTablePegawai(resetPg = false) {
         });
     }
     document.getElementById('tbPegawai').innerHTML = html;
-    
+
     document.getElementById('infoPagePegawai').innerText = tRows === 0 ? `0 dari 0` : `${sIdx + 1}-${Math.min(eIdx, tRows)} dari ${tRows}`;
     drawPagination('pagControlsPegawai', tPages, currentPgPegawai, 'gantiHalPegawai');
 }
@@ -1504,12 +1752,12 @@ function renderTablePegawai(resetPg = false) {
         }
 
         function bukaModalEdit(id, nama, nip, jabatan, status, lokasi, golongan) {
-            document.getElementById('modalTitlePegawai').innerText = "Edit Data Pegawai"; 
+            document.getElementById('modalTitlePegawai').innerText = "Edit Data Pegawai";
             document.getElementById('inIdQR').value = id;
-            document.getElementById('inNama').value = nama; 
+            document.getElementById('inNama').value = nama;
             document.getElementById('inNip').value = nip !== '-' ? nip : '';
-            document.getElementById('inJabatan').value = jabatan; 
-            
+            document.getElementById('inJabatan').value = jabatan;
+
             status = status ? status.trim() : "";
             lokasi = lokasi ? lokasi.trim() : "";
             golongan = golongan ? golongan.trim() : "";
@@ -1517,15 +1765,15 @@ function renderTablePegawai(resetPg = false) {
             let statEl = document.getElementById('inStatus');
             let statOpts = Array.from(statEl.options).map(o => o.value);
             if(statOpts.includes(status)) statEl.value = status; else statEl.selectedIndex = 0;
-            
+
             let lokEl = document.getElementById('inLokasi');
             let lokOpts = Array.from(lokEl.options).map(o => o.value);
             if(lokOpts.includes(lokasi)) lokEl.value = lokasi; else lokEl.selectedIndex = 0;
 
-            let golEl = document.getElementById('inGolongan'); 
+            let golEl = document.getElementById('inGolongan');
             let golOpts = Array.from(golEl.options).map(o => o.value);
             if(golOpts.includes(golongan)) golEl.value = golongan; else golEl.value = "-";
-            
+
             document.getElementById('modalTambahPegawai').classList.remove('hidden');
         }
 
@@ -1533,7 +1781,7 @@ function renderTablePegawai(resetPg = false) {
             let data = { idQR: document.getElementById('inIdQR').value, nama: document.getElementById('inNama').value, nip: document.getElementById('inNip').value, jabatan: document.getElementById('inJabatan').value, status: document.getElementById('inStatus').value, lokasi: document.getElementById('inLokasi').value, golongan: document.getElementById('inGolongan').value };
             if(!data.nama || !data.jabatan) return Swal.fire('Error', 'Nama dan Jabatan wajib', 'warning');
             Swal.fire({title:'Menyimpan Data...', didOpen:()=>Swal.showLoading()});
-            if(data.idQR) { google.script.run.withSuccessHandler(res => { Swal.fire('Berhasil', res.message, 'success'); document.getElementById('modalTambahPegawai').classList.add('hidden'); loadDataPegawai(); }).editPegawai(data); } 
+            if(data.idQR) { google.script.run.withSuccessHandler(res => { Swal.fire('Berhasil', res.message, 'success'); document.getElementById('modalTambahPegawai').classList.add('hidden'); loadDataPegawai(); }).editPegawai(data); }
             else { google.script.run.withSuccessHandler(res => { Swal.fire('Berhasil', res.message, 'success'); document.getElementById('modalTambahPegawai').classList.add('hidden'); loadDataPegawai(); }).tambahPegawai(data); }
         }
 
@@ -1574,16 +1822,16 @@ function renderTablePegawai(resetPg = false) {
         function downloadCardImage() {
             const cardEl = document.getElementById('previewCardContent').querySelector('.universal-id-card');
             Swal.fire({title: 'Memproses Gambar...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
-            
+
             // Bypass transform for crisp render
             cardEl.style.transform = "none";
-            
+
             html2canvas(cardEl, { scale: 4, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
-                let link = document.createElement('a'); 
+                let link = document.createElement('a');
                 let nameStr = cardEl.querySelector('.nama-pegawai').innerText.trim().replace(/\s+/g, '_');
-                link.download = `IDCard_${nameStr}.png`; 
-                link.href = canvas.toDataURL('image/png', 1.0); 
-                link.click(); 
+                link.download = `IDCard_${nameStr}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
                 Swal.close();
             }).catch(err => {
                 Swal.fire('Error', 'Gagal memproses gambar.', 'error');
@@ -1592,21 +1840,21 @@ function renderTablePegawai(resetPg = false) {
 
         function printSingleCard() {
             const printDiv = document.getElementById('printArea');
-            printDiv.innerHTML = document.getElementById('previewCardContent').innerHTML; 
+            printDiv.innerHTML = document.getElementById('previewCardContent').innerHTML;
             printDiv.classList.remove('hidden');
             setTimeout(()=>{ window.print(); printDiv.classList.add('hidden'); printDiv.innerHTML=''; }, 500);
         }
 
-        function cetakSemuaID() { 
-            if(listPegawaiRaw.length === 0) return Swal.fire('Kosong','Tidak ada data pegawai.','info'); 
+        function cetakSemuaID() {
+            if(listPegawaiRaw.length === 0) return Swal.fire('Kosong','Tidak ada data pegawai.','info');
             Swal.fire({ title: 'Menyiapkan Batch Print...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-            
-            const printDiv = document.getElementById('printArea'); printDiv.innerHTML = ''; 
-            listPegawaiRaw.forEach(e => { printDiv.innerHTML += getUniversalCardHTML(e[0], e[1], e[2]); }); 
-            printDiv.classList.remove('hidden'); 
-            
-            listPegawaiRaw.forEach(e => { new QRCode(document.getElementById(`qr-render-${e[0]}`),{ text: e[0], width: 120, height: 120, colorDark : "#003366", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H }); }); 
-            setTimeout(() => { Swal.close(); window.print(); printDiv.classList.add('hidden'); printDiv.innerHTML = ''; }, 1500); 
+
+            const printDiv = document.getElementById('printArea'); printDiv.innerHTML = '';
+            listPegawaiRaw.forEach(e => { printDiv.innerHTML += getUniversalCardHTML(e[0], e[1], e[2]); });
+            printDiv.classList.remove('hidden');
+
+            listPegawaiRaw.forEach(e => { new QRCode(document.getElementById(`qr-render-${e[0]}`),{ text: e[0], width: 120, height: 120, colorDark : "#003366", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H }); });
+            setTimeout(() => { Swal.close(); window.print(); printDiv.classList.add('hidden'); printDiv.innerHTML = ''; }, 1500);
         }
 
         // ==========================================
@@ -1617,10 +1865,10 @@ function renderTablePegawai(resetPg = false) {
     if(!tgl || dataAbsenHarianRaw.length === 0) return Swal.fire('Error', 'Pilih tanggal dan pastikan ada data.', 'warning');
     Swal.fire({title: 'Memproses PDF...', didOpen: () => Swal.showLoading()});
 
-    const { jsPDF } = window.jspdf; 
-    const doc = new jsPDF({ orientation: "portrait" }); 
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "portrait" });
     const pageWidth = doc.internal.pageSize.width;
-    
+
     // FORMAT TANGGAL BARU: Hari, DD MMMM YYYY
     const monthNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
     const dayNames = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
@@ -1628,11 +1876,11 @@ function renderTablePegawai(resetPg = false) {
     let d = new Date(parts[0], parseInt(parts[1])-1, parts[2]);
     let tglFormatted = `${dayNames[d.getDay()]}, ${parseInt(parts[2])} ${monthNames[parseInt(parts[1])-1]} ${parts[0]}`;
 
-    doc.setFontSize(11); 
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
     doc.text("LAPORAN ABSENSI HARIAN PEGAWAI", 14, 15);
     doc.text((window.kapusParams.puskesmas || "PUSKESMAS").toUpperCase(), 14, 21);
-    
+
     // Tanggal dengan format yang diminta
     doc.setFont("helvetica", "normal");
     doc.text(`TANGGAL: ${tglFormatted}`, 14, 27);
@@ -1643,13 +1891,13 @@ function renderTablePegawai(resetPg = false) {
         if (row.alasan && row.alasan !== "-" && row.alasan !== "") {
             statusText += ` (${row.alasan})`;
         }
-        tableData.push([ 
-            i+1, 
-            row.nama + "\n(" + row.jabatan + ")", 
-            row.wktMasuk || "-", 
-            row.wktPulang || "-", 
-            row.jamKerja || "-", 
-            statusText 
+        tableData.push([
+            i+1,
+            row.nama + "\n(" + row.jabatan + ")",
+            row.wktMasuk || "-",
+            row.wktPulang || "-",
+            row.jamKerja || "-",
+            statusText
         ]);
     });
 
@@ -1688,7 +1936,7 @@ function renderTablePegawai(resetPg = false) {
                 doc.text("DAFTAR REKAPITULASI ABSENSI TENAGA ASN/PPPK/BLUD PENUH WAKTU DI LINGKUNGAN", 14, 15);
                 doc.text(res.namaPuskesmas.toUpperCase(), 14, 21);
                 doc.text(`TAHUN ${thn}`, 14, 27); doc.text(`BULAN: ${bln} ${thn}`, 14, 35);
-                
+
                 let tableData = [];
                 res.rekapData.forEach((r, i) => {
                     tableData.push([ i + 1, r.nama_nip, r.gol, r.jabatan + "\n" + r.status, r.hari_kerja || 0, r.hadir || 0, r.sakit || 0, r.izin || 0, r.cuti || 0, r.tl || 0, r.alpa || 0 ]);
@@ -1697,8 +1945,8 @@ function renderTablePegawai(resetPg = false) {
                 doc.autoTable({
                     startY: 40,
                     head: [[{content: 'NO', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'NAMA / NIP', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'PANGKAT\n/ GOL', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'JABATAN', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'HARI\nKERJA', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'ABSENSI', colSpan: 6, styles: {halign: 'center'}}], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'TL', 'ALPA']],
-                    body: tableData, theme: 'grid', 
-                    headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1, fontStyle: 'bold' }, 
+                    body: tableData, theme: 'grid',
+                    headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1, fontStyle: 'bold' },
                     styles: { fontSize: 8, cellPadding: 2, valign: 'middle', textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1 },
                     columnStyles: { 0: { halign: 'center', cellWidth: 10 }, 2: { halign: 'center', cellWidth: 20 }, 4: { halign: 'center', fontStyle: 'bold' }, 5: { halign: 'center' }, 6: { halign: 'center' }, 7: { halign: 'center' }, 8: { halign: 'center' }, 9: { halign: 'center' }, 10: { halign: 'center', fontStyle: 'bold', textColor: [220, 38, 38] } }
                 });
@@ -1720,14 +1968,14 @@ function renderTablePegawai(resetPg = false) {
                 doc.text("LAPORAN RINCIAN TOTAL JAM KERJA PEGAWAI", 14, 15);
                 doc.text(res.namaPuskesmas.toUpperCase(), 14, 21);
                 doc.text(`BULAN: ${bln} ${thn}`, 14, 27);
-                
+
                 let tableData = [];
                 res.rekapData.forEach((r, i) => { tableData.push([ i + 1, r.nama_nip, r.jabatan + "\n" + r.status, r.hadir || 0, r.alpa || 0, r.total_jam ]); });
 
                 doc.autoTable({
                     startY: 32, head: [['NO', 'NAMA / IDENTITAS', 'JABATAN & STATUS', 'HADIR', 'ALPA', 'TOTAL JAM KERJA']],
-                    body: tableData, theme: 'grid', 
-                    headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1, fontStyle: 'bold', halign: 'center' }, 
+                    body: tableData, theme: 'grid',
+                    headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1, fontStyle: 'bold', halign: 'center' },
                     styles: { fontSize: 8, cellPadding: 3, valign: 'middle', textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1 },
                     columnStyles: { 0: { halign: 'center', cellWidth: 10 }, 3: { halign: 'center' }, 4: { halign: 'center', textColor: [220, 38, 38] }, 5: { halign: 'center', fontStyle: 'bold' } }
                 });
@@ -1737,12 +1985,12 @@ function renderTablePegawai(resetPg = false) {
         }
 
         function tambahTandaTangan(doc, res, bln, thn, pW, isHarian) {
-            const finalY = doc.lastAutoTable.finalY || 40; let rightX = pW - 50; 
+            const finalY = doc.lastAutoTable.finalY || 40; let rightX = pW - 50;
             doc.setFontSize(10); doc.setFont("helvetica", "normal");
             const tglTulis = isHarian ? bln.split('-').reverse().join('-') : new Date().getDate() + ' ' + document.getElementById('lapBulan').options[document.getElementById('lapBulan').selectedIndex].text + ' ' + thn;
-            
+
             doc.text(`Sintang, ${tglTulis}`, rightX, finalY + 15, { align: 'center' });
-            doc.setFont("helvetica", "bold"); 
+            doc.setFont("helvetica", "bold");
             let puskNameStr = res.namaPuskesmas || res.puskesmas || "PUSKESMAS";
             let strPrefix = puskNameStr.toUpperCase().replace("UPTD ", "");
             doc.text(`KEPALA ${strPrefix}`, rightX, finalY + 20, { align: 'center' });
