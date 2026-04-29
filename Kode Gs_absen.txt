@@ -193,8 +193,10 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
   if (action === "MASUK") {
     const jamMasukMulai = settings.Jam_Masuk_Mulai || "00:00";
     const jamMasukAkhir = settings.Jam_Masuk_Akhir || "23:59";
+    const jamMasukMulaiTxt = formatJamSetting(jamMasukMulai);
+    const jamMasukAkhirTxt = formatJamSetting(jamMasukAkhir);
     if (!isDalamRentangJam(nowMenit, jamMasukMulai, jamMasukAkhir)) {
-      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen MASUK hanya diizinkan jam ${jamMasukMulai} - ${jamMasukAkhir}.` };
+      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen MASUK hanya diizinkan jam ${jamMasukMulaiTxt} - ${jamMasukAkhirTxt}.` };
     }
     if (rowIndex > -1) {
       let ket = String(existingData[10]).toUpperCase();
@@ -212,8 +214,10 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
   else if (action === "PULANG") {
     const jamPulangMulai = settings.Jam_Pulang_Mulai || "00:00";
     const jamPulangAkhir = settings.Jam_Pulang_Akhir || "23:59";
+    const jamPulangMulaiTxt = formatJamSetting(jamPulangMulai);
+    const jamPulangAkhirTxt = formatJamSetting(jamPulangAkhir);
     if (!isDalamRentangJam(nowMenit, jamPulangMulai, jamPulangAkhir)) {
-      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG hanya diizinkan jam ${jamPulangMulai} - ${jamPulangAkhir}.` };
+      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG hanya diizinkan jam ${jamPulangMulaiTxt} - ${jamPulangAkhirTxt}.` };
     }
     if (rowIndex === -1) return { status: 'ERROR', message: `Anda belum melakukan Absen MASUK hari ini!` };
 
@@ -238,8 +242,20 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
 }
 
 function waktuKeMenit(hhmmss) {
-  let p = String(hhmmss || "00:00").split(":");
-  return (parseInt(p[0], 10) || 0) * 60 + (parseInt(p[1], 10) || 0);
+  if (hhmmss instanceof Date) {
+    return hhmmss.getHours() * 60 + hhmmss.getMinutes();
+  }
+  if (typeof hhmmss === "number" && !isNaN(hhmmss)) {
+    let totalMenit = Math.round((hhmmss % 1) * 24 * 60);
+    return ((totalMenit % 1440) + 1440) % 1440;
+  }
+
+  let clean = String(hhmmss || "00:00").trim().replace(/'/g, "");
+  let m = clean.match(/(\d{1,2}):(\d{2})/);
+  if (!m) return 0;
+  let jam = parseInt(m[1], 10) || 0;
+  let menit = parseInt(m[2], 10) || 0;
+  return (jam * 60 + menit) % 1440;
 }
 
 function isDalamRentangJam(nowMenit, mulaiHHMM, akhirHHMM) {
@@ -247,6 +263,20 @@ function isDalamRentangJam(nowMenit, mulaiHHMM, akhirHHMM) {
   const end = waktuKeMenit(akhirHHMM);
   if (start <= end) return nowMenit >= start && nowMenit <= end;
   return nowMenit >= start || nowMenit <= end;
+}
+
+function formatJamSetting(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, "Asia/Jakarta", "HH:mm");
+  if (typeof v === "number" && !isNaN(v)) {
+    let menit = waktuKeMenit(v);
+    let h = String(Math.floor(menit / 60)).padStart(2, "0");
+    let m = String(menit % 60).padStart(2, "0");
+    return `${h}:${m}`;
+  }
+  let s = String(v || "").trim();
+  let match = s.match(/(\d{1,2}):(\d{2})/);
+  if (!match) return "00:00";
+  return `${String(parseInt(match[1], 10)).padStart(2, "0")}:${match[2]}`;
 }
 
 function hitungJamKerja(masukStr, pulangStr) {
@@ -650,4 +680,3 @@ function simpanKegiatanManual(tglKegiatan, namaKegiatan, selectedPegawai) {
   selectedPegawai.forEach(p => { sheet.appendRow([localTime, formattedDate, namaKegiatan, p.id_qr, p.nama, p.nip, p.golongan, p.jabatan]); });
   return { status: true, message: `Daftar hadir kegiatan berhasil disimpan!` };
 }
-
