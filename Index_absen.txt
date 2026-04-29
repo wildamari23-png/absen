@@ -237,10 +237,11 @@
                     </div>
                     <div id="distanceInfoBox" class="mb-4 border rounded-2xl p-3 text-left bg-slate-50 border-slate-200">
                         <div class="flex items-center justify-between gap-2">
-                            <p class="text-[10px] font-extrabold uppercase tracking-wider text-slate-600"><i class="fa-solid fa-map-pin mr-1"></i>Jarak ke Puskesmas</p>
-                            <span id="distanceBadge" class="text-[10px] font-extrabold px-2 py-1 rounded-full bg-gray-200 text-gray-700">Menunggu GPS</span>
+                            <p class="text-[10px] font-extrabold uppercase tracking-wider text-slate-600"><i class="fa-solid fa-map-pin mr-1"></i>Monitor Jarak Lokasi</p>
+                            <span id="distanceBadge" class="text-[10px] font-extrabold px-2 py-1 rounded-full bg-gray-200 text-gray-700">Mengecek...</span>
                         </div>
-                        <p id="distanceText" class="text-xs font-bold text-slate-700 mt-1">Belum ada data jarak.</p>
+                        <p id="distanceText" class="text-xs font-bold text-slate-700 mt-1 flex items-center gap-2"><i class="fa-solid fa-spinner fa-spin text-slate-400"></i>Sedang mengecek lokasi Anda...</p>
+                        <div id="distanceList" class="mt-2 grid grid-cols-1 gap-1 text-[11px]"></div>
                     </div>
 
                     <h3 class="text-left text-sm font-bold text-gray-800 mb-3 ml-1 uppercase tracking-wider">Pilih Tipe Absensi</h3>
@@ -1098,17 +1099,32 @@
         function updateDistanceInfo() {
             const text = document.getElementById('distanceText');
             const badge = document.getElementById('distanceBadge');
-            if (!text || !badge || !currentUserLat || !currentUserLng) return;
-            const latP = parseFloat(appSettingsCache.Lat_Puskesmas || 0);
-            const lngP = parseFloat(appSettingsCache.Lng_Puskesmas || 0);
-            const rad = parseFloat(appSettingsCache.Rad_Puskesmas || 100);
-            if (!latP || !lngP) { text.innerText = "Koordinat Puskesmas belum diset."; return; }
-            const d = hitungJarakClient(currentUserLat, currentUserLng, latP, lngP);
-            text.innerText = `Jarak Anda ke titik Puskesmas: ${Math.round(d)} meter (Radius izin ${Math.round(rad)}m).`;
-            if (d <= rad) {
+            const list = document.getElementById('distanceList');
+            if (!text || !badge || !list || !currentUserLat || !currentUserLng) return;
+
+            const lokasiRefs = [
+                { nama: "Puskesmas", lat: parseFloat(appSettingsCache.Lat_Puskesmas || 0), lng: parseFloat(appSettingsCache.Lng_Puskesmas || 0), rad: parseFloat(appSettingsCache.Rad_Puskesmas || 100) },
+                { nama: "Polindes Tebing Raya", lat: parseFloat(appSettingsCache.Lat_Pol_TebingRaya || 0), lng: parseFloat(appSettingsCache.Lng_Pol_TebingRaya || 0), rad: parseFloat(appSettingsCache.Rad_Pol_TebingRaya || 100) },
+                { nama: "Polindes Mungguk Bantok", lat: parseFloat(appSettingsCache.Lat_Pol_MunggukBantok || 0), lng: parseFloat(appSettingsCache.Lng_Pol_MunggukBantok || 0), rad: parseFloat(appSettingsCache.Rad_Pol_MunggukBantok || 100) },
+                { nama: "Polindes Kebiau Baru", lat: parseFloat(appSettingsCache.Lat_Pol_KebiauBaru || 0), lng: parseFloat(appSettingsCache.Lng_Pol_KebiauBaru || 0), rad: parseFloat(appSettingsCache.Rad_Pol_KebiauBaru || 100) },
+                { nama: "Polindes Jerora Satu", lat: parseFloat(appSettingsCache.Lat_Pol_JeroraSatu || 0), lng: parseFloat(appSettingsCache.Lng_Pol_JeroraSatu || 0), rad: parseFloat(appSettingsCache.Rad_Pol_JeroraSatu || 100) }
+            ];
+
+            let terdekat = { nama: '-', jarak: Number.POSITIVE_INFINITY, rad: 100 };
+            const htmlRows = lokasiRefs.map(l => {
+                if (!l.lat || !l.lng) return `<div class="px-2 py-1 rounded-lg bg-gray-100 text-gray-500"><b>${l.nama}:</b> Koordinat belum diset</div>`;
+                const d = hitungJarakClient(currentUserLat, currentUserLng, l.lat, l.lng);
+                if (d < terdekat.jarak) terdekat = { nama: l.nama, jarak: d, rad: l.rad };
+                let cls = d <= l.rad ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-amber-50 text-amber-700 border border-amber-100';
+                return `<div class="px-2 py-1 rounded-lg ${cls}"><b>${l.nama}:</b> ${Math.round(d)} m <span class="opacity-70">(R ${Math.round(l.rad)}m)</span></div>`;
+            }).join('');
+            list.innerHTML = htmlRows;
+
+            text.innerHTML = `Terdekat saat ini: <b>${terdekat.nama}</b> (${Math.round(terdekat.jarak)} meter).`;
+            if (terdekat.jarak <= terdekat.rad) {
                 badge.innerText = "Siap Absen";
                 badge.className = "text-[10px] font-extrabold px-2 py-1 rounded-full bg-green-100 text-green-700";
-            } else if (d <= rad * 2) {
+            } else if (terdekat.jarak <= terdekat.rad * 2) {
                 badge.innerText = "Perlu Mendekat";
                 badge.className = "text-[10px] font-extrabold px-2 py-1 rounded-full bg-amber-100 text-amber-700";
             } else {
