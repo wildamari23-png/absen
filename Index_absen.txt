@@ -921,6 +921,7 @@
 
         function muatIdentitasAplikasi() {
             google.script.run.withSuccessHandler(res => {
+                res = res || {};
                 if(res.App_Name) {
                     document.getElementById('appNameTitle').innerText = res.App_Name;
                     document.getElementById('loginAppName').innerText = res.App_Name;
@@ -957,6 +958,7 @@
         // PENGATURAN LOAD & SIMPAN
         function loadPengaturan() {
             google.script.run.withSuccessHandler(res => {
+                res = res || {};
                 document.getElementById('setAppName').value = res.App_Name || 'PORTAL ABSENSI';
                 document.getElementById('setAppHeaderName').value = res.App_Header_Name || '';
                 document.getElementById('setAppLogo').value = res.App_Logo || '';

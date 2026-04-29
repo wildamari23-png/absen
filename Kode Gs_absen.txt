@@ -84,7 +84,14 @@ function cekLogin(user, pass) {
 }
 
 function getPengaturan() {
-  const data = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Pengaturan").getDataRange().getValues();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName("Pengaturan");
+  if (!sheet) {
+    initSetup();
+    sheet = ss.getSheetByName("Pengaturan");
+    if (!sheet) return {};
+  }
+  const data = sheet.getDataRange().getValues();
   let setting = {};
   for (let i = 1; i < data.length; i++) setting[data[i][0]] = data[i][1];
   return setting;
