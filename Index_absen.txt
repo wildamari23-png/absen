@@ -238,10 +238,12 @@
                     <div id="distanceInfoBox" class="mb-4 border rounded-2xl p-3 text-left bg-slate-50 border-slate-200">
                         <div class="flex items-center justify-between gap-2">
                             <p class="text-[10px] font-extrabold uppercase tracking-wider text-slate-600"><i class="fa-solid fa-map-pin mr-1"></i>Monitor Jarak Lokasi</p>
-                            <span id="distanceBadge" class="text-[10px] font-extrabold px-2 py-1 rounded-full bg-gray-200 text-gray-700">Mengecek...</span>
+                            <span id="distanceBadge" class="text-[10px] font-extrabold px-2 py-1 rounded-full bg-gray-200 text-gray-700">Belum Dicek</span>
                         </div>
-                        <p id="distanceText" class="text-xs font-bold text-slate-700 mt-1 flex items-center gap-2"><i class="fa-solid fa-spinner fa-spin text-slate-400"></i>Sedang mengecek lokasi Anda...</p>
-                        <div id="distanceList" class="mt-2 grid grid-cols-1 gap-1 text-[11px]"></div>
+                        <p id="distanceText" class="text-xs font-bold text-slate-700 mt-1">Klik tombol <b>Cek Lokasi</b> untuk mulai memeriksa jarak Anda.</p>
+                        <button id="btnCekLokasi" onclick="cekLokasiSekarang()" class="mt-2 w-full text-xs font-extrabold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl py-2 transition"><i class="fa-solid fa-location-crosshairs mr-1"></i>Cek Lokasi Sekarang</button>
+                        <div id="distanceLoading" class="hidden mt-2 text-[11px] font-bold text-slate-500 items-center gap-2"><i class="fa-solid fa-spinner fa-spin"></i>Sedang mengecek lokasi...</div>
+                        <div id="distanceList" class="hidden mt-2 grid grid-cols-1 gap-1 text-[11px]"></div>
                     </div>
 
                     <h3 class="text-left text-sm font-bold text-gray-800 mb-3 ml-1 uppercase tracking-wider">Pilih Tipe Absensi</h3>
@@ -893,6 +895,7 @@
         let filteredHarian = [], filteredPegawai = [];
         let popupScannerWindow = null;
         let appSettingsCache = {};
+        let isManualCheckingLocation = false;
 
         let currentPgHarian = 1, rowsPerPageHarian = 10;
         let currentPgPegawai = 1, rowsPerPagePegawai = 10;
@@ -1070,7 +1073,6 @@
                         document.getElementById('gpsTitle').innerText = "Lokasi Terhubung";
                         document.getElementById('gpsTitle').classList.replace('text-gray-800', 'text-green-700');
                         document.getElementById('gpsDetails').innerHTML = `Akurasi: <b class="text-green-700">${acc}m</b>. Siap absen.`;
-                        updateDistanceInfo();
                     },
                     (err) => {
                         document.getElementById('gpsIcon').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
@@ -1101,6 +1103,7 @@
             const badge = document.getElementById('distanceBadge');
             const list = document.getElementById('distanceList');
             if (!text || !badge || !list || !currentUserLat || !currentUserLng) return;
+            if (!isManualCheckingLocation) return;
 
             const lokasiRefs = [
                 { nama: "Puskesmas", lat: parseFloat(appSettingsCache.Lat_Puskesmas || 0), lng: parseFloat(appSettingsCache.Lng_Puskesmas || 0), rad: parseFloat(appSettingsCache.Rad_Puskesmas || 100) },
@@ -1119,6 +1122,11 @@
                 return `<div class="px-2 py-1 rounded-lg ${cls}"><b>${l.nama}:</b> ${Math.round(d)} m <span class="opacity-70">(R ${Math.round(l.rad)}m)</span></div>`;
             }).join('');
             list.innerHTML = htmlRows;
+            list.classList.remove('hidden');
+            const loading = document.getElementById('distanceLoading');
+            if (loading) { loading.classList.add('hidden'); loading.classList.remove('flex'); }
+            const btn = document.getElementById('btnCekLokasi');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-rotate-right mr-1"></i>Cek Ulang Lokasi'; }
 
             text.innerHTML = `Terdekat saat ini: <b>${terdekat.nama}</b> (${Math.round(terdekat.jarak)} meter).`;
             if (terdekat.jarak <= terdekat.rad) {
@@ -1131,6 +1139,38 @@
                 badge.innerText = "Terlalu Jauh";
                 badge.className = "text-[10px] font-extrabold px-2 py-1 rounded-full bg-red-100 text-red-700";
             }
+        }
+
+        function cekLokasiSekarang() {
+            isManualCheckingLocation = true;
+            const loading = document.getElementById('distanceLoading');
+            const list = document.getElementById('distanceList');
+            const badge = document.getElementById('distanceBadge');
+            const text = document.getElementById('distanceText');
+            const btn = document.getElementById('btnCekLokasi');
+            if (loading) { loading.classList.remove('hidden'); loading.classList.add('flex'); }
+            if (list) list.classList.add('hidden');
+            if (badge) { badge.innerText = 'Mengecek...'; badge.className = 'text-[10px] font-extrabold px-2 py-1 rounded-full bg-slate-200 text-slate-700'; }
+            if (text) text.innerText = 'Sedang mengambil posisi terbaru...';
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Memproses...'; }
+
+            if (!navigator.geolocation) return finishCekLokasiError('Browser tidak mendukung GPS.');
+            navigator.geolocation.getCurrentPosition((pos) => {
+                currentUserLat = pos.coords.latitude;
+                currentUserLng = pos.coords.longitude;
+                updateDistanceInfo();
+            }, () => finishCekLokasiError('Gagal mendapatkan lokasi. Pastikan GPS aktif.'), { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+        }
+
+        function finishCekLokasiError(msg) {
+            const loading = document.getElementById('distanceLoading');
+            const badge = document.getElementById('distanceBadge');
+            const text = document.getElementById('distanceText');
+            const btn = document.getElementById('btnCekLokasi');
+            if (loading) { loading.classList.add('hidden'); loading.classList.remove('flex'); }
+            if (badge) { badge.innerText = 'GPS Error'; badge.className = 'text-[10px] font-extrabold px-2 py-1 rounded-full bg-red-100 text-red-700'; }
+            if (text) text.innerText = msg;
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-location-crosshairs mr-1"></i>Cek Lokasi Sekarang'; }
         }
 
         function hitungJarakClient(lat1, lon1, lat2, lon2) {
