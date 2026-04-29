@@ -682,14 +682,42 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
-                    <h3 class="text-lg font-extrabold text-gray-800 mb-5 pb-3 border-b border-gray-100"><i class="fa-solid fa-house-medical-circle-check text-pusk-blue mr-2"></i> Area Absen Polindes</h3>
-                    <p class="text-xs text-gray-500 mb-4"><i class="fa-solid fa-info-circle text-blue-500 mr-1"></i> Khusus petugas Polindes, titik kordinat tetap terekam namun radius blokir ditiadakan (Bypass).</p>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 ml-1">Latitude</label><input type="text" id="setLatPol" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-mono"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 ml-1">Longitude</label><input type="text" id="setLngPol" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-mono"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 ml-1">Radius (m)</label><input type="number" id="setRadPol" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold"></div>
+                    <h3 class="text-lg font-extrabold text-gray-800 mb-5 pb-3 border-b border-gray-100"><i class="fa-solid fa-house-medical-circle-check text-pusk-blue mr-2"></i> Tagging Lokasi Polindes</h3>
+                    <p class="text-xs text-gray-500 mb-4"><i class="fa-solid fa-info-circle text-blue-500 mr-1"></i> Isi koordinat/radius per lokasi induk Polindes agar scan menyesuaikan otomatis.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-purple-50 border border-purple-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-purple-700 mb-2 uppercase">Polindes Tebing Raya</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="text" id="setLatPolTebing" placeholder="Lat" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="text" id="setLngPolTebing" placeholder="Lng" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="number" id="setRadPolTebing" placeholder="Rad(m)" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold">
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-purple-700 mb-2 uppercase">Polindes Mungguk Bantok</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="text" id="setLatPolMungguk" placeholder="Lat" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="text" id="setLngPolMungguk" placeholder="Lng" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="number" id="setRadPolMungguk" placeholder="Rad(m)" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold">
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-purple-700 mb-2 uppercase">Polindes Kebiau Baru</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="text" id="setLatPolKebiau" placeholder="Lat" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="text" id="setLngPolKebiau" placeholder="Lng" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="number" id="setRadPolKebiau" placeholder="Rad(m)" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold">
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-100 rounded-xl p-3">
+                            <p class="text-[11px] font-extrabold text-purple-700 mb-2 uppercase">Polindes Jerora Satu</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="text" id="setLatPolJerora" placeholder="Lat" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="text" id="setLngPolJerora" placeholder="Lng" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono">
+                                <input type="number" id="setRadPolJerora" placeholder="Rad(m)" class="w-full px-2 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold">
+                            </div>
+                        </div>
                     </div>
-                    <button onclick="getCurrentLocFor('Pol')" class="w-full md:w-auto px-6 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 py-2.5 rounded-xl transition"><i class="fa-solid fa-location-crosshairs mr-1"></i> Ambil Koordinat Sekarang</button>
                 </div>
             </div>
             <div class="mt-8 flex justify-end">
@@ -784,7 +812,7 @@
                             <option value="Kontrak BLUD" selected>Kontrak BLUD</option><option value="Magang">Magang</option><option value="Mahasiswa Magang">Mahasiswa Magang</option>
                         </select>
                     </div>
-                    <div><label class="block text-xs font-bold text-gray-600 uppercase mb-2">Lokasi Induk</label><select id="inLokasi" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-sm"><option value="Puskesmas">Puskesmas</option><option value="Polindes">Polindes</option></select></div>
+                    <div><label class="block text-xs font-bold text-gray-600 uppercase mb-2">Lokasi Induk</label><select id="inLokasi" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-sm"><option value="Puskesmas">Puskesmas</option><option value="Polindes Tebing Raya">Polindes Tebing Raya</option><option value="Polindes Mungguk Bantok">Polindes Mungguk Bantok</option><option value="Polindes Kebiau Baru">Polindes Kebiau Baru</option><option value="Polindes Jerora Satu">Polindes Jerora Satu</option></select></div>
                 </div>
             </div>
             <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
@@ -918,9 +946,18 @@
                 document.getElementById('setLatPusk').value = res.Lat_Puskesmas || '';
                 document.getElementById('setLngPusk').value = res.Lng_Puskesmas || '';
                 document.getElementById('setRadPusk').value = res.Rad_Puskesmas || '';
-                document.getElementById('setLatPol').value = res.Lat_Polindes || '';
-                document.getElementById('setLngPol').value = res.Lng_Polindes || '';
-                document.getElementById('setRadPol').value = res.Rad_Polindes || '';
+                document.getElementById('setLatPolTebing').value = res.Lat_Pol_TebingRaya || '';
+                document.getElementById('setLngPolTebing').value = res.Lng_Pol_TebingRaya || '';
+                document.getElementById('setRadPolTebing').value = res.Rad_Pol_TebingRaya || '';
+                document.getElementById('setLatPolMungguk').value = res.Lat_Pol_MunggukBantok || '';
+                document.getElementById('setLngPolMungguk').value = res.Lng_Pol_MunggukBantok || '';
+                document.getElementById('setRadPolMungguk').value = res.Rad_Pol_MunggukBantok || '';
+                document.getElementById('setLatPolKebiau').value = res.Lat_Pol_KebiauBaru || '';
+                document.getElementById('setLngPolKebiau').value = res.Lng_Pol_KebiauBaru || '';
+                document.getElementById('setRadPolKebiau').value = res.Rad_Pol_KebiauBaru || '';
+                document.getElementById('setLatPolJerora').value = res.Lat_Pol_JeroraSatu || '';
+                document.getElementById('setLngPolJerora').value = res.Lng_Pol_JeroraSatu || '';
+                document.getElementById('setRadPolJerora').value = res.Rad_Pol_JeroraSatu || '';
             }).getPengaturan();
         }
 
@@ -936,9 +973,18 @@
                 Lat_Puskesmas: document.getElementById('setLatPusk').value,
                 Lng_Puskesmas: document.getElementById('setLngPusk').value,
                 Rad_Puskesmas: document.getElementById('setRadPusk').value,
-                Lat_Polindes: document.getElementById('setLatPol').value,
-                Lng_Polindes: document.getElementById('setLngPol').value,
-                Rad_Polindes: document.getElementById('setRadPol').value
+                Lat_Pol_TebingRaya: document.getElementById('setLatPolTebing').value,
+                Lng_Pol_TebingRaya: document.getElementById('setLngPolTebing').value,
+                Rad_Pol_TebingRaya: document.getElementById('setRadPolTebing').value,
+                Lat_Pol_MunggukBantok: document.getElementById('setLatPolMungguk').value,
+                Lng_Pol_MunggukBantok: document.getElementById('setLngPolMungguk').value,
+                Rad_Pol_MunggukBantok: document.getElementById('setRadPolMungguk').value,
+                Lat_Pol_KebiauBaru: document.getElementById('setLatPolKebiau').value,
+                Lng_Pol_KebiauBaru: document.getElementById('setLngPolKebiau').value,
+                Rad_Pol_KebiauBaru: document.getElementById('setRadPolKebiau').value,
+                Lat_Pol_JeroraSatu: document.getElementById('setLatPolJerora').value,
+                Lng_Pol_JeroraSatu: document.getElementById('setLngPolJerora').value,
+                Rad_Pol_JeroraSatu: document.getElementById('setRadPolJerora').value
             };
             Swal.fire({title:'Menyimpan...', didOpen:()=>Swal.showLoading()});
             google.script.run.withSuccessHandler(res => {
@@ -952,9 +998,6 @@
             if(tipe === 'Pusk') {
                 document.getElementById('setLatPusk').value = currentUserLat;
                 document.getElementById('setLngPusk').value = currentUserLng;
-            } else {
-                document.getElementById('setLatPol').value = currentUserLat;
-                document.getElementById('setLngPol').value = currentUserLng;
             }
             Swal.fire({icon:'success', title:'Disalin!', toast:true, position:'top-end', timer:2000, showConfirmButton:false});
         }
@@ -1112,8 +1155,9 @@
             Swal.fire({ title: `Memproses ${actionText}...`, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             google.script.run.withSuccessHandler(function(res) {
-                if(res.status === 'SUCCESS_MASUK') { Swal.fire({ icon: 'success', title: 'Absen Masuk Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-pusk-blue">${res.waktu}</span><p class="mt-2 text-gray-600">${res.message}</p></div>`, confirmButtonColor: '#003366'}); }
-                else if (res.status === 'SUCCESS_PULANG') { Swal.fire({ icon: 'success', title: 'Absen Pulang Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-orange-600">${res.waktu}</span><p class="text-sm font-bold text-gray-500 mt-2">TOTAL JAM: ${res.jamKerja}</p><p class="text-gray-600 mt-2">${res.message}</p></div>`, confirmButtonColor: '#003366'}); }
+                const lokasiInfo = `<p class="mt-2 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg py-1 px-2">Lokasi Tugas Induk: ${res.lokasiInduk || '-'}<br>Tagging Lokasi: ${res.lokasiTag || '-'}</p>`;
+                if(res.status === 'SUCCESS_MASUK') { Swal.fire({ icon: 'success', title: 'Absen Masuk Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-pusk-blue">${res.waktu}</span><p class="mt-2 text-gray-600">${res.message}</p>${lokasiInfo}</div>`, confirmButtonColor: '#003366'}); }
+                else if (res.status === 'SUCCESS_PULANG') { Swal.fire({ icon: 'success', title: 'Absen Pulang Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-orange-600">${res.waktu}</span><p class="text-sm font-bold text-gray-500 mt-2">TOTAL JAM: ${res.jamKerja}</p><p class="text-gray-600 mt-2">${res.message}</p>${lokasiInfo}</div>`, confirmButtonColor: '#003366'}); }
                 else if (res.status === 'OUT_OF_RADIUS') {
                     tampilkanFormLuarRadius(res.idQR, res.nama);
                 }
