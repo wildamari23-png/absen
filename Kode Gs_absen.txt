@@ -695,15 +695,38 @@ function getKalenderKerja(bulanName, tahun) {
 
   let holidayNames = [];
   try {
-    const holidayCal = CalendarApp.getCalendarById("id.indonesian#holiday@group.v.calendar.google.com");
-    if (holidayCal) {
-      const events = holidayCal.getEvents(start, end);
-      const uniq = {};
-      events.forEach(ev => {
-        const ds = Utilities.formatDate(ev.getStartTime(), "Asia/Jakarta", "yyyy-MM-dd");
-        uniq[ds + "_" + ev.getTitle()] = { tgl: ds, nama: ev.getTitle() };
-      });
-      holidayNames = Object.values(uniq).sort((a,b)=>a.tgl.localeCompare(b.tgl));
+    const calIds = [
+      "id.indonesian#holiday@group.v.calendar.google.com",
+      "en.indonesian#holiday@group.v.calendar.google.com",
+      "id.holiday@group.v.calendar.google.com"
+    ];
+    let uniq = {};
+    calIds.forEach(id => {
+      try {
+        const c = CalendarApp.getCalendarById(id);
+        if (!c) return;
+        c.getEvents(start, end).forEach(ev => {
+          const ds = Utilities.formatDate(ev.getStartTime(), "Asia/Jakarta", "yyyy-MM-dd");
+          uniq[ds + "_" + ev.getTitle()] = { tgl: ds, nama: ev.getTitle() };
+        });
+      } catch (e) {}
+    });
+    holidayNames = Object.values(uniq).sort((a,b)=>a.tgl.localeCompare(b.tgl));
+
+    // Fallback API publik jika kalender libur tidak tersedia/empty.
+    if (!holidayNames.length) {
+      try {
+        const resp = UrlFetchApp.fetch(`https://date.nager.at/api/v3/PublicHolidays/${y}/ID`, { muteHttpExceptions: true });
+        if (resp.getResponseCode() === 200) {
+          const arr = JSON.parse(resp.getContentText() || "[]");
+          arr.forEach(h => {
+            if (!h || !h.date) return;
+            const hm = String(h.date).slice(5, 7);
+            if (parseInt(hm, 10) !== (m + 1)) return;
+            holidayNames.push({ tgl: h.date, nama: h.localName || h.name || "Libur Nasional" });
+          });
+        }
+      } catch (apiErr) {}
     }
   } catch (e) {
     holidayNames = [];
