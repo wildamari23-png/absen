@@ -473,8 +473,9 @@
                     <p class="text-sm text-gray-500">Monitor, set manual, dan kelola absensi per hari.</p>
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
-                    <button onclick="loadAbsenHarian()" class="bg-white text-gray-700 px-4 py-2 rounded-xl shadow-sm font-bold border border-gray-200 hover:bg-gray-50 transition"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    <button onclick="loadAbsenHarian(); if(document.getElementById('scanView') && document.getElementById('scanView').classList.contains('active')) cekLokasiSekarang();" class="bg-white text-gray-700 px-4 py-2 rounded-xl shadow-sm font-bold border border-gray-200 hover:bg-gray-50 transition"><i class="fa-solid fa-arrows-rotate"></i></button>
                     <button onclick="cetakPDFHarian()" class="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md font-bold hover:bg-blue-700 transition"><i class="fa-solid fa-download mr-1"></i> PDF Hari Ini</button>
+                    <button onclick="cetakPDFStatusHarian()" class="flex-1 sm:flex-none bg-amber-600 text-white px-4 py-2 rounded-xl shadow-md font-bold hover:bg-amber-700 transition"><i class="fa-solid fa-filter-circle-xmark mr-1"></i> PDF Status</button>
                 </div>
             </div>
 
@@ -845,7 +846,7 @@
                 </div>
 
                 <div><label class="block text-xs font-bold text-gray-600 uppercase mb-2">Posisi Jabatan</label><input type="text" id="inJabatan" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pusk-blue outline-none"></div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Status Ikatan</label>
                         <select id="inStatus" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-sm">
@@ -854,6 +855,7 @@
                         </select>
                     </div>
                     <div><label class="block text-xs font-bold text-gray-600 uppercase mb-2">Lokasi Induk</label><select id="inLokasi" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-sm"><option value="Puskesmas">Puskesmas</option><option value="Polindes Tebing Raya">Polindes Tebing Raya</option><option value="Polindes Mungguk Bantok">Polindes Mungguk Bantok</option><option value="Polindes Kebiau Baru">Polindes Kebiau Baru</option><option value="Polindes Jerora Satu">Polindes Jerora Satu</option></select></div>
+                    <div><label class="block text-xs font-bold text-gray-600 uppercase mb-2">Kunci Jam</label><select id="inKunci" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-sm"><option value="IYA">IYA</option><option value="TIDAK">TIDAK</option></select></div>
                 </div>
             </div>
             <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
@@ -1850,13 +1852,14 @@ function renderTablePegawai(resetPg = false) {
             let eStat = (p[4] || '').toString().replace(/'/g, "\\'").replace(/"/g, "&quot;");
             let eLok = (p[5] || '').toString().replace(/'/g, "\\'").replace(/"/g, "&quot;");
             let eGol = (p[6] || '').toString().replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            let eKunci = (p[7] || 'IYA').toString().replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
             html += `<tr class="hover:bg-gray-50 border-b border-gray-100">
                 <td class="px-4 py-3"><div class="font-bold text-gray-800 text-[12px]">${p[1]}</div><div class="text-[10px] font-mono text-gray-500">${p[2] || '-'}</div></td>
                 <td class="px-4 py-3"><div class="text-xs font-bold text-pusk-blue">${golVal}</div><span class="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-gray-100 text-gray-600">${p[4]}</span></td>
                 <td class="px-4 py-3"><div class="text-[11px] text-gray-700 font-bold mb-1">${p[3]}</div><span class="px-2 py-1 text-[9px] font-bold uppercase rounded border ${badgeLoc}">${p[5]}</span></td>
                 <td class="px-4 py-3 text-center"><div class="flex justify-center gap-1">
-                    <button onclick="bukaModalEdit('${eId}','${eNama}','${eNip}','${eJab}','${eStat}','${eLok}', '${eGol}')" class="text-white bg-yellow-500 hover:bg-yellow-600 px-2 py-1.5 rounded text-xs"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="bukaModalEdit('${eId}','${eNama}','${eNip}','${eJab}','${eStat}','${eLok}', '${eGol}','${eKunci}')" class="text-white bg-yellow-500 hover:bg-yellow-600 px-2 py-1.5 rounded text-xs"><i class="fa-solid fa-pen"></i></button>
                     <button onclick="hapusPegawai('${eId}')" class="text-white bg-red-500 hover:bg-red-600 px-2 py-1.5 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                     <button onclick="previewCard('${eId}', '${eNama}', '${eNip}')" class="text-pusk-blue bg-blue-50 border border-blue-200 px-2 py-1.5 rounded text-xs font-bold"><i class="fa-solid fa-id-badge"></i></button>
                 </div></td></tr>`;
@@ -1870,11 +1873,11 @@ function renderTablePegawai(resetPg = false) {
 
         function bukaModalTambah() {
             document.getElementById('modalTitlePegawai').innerText = "Tambah Pegawai Baru"; document.getElementById('inIdQR').value = "";
-            document.getElementById('inNama').value = ""; document.getElementById('inNip').value = ""; document.getElementById('inJabatan').value = ""; document.getElementById('inGolongan').value = "-";
+            document.getElementById('inNama').value = ""; document.getElementById('inNip').value = ""; document.getElementById('inJabatan').value = ""; document.getElementById('inGolongan').value = "-"; document.getElementById('inKunci').value = "IYA";
             document.getElementById('modalTambahPegawai').classList.remove('hidden');
         }
 
-        function bukaModalEdit(id, nama, nip, jabatan, status, lokasi, golongan) {
+        function bukaModalEdit(id, nama, nip, jabatan, status, lokasi, golongan, kunci) {
             document.getElementById('modalTitlePegawai').innerText = "Edit Data Pegawai";
             document.getElementById('inIdQR').value = id;
             document.getElementById('inNama').value = nama;
@@ -1896,12 +1899,13 @@ function renderTablePegawai(resetPg = false) {
             let golEl = document.getElementById('inGolongan');
             let golOpts = Array.from(golEl.options).map(o => o.value);
             if(golOpts.includes(golongan)) golEl.value = golongan; else golEl.value = "-";
+            document.getElementById('inKunci').value = (kunci || "IYA").toUpperCase() === "TIDAK" ? "TIDAK" : "IYA";
 
             document.getElementById('modalTambahPegawai').classList.remove('hidden');
         }
 
         function simpanDataPegawai() {
-            let data = { idQR: document.getElementById('inIdQR').value, nama: document.getElementById('inNama').value, nip: document.getElementById('inNip').value, jabatan: document.getElementById('inJabatan').value, status: document.getElementById('inStatus').value, lokasi: document.getElementById('inLokasi').value, golongan: document.getElementById('inGolongan').value };
+            let data = { idQR: document.getElementById('inIdQR').value, nama: document.getElementById('inNama').value, nip: document.getElementById('inNip').value, jabatan: document.getElementById('inJabatan').value, status: document.getElementById('inStatus').value, lokasi: document.getElementById('inLokasi').value, golongan: document.getElementById('inGolongan').value, kunci: document.getElementById('inKunci').value };
             if(!data.nama || !data.jabatan) return Swal.fire('Error', 'Nama dan Jabatan wajib', 'warning');
             Swal.fire({title:'Menyimpan Data...', didOpen:()=>Swal.showLoading()});
             if(data.idQR) { google.script.run.withSuccessHandler(res => { Swal.fire('Berhasil', res.message, 'success'); document.getElementById('modalTambahPegawai').classList.add('hidden'); loadDataPegawai(); }).editPegawai(data); }
@@ -2043,6 +2047,22 @@ function renderTablePegawai(resetPg = false) {
 
     tambahTandaTangan(doc, window.kapusParams, tglFormatted, tglFormatted, pageWidth, true);
     doc.save(`Absen_Harian_${tgl}.pdf`);
+    Swal.close();
+}
+
+    function cetakPDFStatusHarian() {
+    const tgl = document.getElementById('filterTglHarian').value;
+    if(!tgl || dataAbsenHarianRaw.length === 0) return Swal.fire('Error', 'Pilih tanggal dan pastikan ada data.', 'warning');
+    const allowed = ['BELUM ABSEN', 'SAKIT', 'IZIN', 'TL', 'TUGAS LUAR', 'ALPA'];
+    const filtered = dataAbsenHarianRaw.filter(r => allowed.includes(String(r.keterangan || '').toUpperCase()));
+    if(filtered.length === 0) return Swal.fire('Info', 'Tidak ada data status Belum Absen/Sakit/Izin/TL/ALPA pada tanggal ini.', 'info');
+    Swal.fire({title: 'Memproses PDF Status...', didOpen: () => Swal.showLoading()});
+    const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: "portrait" });
+    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text("LAPORAN STATUS KEHADIRAN HARIAN", 14, 15);
+    doc.setFont("helvetica", "normal"); doc.text(`Tanggal: ${tgl}`, 14, 21);
+    const rows = filtered.map((r,i)=>[i+1, r.nama, r.jabatan, r.keterangan, r.alasan || '-']);
+    doc.autoTable({ startY: 26, head: [['No','Nama','Jabatan','Status','Catatan']], body: rows, styles:{fontSize:8}, headStyles:{fillColor:[245,158,11]} });
+    doc.save(`Status_Harian_${tgl}.pdf`);
     Swal.close();
 }
 
