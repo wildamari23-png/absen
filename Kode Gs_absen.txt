@@ -678,6 +678,51 @@ function getMonthNumber_(bulanName) {
   return map[String(bulanName || "").toUpperCase()] || "01";
 }
 
+function getKalenderKerja(bulanName, tahun) {
+  const monthMap = { "JANUARI":0,"FEBRUARI":1,"MARET":2,"APRIL":3,"MEI":4,"JUNI":5,"JULI":6,"AGUSTUS":7,"SEPTEMBER":8,"OKTOBER":9,"NOVEMBER":10,"DESEMBER":11 };
+  const m = monthMap[String(bulanName || "").toUpperCase()];
+  const y = parseInt(tahun, 10);
+  if (isNaN(m) || isNaN(y)) return { targetHariKerja: 0, detailLibur: [] };
+
+  const start = new Date(y, m, 1, 0, 0, 0);
+  const end = new Date(y, m + 1, 1, 0, 0, 0);
+
+  let weekdays = 0;
+  for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+    const day = d.getDay();
+    if (day !== 0 && day !== 6) weekdays++;
+  }
+
+  let holidayNames = [];
+  try {
+    const holidayCal = CalendarApp.getCalendarById("id.indonesian#holiday@group.v.calendar.google.com");
+    if (holidayCal) {
+      const events = holidayCal.getEvents(start, end);
+      const uniq = {};
+      events.forEach(ev => {
+        const ds = Utilities.formatDate(ev.getStartTime(), "Asia/Jakarta", "yyyy-MM-dd");
+        uniq[ds + "_" + ev.getTitle()] = { tgl: ds, nama: ev.getTitle() };
+      });
+      holidayNames = Object.values(uniq).sort((a,b)=>a.tgl.localeCompare(b.tgl));
+    }
+  } catch (e) {
+    holidayNames = [];
+  }
+
+  const holidayWeekdays = holidayNames.filter(h => {
+    const d = new Date(h.tgl + "T00:00:00");
+    const day = d.getDay();
+    return day !== 0 && day !== 6;
+  });
+
+  return {
+    targetHariKerja: Math.max(0, weekdays - holidayWeekdays.length),
+    totalWeekdays: weekdays,
+    totalLiburNasionalWeekday: holidayWeekdays.length,
+    detailLibur: holidayWeekdays
+  };
+}
+
 // 7. ABSENSI MANUAL KEGIATAN
 function getPegawaiEligibleKegiatan(tglStr) {
   let parts = tglStr.split('-');

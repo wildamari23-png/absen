@@ -788,7 +788,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-end relative z-10 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Pilih Bulan</label>
-                        <select id="lapBulan" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
+                        <select id="lapBulan" onchange="hitungHariKerjaOtomatis()" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
                             <option value="JANUARI">Januari</option><option value="FEBRUARI">Februari</option><option value="MARET" selected>Maret</option>
                             <option value="APRIL">April</option><option value="MEI">Mei</option><option value="JUNI">Juni</option>
                             <option value="JULI">Juli</option><option value="AGUSTUS">Agustus</option><option value="SEPTEMBER">September</option>
@@ -797,7 +797,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Pilih Tahun</label>
-                        <select id="lapTahun" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
+                        <select id="lapTahun" onchange="hitungHariKerjaOtomatis()" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
                             <option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option>
                         </select>
                     </div>
@@ -805,6 +805,12 @@
                         <label class="block text-xs font-bold text-red-600 uppercase mb-2"><i class="fa-solid fa-asterisk"></i> Target Hari Kerja</label>
                         <input type="number" id="lapHariKerja" class="w-full px-4 py-3 bg-red-50 border-2 border-red-200 rounded-xl font-extrabold text-red-700 text-center text-lg" value="17">
                     </div>
+                </div>
+                <div id="liburInfoBox" class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-6 text-xs">
+                    <p class="font-extrabold text-gray-700"><i class="fa-solid fa-calendar-check mr-1"></i>Auto Hitung Hari Kerja</p>
+                    <p id="liburSummary" class="text-gray-600 mt-1">Memuat data libur nasional...</p>
+                    <ul id="liburDetailList" class="mt-2 list-disc pl-5 text-gray-600 space-y-0.5 max-h-28 overflow-y-auto"></ul>
+                    <p class="text-[10px] text-gray-500 mt-2">*Nilai target masih bisa Anda edit manual jika dibutuhkan.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
@@ -931,6 +937,9 @@
             document.getElementById('kegTgl').value = todayStr;
             jalankanJam();
             muatIdentitasAplikasi();
+            hitungHariKerjaOtomatis();
+            const savedUser = localStorage.getItem('pusk_saved_user');
+            if (savedUser) document.getElementById('logUser').value = savedUser;
             window.addEventListener('message', handlePopupScanMessage);
         });
 
@@ -1399,15 +1408,33 @@
             if(!u || !p) return Swal.fire('Perhatian', 'Isi Username & Password.', 'warning');
             Swal.fire({title: 'Memverifikasi...', didOpen: () => Swal.showLoading()});
             google.script.run.withSuccessHandler(res => {
-                if(res.status) { Swal.close(); isAdminLoggedIn = true; navTo('dashView'); document.getElementById('adminMenu').style.display = 'flex'; }
+                if(res.status) { localStorage.setItem('pusk_saved_user', u); Swal.close(); isAdminLoggedIn = true; navTo('dashView'); document.getElementById('adminMenu').style.display = 'flex'; }
                 else Swal.fire('Ditolak', res.message, 'error');
             }).cekLogin(u, p);
         }
 
         function logoutAdmin() {
             isAdminLoggedIn = false; document.getElementById('adminMenu').style.display = 'none';
-            document.getElementById('logUser').value = ''; document.getElementById('logPass').value = '';
+            document.getElementById('logPass').value = '';
             navTo('scanView'); Swal.fire({icon:'success', title:'Logout Berhasil', toast:true, position:'top-end', timer:2000, showConfirmButton:false});
+        }
+
+        function hitungHariKerjaOtomatis() {
+            const bln = document.getElementById('lapBulan')?.value;
+            const thn = document.getElementById('lapTahun')?.value;
+            if (!bln || !thn) return;
+            const summary = document.getElementById('liburSummary');
+            const list = document.getElementById('liburDetailList');
+            summary.innerText = 'Menghitung hari kerja otomatis...';
+            list.innerHTML = '';
+            google.script.run.withSuccessHandler(res => {
+                document.getElementById('lapHariKerja').value = res.targetHariKerja || 0;
+                summary.innerHTML = `Hari kerja weekday: <b>${res.totalWeekdays || 0}</b>, Libur nasional (weekday): <b>${res.totalLiburNasionalWeekday || 0}</b>, Target: <b>${res.targetHariKerja || 0}</b>`;
+                list.innerHTML = (res.detailLibur || []).length ? res.detailLibur.map(h => `<li>${h.tgl} — ${h.nama}</li>`).join('') : '<li>Tidak ada libur nasional weekday pada bulan ini.</li>';
+            }).withFailureHandler(() => {
+                summary.innerText = 'Gagal mengambil kalender libur nasional.';
+                list.innerHTML = '<li>Silakan isi target hari kerja manual.</li>';
+            }).getKalenderKerja(bln, thn);
         }
 
         // ==========================================
