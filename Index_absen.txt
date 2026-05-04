@@ -2145,7 +2145,14 @@ function renderTablePegawai(resetPg = false) {
                 doc.text(`BULAN: ${bln} ${thn}`, 14, 27);
                 let tableData = [];
                 asnRows.forEach((r, i) => tableData.push([ i + 1, r.nama_nip, r.gol, r.jabatan + "\n" + r.status, r.hari_kerja || 0, r.hadir || 0, r.sakit || 0, r.izin || 0, r.cuti || 0, r.tl || 0, r.alpa || 0 ]));
-                doc.autoTable({ startY: 32, head: [[{content: 'NO', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'NAMA / NIP', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'PANGKAT\n/ GOL', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'JABATAN', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'HARI\nKERJA', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'ABSENSI', colSpan: 6, styles: {halign: 'center'}}], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'TL', 'ALPA']], body: tableData, styles: { fontSize: 7, cellPadding: 1.2, valign: 'middle' }, headStyles: { fillColor: [22, 163, 74], textColor: 255 }, columnStyles: { 0: {halign:'center',cellWidth:8},1:{cellWidth:40},2:{cellWidth:22,halign:'center'},3:{cellWidth:35},4:{halign:'center',cellWidth:15},5:{halign:'center',cellWidth:12},6:{halign:'center',cellWidth:12},7:{halign:'center',cellWidth:12},8:{halign:'center',cellWidth:12},9:{halign:'center',cellWidth:12},10:{halign:'center',cellWidth:12} } });
+                doc.autoTable({
+                    startY: 42,
+                    head: [[{content: 'NO', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'NAMA / NIP', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'PANGKAT\n/ GOL', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'JABATAN', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'HARI\nKERJA', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'ABSENSI', colSpan: 6, styles: {halign: 'center'}}], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'TL', 'ALPA']],
+                    body: tableData,
+                    styles: { fontSize: 7, cellPadding: 1.2, valign: 'middle', lineColor: [80, 80, 80], lineWidth: 0.1, textColor: [20, 20, 20] },
+                    headStyles: { fillColor: [255, 255, 255], textColor: [20, 20, 20], lineColor: [50, 50, 50], lineWidth: 0.2 },
+                    columnStyles: { 0: {halign:'center',cellWidth:8},1:{cellWidth:40},2:{cellWidth:22,halign:'center'},3:{cellWidth:35},4:{halign:'center',cellWidth:15},5:{halign:'center',cellWidth:12},6:{halign:'center',cellWidth:12},7:{halign:'center',cellWidth:12},8:{halign:'center',cellWidth:12},9:{halign:'center',cellWidth:12},10:{halign:'center',cellWidth:12} }
+                });
                 tambahTandaTangan(doc, res, bln, thn, pW, false); doc.save(`Rekap_ASN_${bln}_${thn}.pdf`); Swal.close();
             }).getRekapitulasi(bln, thn, hariKerja);
         }
