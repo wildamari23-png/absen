@@ -814,6 +814,9 @@
                     <button onclick="generatePDFDetail()" class="w-full bg-gradient-to-r from-blue-500 to-blue-400 hover:from-blue-600 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
                         <i class="fa-solid fa-business-time mr-2"></i> Laporan Total Jam Kerja
                     </button>
+                    <button onclick="generatePDFASN()" class="w-full md:col-span-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
+                        <i class="fa-solid fa-user-shield mr-2"></i> Laporan Khusus ASN
+                    </button>
                 </div>
             </div>
         </section>
@@ -2064,19 +2067,35 @@ function renderTablePegawai(resetPg = false) {
     Swal.close();
 }
 
-    function cetakPDFStatusHarian() {
+    async function cetakPDFStatusHarian() {
     const tgl = document.getElementById('filterTglHarian').value;
     if(!tgl || dataAbsenHarianRaw.length === 0) return Swal.fire('Error', 'Pilih tanggal dan pastikan ada data.', 'warning');
-    const allowed = ['BELUM ABSEN', 'SAKIT', 'IZIN', 'TL', 'TUGAS LUAR', 'ALPA'];
+    const pick = await Swal.fire({
+        title: 'Pilih Status untuk PDF',
+        html: `<div class="text-left text-sm space-y-2">
+            <label><input type="checkbox" class="st-pdf" value="BELUM ABSEN" checked> Belum Absen</label><br>
+            <label><input type="checkbox" class="st-pdf" value="SAKIT" checked> Sakit</label><br>
+            <label><input type="checkbox" class="st-pdf" value="IZIN" checked> Izin</label><br>
+            <label><input type="checkbox" class="st-pdf" value="TL" checked> TL</label><br>
+            <label><input type="checkbox" class="st-pdf" value="TUGAS LUAR" checked> Tugas Luar</label><br>
+            <label><input type="checkbox" class="st-pdf" value="ALPA" checked> ALPA</label>
+        </div>`,
+        showCancelButton: true,
+        confirmButtonText: 'Generate PDF',
+        preConfirm: () => Array.from(document.querySelectorAll('.st-pdf:checked')).map(e => e.value)
+    });
+    if (!pick.isConfirmed) return;
+    const allowed = pick.value || [];
+    if (allowed.length === 0) return Swal.fire('Perhatian', 'Pilih minimal 1 status.', 'warning');
     const filtered = dataAbsenHarianRaw.filter(r => allowed.includes(String(r.keterangan || '').toUpperCase()));
-    if(filtered.length === 0) return Swal.fire('Info', 'Tidak ada data status Belum Absen/Sakit/Izin/TL/ALPA pada tanggal ini.', 'info');
+    if(filtered.length === 0) return Swal.fire('Info', 'Tidak ada data sesuai status yang dipilih.', 'info');
     Swal.fire({title: 'Memproses PDF Status...', didOpen: () => Swal.showLoading()});
     const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: "portrait" });
     doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text("LAPORAN STATUS KEHADIRAN HARIAN", 14, 15);
     doc.setFont("helvetica", "normal"); doc.text(`Tanggal: ${tgl}`, 14, 21);
     const rows = filtered.map((r,i)=>[i+1, r.nama, r.jabatan, r.keterangan, r.alasan || '-']);
     doc.autoTable({ startY: 26, head: [['No','Nama','Jabatan','Status','Catatan']], body: rows, styles:{fontSize:8}, headStyles:{fillColor:[245,158,11]} });
-    doc.save(`Status_Harian_${tgl}.pdf`);
+    doc.save(`Status_Harian_${tgl}_${allowed.join('-').replace(/\s+/g,'_')}.pdf`);
     Swal.close();
 }
 
@@ -2109,6 +2128,25 @@ function renderTablePegawai(resetPg = false) {
                 });
 
                 tambahTandaTangan(doc, res, bln, thn, pW, false); doc.save(`Rekap_Kehadiran_${bln}_${thn}.pdf`); Swal.close();
+            }).getRekapitulasi(bln, thn, hariKerja);
+        }
+
+        function generatePDFASN() {
+            const bln = document.getElementById('lapBulan').value; const thn = document.getElementById('lapTahun').value; const hariKerja = document.getElementById('lapHariKerja').value;
+            if(!hariKerja) return Swal.fire('Error', 'Isi Target Hari Kerja.', 'warning');
+            Swal.fire({title: 'Menyusun Laporan ASN...', didOpen: () => Swal.showLoading()});
+            google.script.run.withSuccessHandler(function(res) {
+                const asnRows = (res.rekapData || []).filter(r => String(r.status || '').toUpperCase().includes('ASN'));
+                if(asnRows.length === 0) return Swal.fire('Data Kosong', 'Tidak ada data ASN pada periode ini.', 'info');
+                const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: "landscape" }); const pW = doc.internal.pageSize.width;
+                doc.setFontSize(10); doc.setFont("helvetica", "bold");
+                doc.text("REKAPITULASI BULANAN CAPAIAN PRODUKTIVITAS KERJA PEGAWAI (ASN) BERDASARKAN LAPORAN KERJA HARIAN PEGAWAI", 14, 15);
+                doc.text(res.namaPuskesmas.toUpperCase(), 14, 21);
+                doc.text(`BULAN: ${bln} ${thn}`, 14, 27);
+                let tableData = [];
+                asnRows.forEach((r, i) => tableData.push([ i + 1, r.nama_nip, r.gol, r.jabatan + "\n" + r.status, r.hari_kerja || 0, r.hadir || 0, r.sakit || 0, r.izin || 0, r.cuti || 0, r.tl || 0, r.alpa || 0 ]));
+                doc.autoTable({ startY: 32, head: [[{content: 'NO', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'NAMA / NIP', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'PANGKAT\n/ GOL', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'JABATAN', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'HARI\nKERJA', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'ABSENSI', colSpan: 6, styles: {halign: 'center'}}], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'TL', 'ALPA']], body: tableData, styles: { fontSize: 7, cellPadding: 1.2, valign: 'middle' }, headStyles: { fillColor: [22, 163, 74], textColor: 255 }, columnStyles: { 0: {halign:'center',cellWidth:8},1:{cellWidth:40},2:{cellWidth:22,halign:'center'},3:{cellWidth:35},4:{halign:'center',cellWidth:15},5:{halign:'center',cellWidth:12},6:{halign:'center',cellWidth:12},7:{halign:'center',cellWidth:12},8:{halign:'center',cellWidth:12},9:{halign:'center',cellWidth:12},10:{halign:'center',cellWidth:12} } });
+                tambahTandaTangan(doc, res, bln, thn, pW, false); doc.save(`Rekap_ASN_${bln}_${thn}.pdf`); Swal.close();
             }).getRekapitulasi(bln, thn, hariKerja);
         }
 

@@ -625,10 +625,19 @@ function getRekapitulasi(bulan, tahun, hariKerjaInput) {
     let totalMenitBulanIni = 0;
 
     dAbsen.forEach(a => {
-      let absBln = String(a[2]).trim().toUpperCase();
-      let absThn = String(a[3]).trim();
+      let isMatchMonth = false;
+      let tanggalRaw = a[1];
+      if (tanggalRaw instanceof Date) {
+        isMatchMonth = (tanggalRaw.getMonth() + 1 === parseInt(getMonthNumber_(bulan), 10) && tanggalRaw.getFullYear() === parseInt(tahun, 10));
+      } else {
+        let tglTxt = String(tanggalRaw || "").replace(/'/g, "").trim();
+        let parts = tglTxt.split("/");
+        if (parts.length === 3) {
+          isMatchMonth = (parseInt(parts[1], 10) === parseInt(getMonthNumber_(bulan), 10) && parseInt(parts[2], 10) === parseInt(tahun, 10));
+        }
+      }
 
-      if(a[4] === p[0] && absBln === bulan.toUpperCase() && absThn === tahun.toString()) {
+      if(a[4] === p[0] && isMatchMonth) {
         let ket = String(a[10]).toUpperCase().trim();
         if(ket === "HADIR") hadir++; else if(ket === "SAKIT") sakit++; else if(ket === "IZIN") izin++; else if(ket === "CUTI") cuti++; else if(ket === "TL" || ket === "TUGAS LUAR") tl++; else if(ket === "ALPA") alpaTercatat++;
         if(a[8] && a[8] !== "-") {
@@ -658,6 +667,15 @@ function getRekapitulasi(bulan, tahun, hariKerjaInput) {
     namaPuskesmas: settings.Nama_Puskesmas || "UPTD PUSKESMAS TANJUNG PURI SINTANG",
     kapusNama: settings.Kepala_Nama || ".......................", kapusNip: settings.Kepala_NIP || "NIP. ....................."
   };
+}
+
+function getMonthNumber_(bulanName) {
+  const map = {
+    "JANUARI": "01", "FEBRUARI": "02", "MARET": "03", "APRIL": "04",
+    "MEI": "05", "JUNI": "06", "JULI": "07", "AGUSTUS": "08",
+    "SEPTEMBER": "09", "OKTOBER": "10", "NOVEMBER": "11", "DESEMBER": "12"
+  };
+  return map[String(bulanName || "").toUpperCase()] || "01";
 }
 
 // 7. ABSENSI MANUAL KEGIATAN
