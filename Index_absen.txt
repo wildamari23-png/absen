@@ -175,6 +175,13 @@
             position: relative; z-index: 10; background: white; border-radius: 50%;
             width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
         }
+        .running-wrap { overflow: hidden; white-space: nowrap; }
+        .running-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: runningText 18s linear infinite;
+        }
+        @keyframes runningText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
     </style>
 </head>
 <body class="text-gray-800 h-screen flex flex-col">
@@ -220,6 +227,9 @@
         <section id="scanView" class="page-section active">
             <div class="flex flex-col items-center justify-center min-h-[75vh]">
                 <div class="glass-panel p-8 rounded-3xl w-full max-w-md text-center shadow-xl border-t-4 border-pusk-blue relative overflow-hidden">
+                    <div class="running-wrap -mx-8 -mt-8 mb-5 py-2 px-3 bg-gradient-to-r from-pusk-blue to-blue-700 text-white text-[11px] font-extrabold tracking-wide">
+                        <span id="runningTextMsg" class="running-text">Selamat datang di Portal Absensi Digital — disiplin, cepat, dan presisi.</span>
+                    </div>
                     <div class="absolute -top-10 -right-10 w-32 h-32 bg-pusk-yellow opacity-10 rounded-full blur-2xl"></div>
                     <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-pusk-blue opacity-5 rounded-full blur-2xl"></div>
 
@@ -653,6 +663,7 @@
                             <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1">Teks Kecil di Bawah Nama (Header)</label><input type="text" id="setAppHeaderName" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold" placeholder="Sistem Digital"></div>
                             <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1">URL Logo Aplikasi (Opsional)</label><input type="text" id="setAppLogo" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" placeholder="https://link-gambar.com/logo.png"></div>
                             <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1">URL Gambar Layar Login (Opsional)</label><input type="text" id="setAppLoginBg" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" placeholder="https://link-gambar.com/bg-login.jpg"></div>
+                            <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1">Pesan Running Text Landing</label><input type="text" id="setRunningText" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold" placeholder="Selamat datang..."></div>
                         </div>
                     </div>
                     <div class="w-full md:w-1/2 bg-blue-50 p-4 rounded-xl border border-blue-100 h-full flex flex-col justify-center">
@@ -959,6 +970,7 @@
                     document.getElementById('appHeaderName').innerText = singkatan;
                     document.getElementById('previewAppSubText').innerText = singkatan;
                 }
+                document.getElementById('runningTextMsg').innerText = res.Running_Text || "Selamat datang di Portal Absensi Digital — disiplin, cepat, dan presisi.";
 
                 if(res.App_Logo && res.App_Logo.trim() !== "") {
                     document.getElementById('appLogoIcon').classList.add('hidden');
@@ -990,6 +1002,7 @@
                 document.getElementById('setAppHeaderName').value = res.App_Header_Name || '';
                 document.getElementById('setAppLogo').value = res.App_Logo || '';
                 document.getElementById('setAppLoginBg').value = res.App_Login_Bg || '';
+                document.getElementById('setRunningText').value = res.Running_Text || '';
                 document.getElementById('setNamaPusk').value = res.Nama_Puskesmas || '';
                 document.getElementById('setKapusNama').value = res.Kepala_Nama || '';
                 document.getElementById('setKapusNip').value = res.Kepala_NIP || '';
@@ -1021,6 +1034,7 @@
                 App_Header_Name: document.getElementById('setAppHeaderName').value,
                 App_Logo: document.getElementById('setAppLogo').value,
                 App_Login_Bg: document.getElementById('setAppLoginBg').value,
+                Running_Text: document.getElementById('setRunningText').value,
                 Nama_Puskesmas: document.getElementById('setNamaPusk').value,
                 Kepala_Nama: document.getElementById('setKapusNama').value,
                 Kepala_NIP: document.getElementById('setKapusNip').value,
