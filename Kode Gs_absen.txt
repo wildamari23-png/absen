@@ -728,6 +728,22 @@ function getKalenderKerja(bulanName, tahun) {
         }
       } catch (apiErr) {}
     }
+
+    // Fallback tambahan khusus data Indonesia.
+    if (!holidayNames.length) {
+      try {
+        const resp2 = UrlFetchApp.fetch(`https://tanggalmerah.upset.dev/api/holidays?year=${y}&month=${m + 1}&type=holiday`, { muteHttpExceptions: true });
+        if (resp2.getResponseCode() === 200) {
+          const obj = JSON.parse(resp2.getContentText() || "{}");
+          const arr2 = obj?.data || obj?.holidays || [];
+          arr2.forEach(h => {
+            const tgl = h?.date || h?.holiday_date || h?.tanggal;
+            if (!tgl) return;
+            holidayNames.push({ tgl: String(tgl).slice(0, 10), nama: h?.name || h?.title || h?.holiday_name || "Libur Nasional" });
+          });
+        }
+      } catch (apiErr2) {}
+    }
   } catch (e) {
     holidayNames = [];
   }
