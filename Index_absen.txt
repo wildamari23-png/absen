@@ -542,6 +542,15 @@
 </select>
                 </div>
                 <div class="w-full lg:w-1/4">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Filter Jarak</label>
+                    <select id="filterJarakHarian" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" onchange="renderTableHarian(true)">
+                        <option value="ALL">Semua Jarak</option>
+                        <option value="DEKAT">Dekat</option>
+                        <option value="SEDANG">Pertengahan</option>
+                        <option value="JAUH">Jauh</option>
+                    </select>
+                </div>
+                <div class="w-full lg:w-1/4">
                     <button onclick="terapkanBulkAlpa()" class="w-full bg-red-50 text-red-600 border border-red-200 font-bold py-2 px-3 rounded-lg text-sm hover:bg-red-100 transition"><i class="fa-solid fa-user-xmark mr-1"></i> Set ALPA Masal</button>
                 </div>
             </div>
@@ -804,6 +813,10 @@
                     <div>
                         <label class="block text-xs font-bold text-red-600 uppercase mb-2"><i class="fa-solid fa-asterisk"></i> Target Hari Kerja</label>
                         <input type="number" id="lapHariKerja" class="w-full px-4 py-3 bg-red-50 border-2 border-red-200 rounded-xl font-extrabold text-red-700 text-center text-lg" value="17">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-orange-600 uppercase mb-2"><i class="fa-solid fa-calendar-xmark"></i> Input Libur Nasional</label>
+                        <input type="number" id="lapLiburManual" onchange="hitungHariKerjaOtomatis()" class="w-full px-4 py-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-extrabold text-orange-700 text-center text-lg" value="0">
                     </div>
                 </div>
                 <div id="liburInfoBox" class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-6 text-xs">
@@ -1428,13 +1441,24 @@
             summary.innerText = 'Menghitung hari kerja otomatis...';
             list.innerHTML = '';
             google.script.run.withSuccessHandler(res => {
-                document.getElementById('lapHariKerja').value = res.targetHariKerja || 0;
-                summary.innerHTML = `Hari kerja weekday: <b>${res.totalWeekdays || 0}</b>, Libur nasional (weekday): <b>${res.totalLiburNasionalWeekday || 0}</b>, Target: <b>${res.targetHariKerja || 0}</b>`;
+                const liburManual = parseInt(document.getElementById('lapLiburManual').value || 0, 10) || 0;
+                const targetFinal = Math.max(0, (res.targetHariKerja || 0) - liburManual);
+                document.getElementById('lapHariKerja').value = targetFinal;
+                summary.innerHTML = `Hari kerja weekday: <b>${res.totalWeekdays || 0}</b>, Libur nasional (weekday): <b>${res.totalLiburNasionalWeekday || 0}</b>, Input libur manual: <b>${liburManual}</b>, Target final: <b>${targetFinal}</b>`;
                 list.innerHTML = (res.detailLibur || []).length ? res.detailLibur.map(h => `<li>${h.tgl} — ${h.nama}</li>`).join('') : '<li>Tidak ada libur nasional weekday pada bulan ini.</li>';
             }).withFailureHandler(() => {
                 summary.innerText = 'Gagal mengambil kalender libur nasional.';
                 list.innerHTML = '<li>Silakan isi target hari kerja manual.</li>';
             }).getKalenderKerja(bln, thn);
+        }
+
+        function renderJarakBadge(jarakInfo) {
+            const m = String(jarakInfo || '').match(/(\d+)\s*m/i);
+            if (!m) return `<span class="inline-flex mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">Jarak: -</span>`;
+            const d = parseInt(m[1],10);
+            if (d <= 100) return `<span class="inline-flex mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">Jarak ${d}m (Dekat)</span>`;
+            if (d <= 300) return `<span class="inline-flex mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700">Jarak ${d}m (Sedang)</span>`;
+            return `<span class="inline-flex mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">Jarak ${d}m (Jauh)</span>`;
         }
 
         // ==========================================
@@ -1482,10 +1506,18 @@
         function renderTableHarian(resetPg = false) {
             if(resetPg) currentPgHarian = 1;
             const filterKet = document.getElementById('filterKetHarian').value;
+            const filterJarak = document.getElementById('filterJarakHarian').value;
             const searchVal = document.getElementById('searchHarian').value.toLowerCase();
 
             filteredHarian = dataAbsenHarianRaw;
             if(filterKet !== "ALL") filteredHarian = filteredHarian.filter(d => d.keterangan.toUpperCase() === filterKet.toUpperCase());
+            if(filterJarak !== "ALL") filteredHarian = filteredHarian.filter(d => {
+                const m = String(d.jarakInfo || '').match(/(\d+)\s*m/i); const dist = m ? parseInt(m[1],10) : null;
+                if (dist === null) return false;
+                if (filterJarak === 'DEKAT') return dist <= 100;
+                if (filterJarak === 'SEDANG') return dist > 100 && dist <= 300;
+                return dist > 300;
+            });
             if(searchVal) filteredHarian = filteredHarian.filter(d => d.nama.toLowerCase().includes(searchVal) || d.jabatan.toLowerCase().includes(searchVal));
 
             // Stats
@@ -1545,6 +1577,7 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
         <span class="inline-flex items-center px-3 py-1 text-xs font-mono font-bold rounded-2xl bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-inner">
             ${d.wktMasuk || '-'}
         </span>
+        <div>${renderJarakBadge(d.jarakInfo)}</div>
     </td>
 
     <!-- JAM PULANG - BADGE ORANGE MODERN -->
@@ -1552,6 +1585,7 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
         <span class="inline-flex items-center px-3 py-1 text-xs font-mono font-bold rounded-2xl bg-orange-100 text-orange-700 border border-orange-200 shadow-inner">
             ${d.wktPulang || '-'}
         </span>
+        <div>${renderJarakBadge(d.jarakInfo)}</div>
     </td>
 
     <td class="px-4 py-3 text-center">

@@ -545,7 +545,7 @@ function getAbsenHarian(tglStr) {
 
   dPgw.forEach(p => {
     let statusHarian = "BELUM ABSEN";
-    let wktMasuk = "-", wktPulang = "-", jamKerja = "-", alasan = "-";
+    let wktMasuk = "-", wktPulang = "-", jamKerja = "-", alasan = "-", jarakInfo = "-";
 
     for(let a of dAbsen) {
       let tanggalAbsenSheet = a[1];
@@ -561,6 +561,7 @@ function getAbsenHarian(tglStr) {
         wktPulang = pRaw instanceof Date ? Utilities.formatDate(pRaw, "Asia/Jakarta", "HH:mm:ss") : String(pRaw).replace(/'/g, "");
         jamKerja = a[8] || "-";
         alasan = a[11] || "-";
+        jarakInfo = a[9] || "-";
 
         // 🔥 LOGIKA BARU: Sudah masuk tapi belum pulang
         if (rawStatus === "HADIR" && wktMasuk !== "-" && wktMasuk !== "" &&
@@ -576,7 +577,7 @@ function getAbsenHarian(tglStr) {
     hasilHarian.push({
       id_qr: p[0], nama: p[1], jabatan: p[3],
       wktMasuk: wktMasuk, wktPulang: wktPulang, jamKerja: jamKerja,
-      keterangan: statusHarian, alasan: alasan
+      keterangan: statusHarian, alasan: alasan, jarakInfo: jarakInfo
     });
   });
 
