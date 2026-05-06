@@ -212,6 +212,20 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
     if (dataAbsen[i][4] === qrText && absenTgl === tglStr) { rowIndex = i + 1; existingData = dataAbsen[i]; break; }
   }
 
+  const openPrev = cariAbsenBelumPulangSebelumnya_(dataAbsen, qrText, tglStr);
+  if (openPrev) {
+    return {
+      status: 'NEED_PREVIOUS_PULANG',
+      idQR: pgwFound.id,
+      nama: pgwFound.nama,
+      tanggal: openPrev.tanggal,
+      waktuMasuk: openPrev.waktuMasuk,
+      lokasiInduk: lokasiInduk,
+      lokasiTag: lokasiTag,
+      message: `Masih ada absen hari sebelumnya (${openPrev.tanggal}) yang belum memiliki jam pulang.`
+    };
+  }
+
   if (action === "MASUK") {
     const jamMasukMulai = settings.Jam_Masuk_Mulai || "00:00";
     const jamMasukAkhir = settings.Jam_Masuk_Akhir || "23:59";
@@ -261,6 +275,66 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
     sheetAbsen.getRange(rowIndex, 8).setValue(wktStr); sheetAbsen.getRange(rowIndex, 9).setValue(jamKerja); sheetAbsen.getRange(rowIndex, 10).setValue(lokasiStr);
     return { status: 'SUCCESS_PULANG', waktu: wktStr, jamKerja: jamKerja, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG berhasil. Hati-hati di jalan, ${pgwFound.nama}.` };
   }
+}
+
+function cariAbsenBelumPulangSebelumnya_(dataAbsen, idQR, tglHariIni) {
+  const today = parseTanggalAbsensi(tglHariIni);
+  let latest = null;
+
+  for (let i = 1; i < dataAbsen.length; i++) {
+    if (dataAbsen[i][4] !== idQR) continue;
+
+    const tgl = parseTanggalAbsensi(dataAbsen[i][1]);
+    if (!tgl || !today || tgl.getTime() >= today.getTime()) continue;
+
+    const ket = String(dataAbsen[i][10] || "").toUpperCase().trim();
+    const masukRaw = dataAbsen[i][6];
+    const pulangRaw = dataAbsen[i][7];
+    const waktuMasuk = masukRaw instanceof Date ? Utilities.formatDate(masukRaw, "Asia/Jakarta", "HH:mm:ss") : String(masukRaw || "").replace(/'/g, "").trim();
+    const waktuPulang = pulangRaw instanceof Date ? Utilities.formatDate(pulangRaw, "Asia/Jakarta", "HH:mm:ss") : String(pulangRaw || "").replace(/'/g, "").trim();
+
+    if (ket === "HADIR" && waktuMasuk && waktuMasuk !== "-" && (!waktuPulang || waktuPulang === "-")) {
+      if (!latest || tgl.getTime() > latest.dateObj.getTime()) {
+        latest = {
+          rowIndex: i + 1,
+          dateObj: tgl,
+          tanggal: Utilities.formatDate(tgl, "Asia/Jakarta", "dd/MM/yyyy"),
+          waktuMasuk: waktuMasuk
+        };
+      }
+    }
+  }
+
+  return latest;
+}
+
+function setPulangHariSebelumnya(idQR, tanggalDDMMYYYY, jamPulang) {
+  if (!idQR || !tanggalDDMMYYYY || !jamPulang) return { status: false, message: "Data jam pulang belum lengkap." };
+  if (!/^\d{1,2}:\d{2}$/.test(String(jamPulang))) return { status: false, message: "Format jam pulang harus HH:mm." };
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Absensi");
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][4] !== idQR) continue;
+    let tgl = data[i][1];
+    if (tgl instanceof Date) tgl = Utilities.formatDate(tgl, "Asia/Jakarta", "dd/MM/yyyy");
+    else tgl = String(tgl || "").replace(/'/g, "").trim();
+    if (tgl !== tanggalDDMMYYYY) continue;
+
+    const masukRaw = data[i][6];
+    const waktuMasuk = masukRaw instanceof Date ? Utilities.formatDate(masukRaw, "Asia/Jakarta", "HH:mm:ss") : String(masukRaw || "").replace(/'/g, "").trim();
+    const jamPulangFull = jamPulang.length === 5 ? jamPulang + ":00" : jamPulang;
+    const jamKerja = hitungJamKerja(waktuMasuk, jamPulangFull);
+
+    sheet.getRange(i + 1, 8).setValue("'" + jamPulangFull);
+    sheet.getRange(i + 1, 9).setValue(jamKerja);
+    sheet.getRange(i + 1, 12).setValue("Jam pulang dilengkapi otomatis sebelum absen hari berikutnya");
+    return { status: true, message: `Jam pulang tanggal ${tanggalDDMMYYYY} berhasil disimpan (${jamPulangFull}).`, jamKerja: jamKerja };
+  }
+
+  return { status: false, message: "Data absen sebelumnya tidak ditemukan." };
 }
 
 function waktuKeMenit(hhmmss) {

@@ -1354,10 +1354,61 @@
                 else if (res.status === 'OUT_OF_RADIUS') {
                     tampilkanFormLuarRadius(res.idQR, res.nama);
                 }
+                else if (res.status === 'NEED_PREVIOUS_PULANG') {
+                    tampilkanDialogPulangSebelumnya(res, decodedText, actionType, onFinish);
+                    return;
+                }
                 else { Swal.fire({ icon: 'error', title: 'Gagal', text: res.message }); }
                 if (onFinish) onFinish();
             }).withFailureHandler(function(err) { Swal.fire('Error', 'Jaringan lambat.', 'error'); if (onFinish) onFinish(); })
             .prosesAbsen(decodedText, currentUserLat, currentUserLng, actionType);
+        }
+
+        function tampilkanDialogPulangSebelumnya(res, decodedText, actionType, onFinish = null) {
+            Swal.fire({
+                title: 'Lengkapi Absen Pulang Sebelumnya',
+                html: `
+                    <div class="text-left p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-white border border-amber-100">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            <div>
+                                <p class="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider">Absen pulang tertunda</p>
+                                <p class="text-sm font-extrabold text-gray-800">${res.nama || '-'}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-600 mb-3 leading-relaxed">${res.message || ''}<br>Isi jam pulang aktual terlebih dahulu. Setelah tersimpan, sistem akan melanjutkan proses absen hari ini.</p>
+                        <div class="grid grid-cols-2 gap-2 mb-3 text-xs">
+                            <div class="bg-white border border-amber-100 rounded-xl p-2"><b>Tanggal</b><br>${res.tanggal || '-'}</div>
+                            <div class="bg-white border border-amber-100 rounded-xl p-2"><b>Jam Masuk</b><br>${res.waktuMasuk || '-'}</div>
+                        </div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1 uppercase">Jam Pulang Aktual</label>
+                        <input type="time" id="swal-jam-pulang-prev" class="w-full px-4 py-3 bg-white border border-amber-200 rounded-xl text-lg font-extrabold text-amber-700 outline-none" value="17:00">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan & Lanjutkan',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#d97706',
+                preConfirm: () => {
+                    const jam = document.getElementById('swal-jam-pulang-prev').value;
+                    if (!jam) { Swal.showValidationMessage('Jam pulang wajib diisi.'); return false; }
+                    return jam;
+                }
+            }).then(result => {
+                if (!result.isConfirmed) { if (onFinish) onFinish(); return; }
+                Swal.fire({ title: 'Menyimpan jam pulang...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                google.script.run.withSuccessHandler(r => {
+                    if (!r.status) { Swal.fire('Gagal', r.message, 'error'); if (onFinish) onFinish(); return; }
+                    if (actionType === 'MASUK') {
+                        Swal.fire({ title: 'Berhasil', text: 'Jam pulang sebelumnya tersimpan. Melanjutkan absen masuk...', icon: 'success', timer: 1200, showConfirmButton: false });
+                        setTimeout(() => prosesKeBackend(decodedText, 'MASUK', onFinish), 1200);
+                    } else {
+                        Swal.fire('Berhasil', `${r.message}. Silakan lakukan Live Scan MASUK untuk absen hari ini.`, 'success');
+                        if (onFinish) onFinish();
+                    }
+                }).withFailureHandler(() => { Swal.fire('Error', 'Gagal menyimpan jam pulang sebelumnya.', 'error'); if (onFinish) onFinish(); })
+                .setPulangHariSebelumnya(res.idQR, res.tanggal, result.value);
+            });
         }
 
         function tampilkanFormLuarRadius(idQR, nama) {
