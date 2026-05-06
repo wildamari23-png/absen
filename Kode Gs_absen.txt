@@ -13,18 +13,21 @@ function doGet(e) {
 // 1. SETUP DATABASE OTOMATIS
 function initSetup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
+
   if (!ss.getSheetByName("Pegawai")) {
     let sheet = ss.insertSheet("Pegawai");
-    sheet.appendRow(["ID_QR", "Nama", "NIP_Gol", "Jabatan", "Status", "Lokasi_Tugas", "Pangkat_Golongan"]);
-    sheet.getRange("A1:G1").setFontWeight("bold").setBackground("#003366").setFontColor("#FFFFFF");
+    sheet.appendRow(["ID_QR", "Nama", "NIP_Gol", "Jabatan", "Status", "Lokasi_Tugas", "Pangkat_Golongan", "Kunci"]);
+    sheet.getRange("A1:H1").setFontWeight("bold").setBackground("#003366").setFontColor("#FFFFFF");
   } else {
     let sheet = ss.getSheetByName("Pegawai");
     if (!sheet.getRange("G1").getValue()) {
       sheet.getRange("G1").setValue("Pangkat_Golongan").setFontWeight("bold").setBackground("#003366").setFontColor("#FFFFFF");
     }
+    if (!sheet.getRange("H1").getValue()) {
+      sheet.getRange("H1").setValue("Kunci").setFontWeight("bold").setBackground("#003366").setFontColor("#FFFFFF");
+    }
   }
-  
+
   if (!ss.getSheetByName("Absensi")) {
     let sheet = ss.insertSheet("Absensi");
     sheet.appendRow(["Timestamp", "Tanggal", "Bulan", "Tahun", "ID_QR", "Nama", "Waktu_Masuk", "Waktu_Pulang", "Jam_Kerja", "Status_Lokasi", "Keterangan", "Alasan", "Lat", "Lng"]);
@@ -34,25 +37,42 @@ function initSetup() {
   if (!ss.getSheetByName("Kegiatan")) {
     let sheet = ss.insertSheet("Kegiatan");
     sheet.appendRow(["Timestamp", "Tanggal_Kegiatan", "Nama_Kegiatan", "ID_QR", "Nama_Pegawai", "NIP", "Pangkat_Gol", "Jabatan"]);
-    sheet.getRange("A1:H1").setFontWeight("bold").setBackground("#10b981").setFontColor("#FFFFFF"); 
+    sheet.getRange("A1:H1").setFontWeight("bold").setBackground("#10b981").setFontColor("#FFFFFF");
   }
-  
+
   if (!ss.getSheetByName("Pengaturan")) {
     let sheet = ss.insertSheet("Pengaturan");
     sheet.appendRow(["Key", "Value"]);
     sheet.getRange("A1:B1").setFontWeight("bold").setBackground("#003366").setFontColor("#FFFFFF");
-    
-    const defaults = [
-      ["App_Name", "PORTAL ABSENSI"], ["App_Logo", ""], 
-      ["Admin_User", "admin"], ["Admin_Pass", "sintang2026"],
-      ["Nama_Puskesmas", "UPTD PUSKESMAS TANJUNG PURI SINTANG"],
-      ["Lat_Puskesmas", "0.0636"], ["Lng_Puskesmas", "111.4988"], ["Rad_Puskesmas", "100"],
-      ["Lat_Polindes", "0.0650"], ["Lng_Polindes", "111.5000"], ["Rad_Polindes", "100"],
-      ["Kepala_Nama", "dr. ANDAR JIMMY PINTABAR, M.A.P.,M.HKes"],
-      ["Kepala_NIP", "NIP. 198610292014021002"]
-    ];
-    defaults.forEach(d => sheet.appendRow(d));
   }
+  ensurePengaturanDefaults_();
+}
+
+function ensurePengaturanDefaults_() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Pengaturan");
+  const data = sheet.getDataRange().getValues();
+  const existing = new Set();
+  for (let i = 1; i < data.length; i++) existing.add(String(data[i][0]).trim());
+
+  const defaults = [
+    ["App_Name", "PORTAL ABSENSI"], ["App_Logo", ""], ["App_Header_Name", "Sistem Digital"], ["App_Login_Bg", ""],
+    ["Running_Text", "Selamat datang di Portal Absensi Digital — disiplin, cepat, dan presisi."],
+    ["Admin_User", "admin"], ["Admin_Pass", "sintang2026"],
+    ["Nama_Puskesmas", "UPTD PUSKESMAS TANJUNG PURI SINTANG"],
+    ["Lat_Puskesmas", "0.0636"], ["Lng_Puskesmas", "111.4988"], ["Rad_Puskesmas", "100"],
+    ["Lat_Pol_TebingRaya", "0.0650"], ["Lng_Pol_TebingRaya", "111.5000"], ["Rad_Pol_TebingRaya", "100"],
+    ["Lat_Pol_MunggukBantok", "0.0650"], ["Lng_Pol_MunggukBantok", "111.5000"], ["Rad_Pol_MunggukBantok", "100"],
+    ["Lat_Pol_KebiauBaru", "0.0650"], ["Lng_Pol_KebiauBaru", "111.5000"], ["Rad_Pol_KebiauBaru", "100"],
+    ["Lat_Pol_JeroraSatu", "0.0650"], ["Lng_Pol_JeroraSatu", "111.5000"], ["Rad_Pol_JeroraSatu", "100"],
+    ["Jam_Masuk_Mulai", "06:00"], ["Jam_Masuk_Akhir", "10:00"],
+    ["Jam_Pulang_Mulai", "12:00"], ["Jam_Pulang_Akhir", "23:59"],
+    ["Kepala_Nama", "dr. ANDAR JIMMY PINTABAR, M.A.P.,M.HKes"],
+    ["Kepala_NIP", "NIP. 198610292014021002"]
+  ];
+
+  defaults.forEach(d => {
+    if (!existing.has(d[0])) sheet.appendRow(d);
+  });
 }
 
 // 2. LOGIN & PENGATURAN
@@ -68,7 +88,14 @@ function cekLogin(user, pass) {
 }
 
 function getPengaturan() {
-  const data = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Pengaturan").getDataRange().getValues();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName("Pengaturan");
+  if (!sheet) {
+    initSetup();
+    sheet = ss.getSheetByName("Pengaturan");
+    if (!sheet) return {};
+  }
+  const data = sheet.getDataRange().getValues();
   let setting = {};
   for (let i = 1; i < data.length; i++) setting[data[i][0]] = data[i][1];
   return setting;
@@ -78,7 +105,7 @@ function simpanPengaturan(dataForm) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Pengaturan");
   const data = sheet.getDataRange().getValues();
   let keysInSheet = [];
-  
+
   for (let i = 1; i < data.length; i++) {
     let key = data[i][0];
     keysInSheet.push(key);
@@ -94,7 +121,7 @@ function simpanPengaturan(dataForm) {
 function tambahPegawai(dataForm) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Pegawai");
   const idQR = "PGW-" + new Date().getTime() + Math.floor(Math.random() * 100);
-  sheet.appendRow([idQR, dataForm.nama, dataForm.nip, dataForm.jabatan, dataForm.status, dataForm.lokasi, dataForm.golongan]);
+  sheet.appendRow([idQR, dataForm.nama, dataForm.nip, dataForm.jabatan, dataForm.status, dataForm.lokasi, dataForm.golongan, dataForm.kunci || "IYA"]);
   return { status: true, message: "Pegawai berhasil ditambahkan!" };
 }
 
@@ -105,7 +132,7 @@ function editPegawai(dataForm) {
     if (data[i][0] === dataForm.idQR) {
       sheet.getRange(i + 1, 2).setValue(dataForm.nama); sheet.getRange(i + 1, 3).setValue(dataForm.nip);
       sheet.getRange(i + 1, 4).setValue(dataForm.jabatan); sheet.getRange(i + 1, 5).setValue(dataForm.status);
-      sheet.getRange(i + 1, 6).setValue(dataForm.lokasi); sheet.getRange(i + 1, 7).setValue(dataForm.golongan); 
+      sheet.getRange(i + 1, 6).setValue(dataForm.lokasi); sheet.getRange(i + 1, 7).setValue(dataForm.golongan); sheet.getRange(i + 1, 8).setValue(dataForm.kunci || "IYA");
       return { status: true, message: "Data Pegawai berhasil diperbarui!" };
     }
   }
@@ -135,34 +162,48 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
   const dataPgw = ss.getSheetByName("Pegawai").getDataRange().getValues();
   let pgwFound = null;
   for (let i = 1; i < dataPgw.length; i++) {
-    if (dataPgw[i][0] === qrText) { pgwFound = { id: dataPgw[i][0], nama: dataPgw[i][1], lokasiTugas: dataPgw[i][5] }; break; }
+    if (dataPgw[i][0] === qrText) { pgwFound = { id: dataPgw[i][0], nama: dataPgw[i][1], lokasiTugas: dataPgw[i][5], kunciJam: String(dataPgw[i][7] || "IYA").toUpperCase() }; break; }
   }
   if (!pgwFound) return { status: 'ERROR', message: "QR Code tidak terdaftar di sistem!" };
-  
+
   const settings = getPengaturan();
   let targetLat, targetLng, targetRad;
-  let isPolindes = pgwFound.lokasiTugas.toLowerCase().includes("polindes");
-  
-  if (isPolindes) {
-    targetLat = parseFloat(settings.Lat_Polindes); targetLng = parseFloat(settings.Lng_Polindes); targetRad = parseFloat(settings.Rad_Polindes);
+  let lokasiInduk = "Puskesmas";
+  let lokasiTag = pgwFound.lokasiTugas || "Puskesmas";
+  const lok = String(pgwFound.lokasiTugas || "").toLowerCase();
+
+  if (lok.includes("tebing raya")) {
+    lokasiInduk = "Polindes Tebing Raya";
+    targetLat = parseFloat(settings.Lat_Pol_TebingRaya); targetLng = parseFloat(settings.Lng_Pol_TebingRaya); targetRad = parseFloat(settings.Rad_Pol_TebingRaya);
+  } else if (lok.includes("mungguk bantok")) {
+    lokasiInduk = "Polindes Mungguk Bantok";
+    targetLat = parseFloat(settings.Lat_Pol_MunggukBantok); targetLng = parseFloat(settings.Lng_Pol_MunggukBantok); targetRad = parseFloat(settings.Rad_Pol_MunggukBantok);
+  } else if (lok.includes("kebiau baru")) {
+    lokasiInduk = "Polindes Kebiau Baru";
+    targetLat = parseFloat(settings.Lat_Pol_KebiauBaru); targetLng = parseFloat(settings.Lng_Pol_KebiauBaru); targetRad = parseFloat(settings.Rad_Pol_KebiauBaru);
+  } else if (lok.includes("jerora satu")) {
+    lokasiInduk = "Polindes Jerora Satu";
+    targetLat = parseFloat(settings.Lat_Pol_JeroraSatu); targetLng = parseFloat(settings.Lng_Pol_JeroraSatu); targetRad = parseFloat(settings.Rad_Pol_JeroraSatu);
   } else {
+    lokasiInduk = "Puskesmas";
     targetLat = parseFloat(settings.Lat_Puskesmas); targetLng = parseFloat(settings.Lng_Puskesmas); targetRad = parseFloat(settings.Rad_Puskesmas);
   }
-  
+
   const distance = hitungJarak(latUser, lngUser, targetLat, targetLng);
   const localTime = new Date();
   const tglStr = Utilities.formatDate(localTime, "Asia/Jakarta", "dd/MM/yyyy");
-  const wktStr = Utilities.formatDate(localTime, "Asia/Jakarta", "HH:mm:ss"); 
-  
+  const wktStr = Utilities.formatDate(localTime, "Asia/Jakarta", "HH:mm:ss");
+  const nowMenit = waktuKeMenit(wktStr);
+
   let outOfRadius = distance > targetRad;
   let lokasiStr = `Jarak: ${Math.round(distance)}m`;
-  if (isPolindes) { outOfRadius = false; lokasiStr = `POLINDES (${lokasiStr})`; } 
+  if (lokasiInduk !== "Puskesmas") { outOfRadius = false; lokasiStr = `${lokasiInduk.toUpperCase()} (${lokasiStr})`; }
   else { lokasiStr = outOfRadius ? `LUAR AREA (${lokasiStr})` : `PUSKESMAS (${lokasiStr})`; }
 
   const sheetAbsen = ss.getSheetByName("Absensi");
   const dataAbsen = sheetAbsen.getDataRange().getValues();
   let rowIndex = -1; let existingData = null;
-  
+
   for (let i = 1; i < dataAbsen.length; i++) {
     let absenTgl = dataAbsen[i][1];
     if (absenTgl instanceof Date) absenTgl = Utilities.formatDate(absenTgl, "Asia/Jakarta", "dd/MM/yyyy");
@@ -171,7 +212,28 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
     if (dataAbsen[i][4] === qrText && absenTgl === tglStr) { rowIndex = i + 1; existingData = dataAbsen[i]; break; }
   }
 
+  const openPrev = cariAbsenBelumPulangSebelumnya_(dataAbsen, qrText, tglStr);
+  if (openPrev) {
+    return {
+      status: 'NEED_PREVIOUS_PULANG',
+      idQR: pgwFound.id,
+      nama: pgwFound.nama,
+      tanggal: openPrev.tanggal,
+      waktuMasuk: openPrev.waktuMasuk,
+      lokasiInduk: lokasiInduk,
+      lokasiTag: lokasiTag,
+      message: `Masih ada absen hari sebelumnya (${openPrev.tanggal}) yang belum memiliki jam pulang.`
+    };
+  }
+
   if (action === "MASUK") {
+    const jamMasukMulai = settings.Jam_Masuk_Mulai || "00:00";
+    const jamMasukAkhir = settings.Jam_Masuk_Akhir || "23:59";
+    const jamMasukMulaiTxt = formatJamSetting(jamMasukMulai);
+    const jamMasukAkhirTxt = formatJamSetting(jamMasukAkhir);
+    if (pgwFound.kunciJam !== "TIDAK" && !isDalamRentangJam(nowMenit, jamMasukMulai, jamMasukAkhir)) {
+      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen MASUK hanya diizinkan jam ${jamMasukMulaiTxt} - ${jamMasukAkhirTxt}.` };
+    }
     if (rowIndex > -1) {
       let ket = String(existingData[10]).toUpperCase();
       let wktMsk = existingData[6];
@@ -179,33 +241,138 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
       return { status: 'ERROR', message: `Anda sudah tercatat ${ket} hari ini pada pukul ${wktMsk}.` };
     }
     if (outOfRadius) {
-      return { status: 'OUT_OF_RADIUS', idQR: pgwFound.id, nama: pgwFound.nama, message: `Anda berada di luar radius penugasan (${Math.round(distance)}m). Apakah Anda sedang Izin, Sakit, atau Dinas Luar?` };
+      return { status: 'OUT_OF_RADIUS', idQR: pgwFound.id, nama: pgwFound.nama, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Anda berada di luar radius penugasan (${Math.round(distance)}m). Apakah Anda sedang Izin, Sakit, atau Dinas Luar?` };
     }
     const blnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "MMMM"); const thnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "yyyy");
     sheetAbsen.appendRow([localTime, tglStr, blnStr, thnStr, pgwFound.id, pgwFound.nama, wktStr, "-", "-", lokasiStr, "HADIR", "-", latUser, lngUser]);
-    return { status: 'SUCCESS_MASUK', waktu: wktStr, message: `Absen MASUK berhasil. Selamat Bekerja, ${pgwFound.nama}!` };
+    return { status: 'SUCCESS_MASUK', waktu: wktStr, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen MASUK berhasil. Selamat Bekerja, ${pgwFound.nama}!` };
   }
   else if (action === "PULANG") {
+    const jamPulangMulai = settings.Jam_Pulang_Mulai || "00:00";
+    const jamPulangAkhir = settings.Jam_Pulang_Akhir || "23:59";
+    const jamPulangMulaiTxt = formatJamSetting(jamPulangMulai);
+    const jamPulangAkhirTxt = formatJamSetting(jamPulangAkhir);
+    if (pgwFound.kunciJam !== "TIDAK" && !isDalamRentangJam(nowMenit, jamPulangMulai, jamPulangAkhir)) {
+      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG hanya diizinkan jam ${jamPulangMulaiTxt} - ${jamPulangAkhirTxt}.` };
+    }
     if (rowIndex === -1) return { status: 'ERROR', message: `Anda belum melakukan Absen MASUK hari ini!` };
-    
+
     let ket = String(existingData[10]).toUpperCase();
     if (ket !== "HADIR") return { status: 'ERROR', message: `Status hari ini adalah ${ket}. Tidak perlu absen pulang.` };
-    
+
     let waktuPulang = existingData[7];
     if (waktuPulang !== "-" && waktuPulang !== "") {
       if (waktuPulang instanceof Date) waktuPulang = Utilities.formatDate(waktuPulang, "Asia/Jakarta", "HH:mm:ss");
       return { status: 'ERROR', message: `Anda sudah melakukan Absen PULANG hari ini pada pukul ${waktuPulang}.` };
     }
-    
+
     if (outOfRadius) return { status: 'ERROR', message: `Absen PULANG ditolak. Anda berada di luar radius penugasan (${Math.round(distance)}m).` };
 
     let wktMasukRaw = existingData[6];
     let wktMasukStr = wktMasukRaw instanceof Date ? Utilities.formatDate(wktMasukRaw, "Asia/Jakarta", "HH:mm:ss") : String(wktMasukRaw);
     let jamKerja = hitungJamKerja(wktMasukStr, wktStr);
-    
-    sheetAbsen.getRange(rowIndex, 8).setValue(wktStr); sheetAbsen.getRange(rowIndex, 9).setValue(jamKerja); sheetAbsen.getRange(rowIndex, 10).setValue(lokasiStr); 
-    return { status: 'SUCCESS_PULANG', waktu: wktStr, jamKerja: jamKerja, message: `Absen PULANG berhasil. Hati-hati di jalan, ${pgwFound.nama}.` };
+
+    sheetAbsen.getRange(rowIndex, 8).setValue(wktStr); sheetAbsen.getRange(rowIndex, 9).setValue(jamKerja); sheetAbsen.getRange(rowIndex, 10).setValue(lokasiStr);
+    return { status: 'SUCCESS_PULANG', waktu: wktStr, jamKerja: jamKerja, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG berhasil. Hati-hati di jalan, ${pgwFound.nama}.` };
   }
+}
+
+function cariAbsenBelumPulangSebelumnya_(dataAbsen, idQR, tglHariIni) {
+  const today = parseTanggalAbsensi(tglHariIni);
+  let latest = null;
+
+  for (let i = 1; i < dataAbsen.length; i++) {
+    if (dataAbsen[i][4] !== idQR) continue;
+
+    const tgl = parseTanggalAbsensi(dataAbsen[i][1]);
+    if (!tgl || !today || tgl.getTime() >= today.getTime()) continue;
+
+    const ket = String(dataAbsen[i][10] || "").toUpperCase().trim();
+    const masukRaw = dataAbsen[i][6];
+    const pulangRaw = dataAbsen[i][7];
+    const waktuMasuk = masukRaw instanceof Date ? Utilities.formatDate(masukRaw, "Asia/Jakarta", "HH:mm:ss") : String(masukRaw || "").replace(/'/g, "").trim();
+    const waktuPulang = pulangRaw instanceof Date ? Utilities.formatDate(pulangRaw, "Asia/Jakarta", "HH:mm:ss") : String(pulangRaw || "").replace(/'/g, "").trim();
+
+    if (ket === "HADIR" && waktuMasuk && waktuMasuk !== "-" && (!waktuPulang || waktuPulang === "-")) {
+      if (!latest || tgl.getTime() > latest.dateObj.getTime()) {
+        latest = {
+          rowIndex: i + 1,
+          dateObj: tgl,
+          tanggal: Utilities.formatDate(tgl, "Asia/Jakarta", "dd/MM/yyyy"),
+          waktuMasuk: waktuMasuk
+        };
+      }
+    }
+  }
+
+  return latest;
+}
+
+function setPulangHariSebelumnya(idQR, tanggalDDMMYYYY, jamPulang) {
+  if (!idQR || !tanggalDDMMYYYY || !jamPulang) return { status: false, message: "Data jam pulang belum lengkap." };
+  if (!/^\d{1,2}:\d{2}$/.test(String(jamPulang))) return { status: false, message: "Format jam pulang harus HH:mm." };
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Absensi");
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][4] !== idQR) continue;
+    let tgl = data[i][1];
+    if (tgl instanceof Date) tgl = Utilities.formatDate(tgl, "Asia/Jakarta", "dd/MM/yyyy");
+    else tgl = String(tgl || "").replace(/'/g, "").trim();
+    if (tgl !== tanggalDDMMYYYY) continue;
+
+    const masukRaw = data[i][6];
+    const waktuMasuk = masukRaw instanceof Date ? Utilities.formatDate(masukRaw, "Asia/Jakarta", "HH:mm:ss") : String(masukRaw || "").replace(/'/g, "").trim();
+    const jamPulangFull = jamPulang.length === 5 ? jamPulang + ":00" : jamPulang;
+    const jamKerja = hitungJamKerja(waktuMasuk, jamPulangFull);
+
+    sheet.getRange(i + 1, 8).setValue("'" + jamPulangFull);
+    sheet.getRange(i + 1, 9).setValue(jamKerja);
+    sheet.getRange(i + 1, 12).setValue("Jam pulang dilengkapi otomatis sebelum absen hari berikutnya");
+    return { status: true, message: `Jam pulang tanggal ${tanggalDDMMYYYY} berhasil disimpan (${jamPulangFull}).`, jamKerja: jamKerja };
+  }
+
+  return { status: false, message: "Data absen sebelumnya tidak ditemukan." };
+}
+
+function waktuKeMenit(hhmmss) {
+  if (hhmmss instanceof Date) {
+    return hhmmss.getHours() * 60 + hhmmss.getMinutes();
+  }
+  if (typeof hhmmss === "number" && !isNaN(hhmmss)) {
+    let totalMenit = Math.round((hhmmss % 1) * 24 * 60);
+    return ((totalMenit % 1440) + 1440) % 1440;
+  }
+
+  let clean = String(hhmmss || "00:00").trim().replace(/'/g, "");
+  let m = clean.match(/(\d{1,2}):(\d{2})/);
+  if (!m) return 0;
+  let jam = parseInt(m[1], 10) || 0;
+  let menit = parseInt(m[2], 10) || 0;
+  return (jam * 60 + menit) % 1440;
+}
+
+function isDalamRentangJam(nowMenit, mulaiHHMM, akhirHHMM) {
+  const start = waktuKeMenit(mulaiHHMM);
+  const end = waktuKeMenit(akhirHHMM);
+  if (start <= end) return nowMenit >= start && nowMenit <= end;
+  return nowMenit >= start || nowMenit <= end;
+}
+
+function formatJamSetting(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, "Asia/Jakarta", "HH:mm");
+  if (typeof v === "number" && !isNaN(v)) {
+    let menit = waktuKeMenit(v);
+    let h = String(Math.floor(menit / 60)).padStart(2, "0");
+    let m = String(menit % 60).padStart(2, "0");
+    return `${h}:${m}`;
+  }
+  let s = String(v || "").trim();
+  let match = s.match(/(\d{1,2}):(\d{2})/);
+  if (!match) return "00:00";
+  return `${String(parseInt(match[1], 10)).padStart(2, "0")}:${match[2]}`;
 }
 
 function hitungJamKerja(masukStr, pulangStr) {
@@ -227,7 +394,7 @@ function prosesAbsenManual(idQR, nama, statusPilihan, alasan, latUser, lngUser) 
   const blnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "MMMM");
   const thnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "yyyy");
   const wktStr = Utilities.formatDate(localTime, "Asia/Jakarta", "HH:mm:ss");
-  
+
   sheetAbsen.appendRow([localTime, tglStr, blnStr, thnStr, idQR, nama, wktStr, "-", "-", "LUAR AREA / MANUAL", statusPilihan.toUpperCase(), alasan, latUser, lngUser]);
   return { status: 'SUCCESS', message: `Pengajuan Keterangan (${statusPilihan}) berhasil dikirim.` };
 }
@@ -235,16 +402,16 @@ function prosesAbsenManual(idQR, nama, statusPilihan, alasan, latUser, lngUser) 
 // 4C. ADMIN SET MANUAL ABSEN
 function setManualAbsenAdmin(idQR, tglStrYMD, actionStatus, alasan) {
   let parts = tglStrYMD.split('-');
-  let tglFormatSheet = `${parts[2]}/${parts[1]}/${parts[0]}`; 
+  let tglFormatSheet = `${parts[2]}/${parts[1]}/${parts[0]}`;
   const d = new Date(parts[0], parseInt(parts[1])-1, parts[2]);
   const blnStr = Utilities.formatDate(d, "Asia/Jakarta", "MMMM");
   const thnStr = Utilities.formatDate(d, "Asia/Jakarta", "yyyy");
-  
+
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheetAbsen = ss.getSheetByName("Absensi");
   const dataAbsen = sheetAbsen.getDataRange().getValues();
   const sheetPegawai = ss.getSheetByName("Pegawai").getDataRange().getValues();
-  
+
   let namaPgw = "Unknown";
   for(let i=1; i<sheetPegawai.length; i++) {
     if(sheetPegawai[i][0] === idQR) { namaPgw = sheetPegawai[i][1]; break; }
@@ -285,10 +452,68 @@ function setManualAbsenAdmin(idQR, tglStrYMD, actionStatus, alasan) {
     let realStatus = actionStatus.includes("HADIR") ? "HADIR" : actionStatus;
     let wM = (actionStatus === "HADIR_MASUK" || actionStatus === "HADIR_PULANG") ? wktMskStr : "-";
     let wP = actionStatus === "HADIR_PULANG" ? wktMskStr : "-";
-    
+
     sheetAbsen.appendRow([localTime, `'${tglFormatSheet}`, blnStr, thnStr, idQR, namaPgw, `'${wM}`, `'${wP}`, "-", "MANUAL ADMIN", realStatus, alasan || "Diset Admin", "", ""]);
   }
   return {status: true, message: "Status & Jam kehadiran berhasil diperbarui manual!"};
+}
+
+// 4D. ADMIN SET CUTI RENTANG TANGGAL
+function setCutiRangeAdmin(idQR, tglMulaiYMD, tglAkhirYMD, alasan) {
+  if (!idQR || !tglMulaiYMD || !tglAkhirYMD) {
+    return { status: false, message: "Data cuti belum lengkap." };
+  }
+
+  let start = new Date(tglMulaiYMD + "T00:00:00");
+  let end = new Date(tglAkhirYMD + "T00:00:00");
+  if (start > end) return { status: false, message: "Tanggal mulai cuti tidak boleh lebih besar dari tanggal akhir." };
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetAbsen = ss.getSheetByName("Absensi");
+  const allAbsen = sheetAbsen.getDataRange().getValues();
+  const allPegawai = ss.getSheetByName("Pegawai").getDataRange().getValues();
+
+  let namaPgw = "Unknown";
+  for (let i = 1; i < allPegawai.length; i++) {
+    if (allPegawai[i][0] === idQR) { namaPgw = allPegawai[i][1]; break; }
+  }
+
+  let inserted = 0, updated = 0, skipped = 0;
+  let note = (alasan || "Diset Admin").trim();
+
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    let tglStr = Utilities.formatDate(d, "Asia/Jakarta", "dd/MM/yyyy");
+    let blnStr = Utilities.formatDate(d, "Asia/Jakarta", "MMMM");
+    let thnStr = Utilities.formatDate(d, "Asia/Jakarta", "yyyy");
+
+    let rowIndex = -1;
+    for (let r = 1; r < allAbsen.length; r++) {
+      let absenTgl = allAbsen[r][1];
+      if (absenTgl instanceof Date) absenTgl = Utilities.formatDate(absenTgl, "Asia/Jakarta", "dd/MM/yyyy");
+      else absenTgl = String(absenTgl).replace(/'/g, "");
+      if (allAbsen[r][4] === idQR && absenTgl === tglStr) { rowIndex = r + 1; break; }
+    }
+
+    if (rowIndex > -1) {
+      const statusNow = String(sheetAbsen.getRange(rowIndex, 11).getValue() || "").toUpperCase().trim();
+      if (statusNow === "HADIR") { skipped++; continue; }
+      sheetAbsen.getRange(rowIndex, 7).setValue("-");
+      sheetAbsen.getRange(rowIndex, 8).setValue("-");
+      sheetAbsen.getRange(rowIndex, 9).setValue("-");
+      sheetAbsen.getRange(rowIndex, 10).setValue("MANUAL ADMIN - CUTI");
+      sheetAbsen.getRange(rowIndex, 11).setValue("CUTI");
+      sheetAbsen.getRange(rowIndex, 12).setValue(note);
+      updated++;
+    } else {
+      sheetAbsen.appendRow([new Date(), `'${tglStr}`, blnStr, thnStr, idQR, namaPgw, "-", "-", "-", "MANUAL ADMIN - CUTI", "CUTI", note, "", ""]);
+      inserted++;
+    }
+  }
+
+  return {
+    status: true,
+    message: `Cuti berhasil diset. Baru: ${inserted}, diperbarui: ${updated}, dilewati(HADIR): ${skipped}.`
+  };
 }
 
 function hitungJarak(lat1, lon1, lat2, lon2) {
@@ -299,22 +524,103 @@ function hitungJarak(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+function parseTanggalAbsensi(value) {
+  if (value instanceof Date) return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  let s = String(value || "").replace(/'/g, "").trim();
+  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return null;
+  return new Date(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10));
+}
+
+function getDaftarCutiBulanIni() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const dataAbsen = ss.getSheetByName("Absensi").getDataRange().getValues();
+  const dataPegawai = ss.getSheetByName("Pegawai").getDataRange().getValues();
+
+  const now = new Date();
+  const bulanNow = now.getMonth();
+  const tahunNow = now.getFullYear();
+  const bulanLabel = Utilities.formatDate(now, "Asia/Jakarta", "MMMM");
+
+  let pegawaiMap = {};
+  for (let i = 1; i < dataPegawai.length; i++) {
+    pegawaiMap[dataPegawai[i][0]] = { nama: dataPegawai[i][1] || "-", jabatan: dataPegawai[i][3] || "-" };
+  }
+
+  let cutiMap = {};
+  for (let i = 1; i < dataAbsen.length; i++) {
+    let ket = String(dataAbsen[i][10] || "").toUpperCase().trim();
+    if (ket !== "CUTI") continue;
+
+    let d = parseTanggalAbsensi(dataAbsen[i][1]);
+    if (!d || d.getMonth() !== bulanNow || d.getFullYear() !== tahunNow) continue;
+
+    let idQR = dataAbsen[i][4];
+    if (!cutiMap[idQR]) cutiMap[idQR] = { tanggal: [], nama: pegawaiMap[idQR] ? pegawaiMap[idQR].nama : (dataAbsen[i][5] || "-"), jabatan: pegawaiMap[idQR] ? pegawaiMap[idQR].jabatan : "-" };
+    cutiMap[idQR].tanggal.push(new Date(d));
+  }
+
+  let hasil = [];
+  Object.keys(cutiMap).forEach(idQR => {
+    let dates = cutiMap[idQR].tanggal
+      .sort((a, b) => a - b)
+      .map(d => Utilities.formatDate(d, "Asia/Jakarta", "dd/MM/yyyy"));
+
+    let uniqueDates = Array.from(new Set(dates));
+    let periods = [];
+    let start = null, prev = null;
+    uniqueDates.forEach((ds, idx) => {
+      let parts = ds.split('/');
+      let current = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+      if (!start) { start = current; prev = current; }
+      else {
+        let nextExpected = new Date(prev);
+        nextExpected.setDate(nextExpected.getDate() + 1);
+        if (current.getTime() !== nextExpected.getTime()) {
+          periods.push(`${Utilities.formatDate(start, "Asia/Jakarta", "dd/MM")} - ${Utilities.formatDate(prev, "Asia/Jakarta", "dd/MM")}`);
+          start = current;
+        }
+        prev = current;
+      }
+      if (idx === uniqueDates.length - 1) {
+        periods.push(`${Utilities.formatDate(start, "Asia/Jakarta", "dd/MM")} - ${Utilities.formatDate(prev, "Asia/Jakarta", "dd/MM")}`);
+      }
+    });
+
+    hasil.push({
+      id_qr: idQR,
+      nama: cutiMap[idQR].nama,
+      jabatan: cutiMap[idQR].jabatan,
+      total_hari: uniqueDates.length,
+      periode: periods.join(", ")
+    });
+  });
+
+  hasil.sort((a, b) => b.total_hari - a.total_hari || a.nama.localeCompare(b.nama));
+
+  return {
+    bulan: bulanLabel,
+    tahun: tahunNow,
+    data: hasil
+  };
+}
+
 // 5. FITUR ADMIN HARIAN
 function getAbsenHarian(tglStr) {
   let parts = tglStr.split('-');
-  let formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`; 
-  
+  let formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const dPgw = ss.getSheetByName("Pegawai").getDataRange().getValues(); dPgw.shift();
   const dAbsen = ss.getSheetByName("Absensi").getDataRange().getValues(); dAbsen.shift();
   const settings = getPengaturan();
-  
+
   let hasilHarian = [];
-  
+
   dPgw.forEach(p => {
     let statusHarian = "BELUM ABSEN";
-    let wktMasuk = "-", wktPulang = "-", jamKerja = "-", alasan = "-";
-    
+    let wktMasuk = "-", wktPulang = "-", jamKerja = "-", alasan = "-", jarakInfo = "-";
+
     for(let a of dAbsen) {
       let tanggalAbsenSheet = a[1];
       if (tanggalAbsenSheet instanceof Date) tanggalAbsenSheet = Utilities.formatDate(tanggalAbsenSheet, "Asia/Jakarta", "dd/MM/yyyy");
@@ -322,16 +628,17 @@ function getAbsenHarian(tglStr) {
 
       if(a[4] === p[0] && tanggalAbsenSheet === formattedDate) {
         let rawStatus = String(a[10]).toUpperCase().trim();
-        
+
         let mRaw = a[6];
         let pRaw = a[7];
         wktMasuk = mRaw instanceof Date ? Utilities.formatDate(mRaw, "Asia/Jakarta", "HH:mm:ss") : String(mRaw).replace(/'/g, "");
         wktPulang = pRaw instanceof Date ? Utilities.formatDate(pRaw, "Asia/Jakarta", "HH:mm:ss") : String(pRaw).replace(/'/g, "");
         jamKerja = a[8] || "-";
         alasan = a[11] || "-";
+        jarakInfo = a[9] || "-";
 
         // 🔥 LOGIKA BARU: Sudah masuk tapi belum pulang
-        if (rawStatus === "HADIR" && wktMasuk !== "-" && wktMasuk !== "" && 
+        if (rawStatus === "HADIR" && wktMasuk !== "-" && wktMasuk !== "" &&
             (wktPulang === "-" || wktPulang === "" || !wktPulang)) {
           statusHarian = "BELUM ABSEN PULANG";
         } else {
@@ -340,14 +647,14 @@ function getAbsenHarian(tglStr) {
         break;
       }
     }
-    
+
     hasilHarian.push({
-      id_qr: p[0], nama: p[1], jabatan: p[3], 
+      id_qr: p[0], nama: p[1], jabatan: p[3],
       wktMasuk: wktMasuk, wktPulang: wktPulang, jamKerja: jamKerja,
-      keterangan: statusHarian, alasan: alasan
+      keterangan: statusHarian, alasan: alasan, jarakInfo: jarakInfo
     });
   });
-  
+
   return {
     data: hasilHarian,
     namaPuskesmas: settings.Nama_Puskesmas || "PUSKESMAS",
@@ -363,12 +670,12 @@ function setBulkAlpa(tglStr) {
   const blnStr = Utilities.formatDate(d, "Asia/Jakarta", "MMMM");
   const thnStr = Utilities.formatDate(d, "Asia/Jakarta", "yyyy");
   const timestamp = d;
-  
+
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheetAbsen = ss.getSheetByName("Absensi");
   const harianData = getAbsenHarian(tglStr).data;
   let countAlpa = 0;
-  
+
   harianData.forEach(hd => {
     if(hd.keterangan === "BELUM ABSEN") {
       sheetAbsen.appendRow([timestamp, `'${formattedDate}`, blnStr, thnStr, hd.id_qr, hd.nama, "-", "-", "-", "SISTEM", "ALPA", "Set Otomatis Admin", "", ""]);
@@ -384,20 +691,29 @@ function getRekapitulasi(bulan, tahun, hariKerjaInput) {
   const dPgw = ss.getSheetByName("Pegawai").getDataRange().getValues(); dPgw.shift();
   const dAbsen = ss.getSheetByName("Absensi").getDataRange().getValues(); dAbsen.shift();
   const settings = getPengaturan();
-  
+
   const targetHari = parseInt(hariKerjaInput) || 17;
   let rekap = [];
-  
+
   dPgw.forEach(p => {
     let hadir = 0, sakit = 0, izin = 0, cuti = 0, tl = 0, alpaTercatat = 0;
-    let totalMenitBulanIni = 0; 
-    
+    let totalMenitBulanIni = 0;
+
     dAbsen.forEach(a => {
-      let absBln = String(a[2]).trim().toUpperCase();
-      let absThn = String(a[3]).trim();
-      
-      if(a[4] === p[0] && absBln === bulan.toUpperCase() && absThn === tahun.toString()) {
-        let ket = String(a[10]).toUpperCase().trim(); 
+      let isMatchMonth = false;
+      let tanggalRaw = a[1];
+      if (tanggalRaw instanceof Date) {
+        isMatchMonth = (tanggalRaw.getMonth() + 1 === parseInt(getMonthNumber_(bulan), 10) && tanggalRaw.getFullYear() === parseInt(tahun, 10));
+      } else {
+        let tglTxt = String(tanggalRaw || "").replace(/'/g, "").trim();
+        let parts = tglTxt.split("/");
+        if (parts.length === 3) {
+          isMatchMonth = (parseInt(parts[1], 10) === parseInt(getMonthNumber_(bulan), 10) && parseInt(parts[2], 10) === parseInt(tahun, 10));
+        }
+      }
+
+      if(a[4] === p[0] && isMatchMonth) {
+        let ket = String(a[10]).toUpperCase().trim();
         if(ket === "HADIR") hadir++; else if(ket === "SAKIT") sakit++; else if(ket === "IZIN") izin++; else if(ket === "CUTI") cuti++; else if(ket === "TL" || ket === "TUGAS LUAR") tl++; else if(ket === "ALPA") alpaTercatat++;
         if(a[8] && a[8] !== "-") {
             let jkStr = String(a[8]); let matchJam = jkStr.match(/(\d+)\s*Jam/i); let matchMenit = jkStr.match(/(\d+)\s*Menit/i);
@@ -406,21 +722,21 @@ function getRekapitulasi(bulan, tahun, hariKerjaInput) {
         }
       }
     });
-    
+
     let totalMasuk = hadir + sakit + izin + cuti + tl + alpaTercatat;
     let alpaSisa = (targetHari - totalMasuk) > 0 ? (targetHari - totalMasuk) : 0;
     let totalAlpa = alpaTercatat + alpaSisa;
     let totalJamFormat = Math.floor(totalMenitBulanIni / 60) + " Jam " + (totalMenitBulanIni % 60) + " Menit";
-    let strNipGol = String(p[2] || ""); let extractedGol = p[6] || "-"; 
+    let strNipGol = String(p[2] || ""); let extractedGol = p[6] || "-";
     if (extractedGol === "-" && strNipGol.includes("/")) { extractedGol = strNipGol.split("/").pop().replace(")","").trim(); }
-    
+
     rekap.push({
       nama_nip: p[1] + (strNipGol && strNipGol !== '-' ? "\n" + strNipGol : ""),
-      gol: extractedGol, jabatan: p[3], status: p[4] + (p[5].includes("Polindes") ? "\n(Polindes)" : ""), 
+      gol: extractedGol, jabatan: p[3], status: p[4] + (p[5].includes("Polindes") ? "\n(Polindes)" : ""),
       hari_kerja: targetHari, hadir: hadir, sakit: sakit, izin: izin, cuti: cuti, tl: tl, alpa: totalAlpa, total_jam: totalJamFormat
     });
   });
-  
+
   return {
     rekapData: rekap,
     namaPuskesmas: settings.Nama_Puskesmas || "UPTD PUSKESMAS TANJUNG PURI SINTANG",
@@ -428,18 +744,111 @@ function getRekapitulasi(bulan, tahun, hariKerjaInput) {
   };
 }
 
+function getMonthNumber_(bulanName) {
+  const map = {
+    "JANUARI": "01", "FEBRUARI": "02", "MARET": "03", "APRIL": "04",
+    "MEI": "05", "JUNI": "06", "JULI": "07", "AGUSTUS": "08",
+    "SEPTEMBER": "09", "OKTOBER": "10", "NOVEMBER": "11", "DESEMBER": "12"
+  };
+  return map[String(bulanName || "").toUpperCase()] || "01";
+}
+
+function getKalenderKerja(bulanName, tahun) {
+  const monthMap = { "JANUARI":0,"FEBRUARI":1,"MARET":2,"APRIL":3,"MEI":4,"JUNI":5,"JULI":6,"AGUSTUS":7,"SEPTEMBER":8,"OKTOBER":9,"NOVEMBER":10,"DESEMBER":11 };
+  const m = monthMap[String(bulanName || "").toUpperCase()];
+  const y = parseInt(tahun, 10);
+  if (isNaN(m) || isNaN(y)) return { targetHariKerja: 0, detailLibur: [] };
+
+  const start = new Date(y, m, 1, 0, 0, 0);
+  const end = new Date(y, m + 1, 1, 0, 0, 0);
+
+  let weekdays = 0;
+  for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+    const day = d.getDay();
+    if (day !== 0 && day !== 6) weekdays++;
+  }
+
+  let holidayNames = [];
+  try {
+    const calIds = [
+      "id.indonesian#holiday@group.v.calendar.google.com",
+      "en.indonesian#holiday@group.v.calendar.google.com",
+      "id.holiday@group.v.calendar.google.com"
+    ];
+    let uniq = {};
+    calIds.forEach(id => {
+      try {
+        const c = CalendarApp.getCalendarById(id);
+        if (!c) return;
+        c.getEvents(start, end).forEach(ev => {
+          const ds = Utilities.formatDate(ev.getStartTime(), "Asia/Jakarta", "yyyy-MM-dd");
+          uniq[ds + "_" + ev.getTitle()] = { tgl: ds, nama: ev.getTitle() };
+        });
+      } catch (e) {}
+    });
+    holidayNames = Object.values(uniq).sort((a,b)=>a.tgl.localeCompare(b.tgl));
+
+    // Fallback API publik jika kalender libur tidak tersedia/empty.
+    if (!holidayNames.length) {
+      try {
+        const resp = UrlFetchApp.fetch(`https://date.nager.at/api/v3/PublicHolidays/${y}/ID`, { muteHttpExceptions: true });
+        if (resp.getResponseCode() === 200) {
+          const arr = JSON.parse(resp.getContentText() || "[]");
+          arr.forEach(h => {
+            if (!h || !h.date) return;
+            const hm = String(h.date).slice(5, 7);
+            if (parseInt(hm, 10) !== (m + 1)) return;
+            holidayNames.push({ tgl: h.date, nama: h.localName || h.name || "Libur Nasional" });
+          });
+        }
+      } catch (apiErr) {}
+    }
+
+    // Fallback tambahan khusus data Indonesia.
+    if (!holidayNames.length) {
+      try {
+        const resp2 = UrlFetchApp.fetch(`https://tanggalmerah.upset.dev/api/holidays?year=${y}&month=${m + 1}&type=holiday`, { muteHttpExceptions: true });
+        if (resp2.getResponseCode() === 200) {
+          const obj = JSON.parse(resp2.getContentText() || "{}");
+          const arr2 = obj?.data || obj?.holidays || [];
+          arr2.forEach(h => {
+            const tgl = h?.date || h?.holiday_date || h?.tanggal;
+            if (!tgl) return;
+            holidayNames.push({ tgl: String(tgl).slice(0, 10), nama: h?.name || h?.title || h?.holiday_name || "Libur Nasional" });
+          });
+        }
+      } catch (apiErr2) {}
+    }
+  } catch (e) {
+    holidayNames = [];
+  }
+
+  const holidayWeekdays = holidayNames.filter(h => {
+    const d = new Date(h.tgl + "T00:00:00");
+    const day = d.getDay();
+    return day !== 0 && day !== 6;
+  });
+
+  return {
+    targetHariKerja: Math.max(0, weekdays - holidayWeekdays.length),
+    totalWeekdays: weekdays,
+    totalLiburNasionalWeekday: holidayWeekdays.length,
+    detailLibur: holidayWeekdays
+  };
+}
+
 // 7. ABSENSI MANUAL KEGIATAN
 function getPegawaiEligibleKegiatan(tglStr) {
   let parts = tglStr.split('-');
-  let formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`; 
+  let formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const dPgw = ss.getSheetByName("Pegawai").getDataRange().getValues(); dPgw.shift();
   const dAbsen = ss.getSheetByName("Absensi").getDataRange().getValues(); dAbsen.shift();
   const settings = getPengaturan();
-  
+
   let eligible = [];
-  let counts = { tersedia: 0, sakit: 0, izin: 0, tl: 0 };
-  
+  let counts = { tersedia: 0, sakit: 0, izin: 0, tl: 0, cuti: 0 };
+
   dPgw.forEach(p => {
     let statusAbsen = "BELUM ABSEN";
     for(let a of dAbsen) {
@@ -449,24 +858,24 @@ function getPegawaiEligibleKegiatan(tglStr) {
 
       if(a[4] === p[0] && tanggalAbsenSheet === formattedDate) { statusAbsen = String(a[10]).toUpperCase(); break; }
     }
-    
+
     if (statusAbsen === "SAKIT") counts.sakit++;
     else if (statusAbsen === "IZIN") counts.izin++;
     else if (statusAbsen === "TL" || statusAbsen === "TUGAS LUAR") counts.tl++;
+    else if (statusAbsen === "CUTI") counts.cuti++;
     else {
       counts.tersedia++;
       eligible.push({ id_qr: p[0], nama: p[1], nip: p[2] && p[2] !== '-' ? p[2] : "", jabatan: p[3], golongan: p[6] || "-" });
     }
   });
-  
+
   return { eligibleData: eligible, counts: counts, namaPuskesmas: settings.Nama_Puskesmas || "PUSKESMAS", kapusNama: settings.Kepala_Nama || "", kapusNip: settings.Kepala_NIP || "" };
 }
 
 function simpanKegiatanManual(tglKegiatan, namaKegiatan, selectedPegawai) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Kegiatan");
   const localTime = new Date();
-  let parts = tglKegiatan.split('-'); let formattedDate = `'${parts[2]}/${parts[1]}/${parts[0]}`; 
+  let parts = tglKegiatan.split('-'); let formattedDate = `'${parts[2]}/${parts[1]}/${parts[0]}`;
   selectedPegawai.forEach(p => { sheet.appendRow([localTime, formattedDate, namaKegiatan, p.id_qr, p.nama, p.nip, p.golongan, p.jabatan]); });
   return { status: true, message: `Daftar hadir kegiatan berhasil disimpan!` };
 }
-
