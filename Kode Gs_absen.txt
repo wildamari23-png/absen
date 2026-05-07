@@ -157,7 +157,7 @@ function getListPegawai() {
 }
 
 // 4. LOGIKA ABSENSI
-function prosesAbsen(qrText, latUser, lngUser, action) {
+function prosesAbsen(qrText, latUser, lngUser, action, gpsAccuracy) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const dataPgw = ss.getSheetByName("Pegawai").getDataRange().getValues();
   let pgwFound = null;
@@ -190,13 +190,16 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
   }
 
   const distance = hitungJarak(latUser, lngUser, targetLat, targetLng);
+  const accuracy = Math.max(0, parseFloat(gpsAccuracy) || 0);
+  const accuracyTolerance = Math.min(accuracy, Math.max(50, targetRad));
+  const effectiveDistance = Math.max(0, distance - accuracyTolerance);
   const localTime = new Date();
   const tglStr = Utilities.formatDate(localTime, "Asia/Jakarta", "dd/MM/yyyy");
   const wktStr = Utilities.formatDate(localTime, "Asia/Jakarta", "HH:mm:ss");
   const nowMenit = waktuKeMenit(wktStr);
 
-  let outOfRadius = distance > targetRad;
-  let lokasiStr = `Jarak: ${Math.round(distance)}m`;
+  let outOfRadius = effectiveDistance > targetRad;
+  let lokasiStr = `Jarak: ${Math.round(distance)}m (akurasi ±${Math.round(accuracy)}m, toleransi ${Math.round(accuracyTolerance)}m, efektif ${Math.round(effectiveDistance)}m)`;
   if (lokasiInduk !== "Puskesmas") { outOfRadius = false; lokasiStr = `${lokasiInduk.toUpperCase()} (${lokasiStr})`; }
   else { lokasiStr = outOfRadius ? `LUAR AREA (${lokasiStr})` : `PUSKESMAS (${lokasiStr})`; }
 
@@ -241,7 +244,7 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
       return { status: 'ERROR', message: `Anda sudah tercatat ${ket} hari ini pada pukul ${wktMsk}.` };
     }
     if (outOfRadius) {
-      return { status: 'OUT_OF_RADIUS', idQR: pgwFound.id, nama: pgwFound.nama, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Anda berada di luar radius penugasan (${Math.round(distance)}m). Apakah Anda sedang Izin, Sakit, atau Dinas Luar?` };
+      return { status: 'OUT_OF_RADIUS', idQR: pgwFound.id, nama: pgwFound.nama, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Anda berada di luar radius penugasan (${Math.round(effectiveDistance)}m efektif, akurasi ±${Math.round(accuracy)}m). Apakah Anda sedang Izin, Sakit, atau Dinas Luar?` };
     }
     const blnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "MMMM"); const thnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "yyyy");
     sheetAbsen.appendRow([localTime, tglStr, blnStr, thnStr, pgwFound.id, pgwFound.nama, wktStr, "-", "-", lokasiStr, "HADIR", "-", latUser, lngUser]);
@@ -266,7 +269,7 @@ function prosesAbsen(qrText, latUser, lngUser, action) {
       return { status: 'ERROR', message: `Anda sudah melakukan Absen PULANG hari ini pada pukul ${waktuPulang}.` };
     }
 
-    if (outOfRadius) return { status: 'ERROR', message: `Absen PULANG ditolak. Anda berada di luar radius penugasan (${Math.round(distance)}m).` };
+    if (outOfRadius) return { status: 'ERROR', message: `Absen PULANG ditolak. Anda berada di luar radius penugasan (${Math.round(effectiveDistance)}m efektif, akurasi ±${Math.round(accuracy)}m).` };
 
     let wktMasukRaw = existingData[6];
     let wktMasukStr = wktMasukRaw instanceof Date ? Utilities.formatDate(wktMasukRaw, "Asia/Jakarta", "HH:mm:ss") : String(wktMasukRaw);
@@ -513,6 +516,62 @@ function setCutiRangeAdmin(idQR, tglMulaiYMD, tglAkhirYMD, alasan) {
   return {
     status: true,
     message: `Cuti berhasil diset. Baru: ${inserted}, diperbarui: ${updated}, dilewati(HADIR): ${skipped}.`
+  };
+}
+
+function setCutiTanggalPilihanAdmin(idQR, tanggalYMDList, alasan) {
+  if (!idQR || !tanggalYMDList || tanggalYMDList.length === 0) {
+    return { status: false, message: "Pilih minimal 1 tanggal cuti." };
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetAbsen = ss.getSheetByName("Absensi");
+  const allPegawai = ss.getSheetByName("Pegawai").getDataRange().getValues();
+  let namaPgw = "Unknown";
+  for (let i = 1; i < allPegawai.length; i++) {
+    if (allPegawai[i][0] === idQR) { namaPgw = allPegawai[i][1]; break; }
+  }
+
+  const uniqueDates = Array.from(new Set(tanggalYMDList)).sort();
+  let inserted = 0, updated = 0, skipped = 0;
+  let note = (alasan || "Diset Admin").trim();
+
+  uniqueDates.forEach(ymd => {
+    let parts = String(ymd).split('-');
+    if (parts.length !== 3) return;
+    let d = new Date(parts[0], parseInt(parts[1], 10) - 1, parts[2]);
+    let tglStr = Utilities.formatDate(d, "Asia/Jakarta", "dd/MM/yyyy");
+    let blnStr = Utilities.formatDate(d, "Asia/Jakarta", "MMMM");
+    let thnStr = Utilities.formatDate(d, "Asia/Jakarta", "yyyy");
+    let dataAbsen = sheetAbsen.getDataRange().getValues();
+    let rowIndex = -1;
+
+    for (let r = 1; r < dataAbsen.length; r++) {
+      let absenTgl = dataAbsen[r][1];
+      if (absenTgl instanceof Date) absenTgl = Utilities.formatDate(absenTgl, "Asia/Jakarta", "dd/MM/yyyy");
+      else absenTgl = String(absenTgl).replace(/'/g, "");
+      if (dataAbsen[r][4] === idQR && absenTgl === tglStr) { rowIndex = r + 1; break; }
+    }
+
+    if (rowIndex > -1) {
+      const statusNow = String(sheetAbsen.getRange(rowIndex, 11).getValue() || "").toUpperCase().trim();
+      if (statusNow === "HADIR") { skipped++; return; }
+      sheetAbsen.getRange(rowIndex, 7).setValue("-");
+      sheetAbsen.getRange(rowIndex, 8).setValue("-");
+      sheetAbsen.getRange(rowIndex, 9).setValue("-");
+      sheetAbsen.getRange(rowIndex, 10).setValue("MANUAL ADMIN - CUTI PILIHAN");
+      sheetAbsen.getRange(rowIndex, 11).setValue("CUTI");
+      sheetAbsen.getRange(rowIndex, 12).setValue(note);
+      updated++;
+    } else {
+      sheetAbsen.appendRow([new Date(), `'${tglStr}`, blnStr, thnStr, idQR, namaPgw, "-", "-", "-", "MANUAL ADMIN - CUTI PILIHAN", "CUTI", note, "", ""]);
+      inserted++;
+    }
+  });
+
+  return {
+    status: true,
+    message: `Cuti tanggal pilihan berhasil diset. Tanggal: ${uniqueDates.length}, baru: ${inserted}, diperbarui: ${updated}, dilewati(HADIR): ${skipped}.`
   };
 }
 
