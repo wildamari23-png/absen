@@ -1001,19 +1001,20 @@ function getPegawaiEligibleKegiatan(tglStr) {
   const dAbsen = ss.getSheetByName("Absensi").getDataRange().getValues(); dAbsen.shift();
   const settings = getPengaturan();
 
+  const statusById = {};
+  for (let i = 0; i < dAbsen.length; i++) {
+    const a = dAbsen[i];
+    let tanggalAbsenSheet = a[1];
+    if (tanggalAbsenSheet instanceof Date) tanggalAbsenSheet = Utilities.formatDate(tanggalAbsenSheet, "Asia/Jakarta", "dd/MM/yyyy");
+    else tanggalAbsenSheet = String(tanggalAbsenSheet).replace(/'/g, "");
+    if (tanggalAbsenSheet === formattedDate && a[4]) statusById[String(a[4])] = String(a[10] || "BELUM ABSEN").toUpperCase();
+  }
+
   let eligible = [];
   let counts = { tersedia: 0, sakit: 0, izin: 0, tl: 0, cuti: 0 };
 
   dPgw.forEach(p => {
-    let statusAbsen = "BELUM ABSEN";
-    for(let a of dAbsen) {
-      let tanggalAbsenSheet = a[1];
-      if (tanggalAbsenSheet instanceof Date) tanggalAbsenSheet = Utilities.formatDate(tanggalAbsenSheet, "Asia/Jakarta", "dd/MM/yyyy");
-      else tanggalAbsenSheet = String(tanggalAbsenSheet).replace(/'/g, "");
-
-      if(a[4] === p[0] && tanggalAbsenSheet === formattedDate) { statusAbsen = String(a[10]).toUpperCase(); break; }
-    }
-
+    let statusAbsen = statusById[String(p[0])] || "BELUM ABSEN";
     if (statusAbsen === "SAKIT") counts.sakit++;
     else if (statusAbsen === "IZIN") counts.izin++;
     else if (statusAbsen === "TL" || statusAbsen === "TUGAS LUAR") counts.tl++;
