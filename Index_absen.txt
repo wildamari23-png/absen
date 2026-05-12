@@ -191,7 +191,7 @@
         .running-text::before, .running-text::after { content: "✦"; color: #FFD700; filter: drop-shadow(0 0 8px rgba(250,204,21,.9)); }
         @keyframes runningText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        .landing-orbit { position: absolute; inset: -35%; background: conic-gradient(from 120deg, rgba(14,165,233,.18), rgba(250,204,21,.25), rgba(16,185,129,.2), rgba(14,165,233,.18)); animation: orbitGlow 16s linear infinite; }
+        .landing-orbit { position: absolute; inset: -35%; background: conic-gradient(from 120deg, rgba(0,51,102,.28), rgba(255,215,0,.28), rgba(30,64,175,.18), rgba(0,51,102,.28)); animation: orbitGlow 18s linear infinite; }
         @keyframes orbitGlow { to { transform: rotate(360deg); } }
         .float-soft { animation: floatSoft 4.5s ease-in-out infinite; }
         @keyframes floatSoft { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -201,6 +201,19 @@
         .info-card-modern:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(15, 23, 42, .10); }
         .distance-reveal-btn { transition: all .25s ease; }
         .distance-reveal-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(15,23,42,.10); }
+
+        .hero-title-modern {
+            background: linear-gradient(90deg, #ffffff 0%, #FFD700 35%, #dbeafe 70%, #ffffff 100%);
+            background-size: 220% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: heroTextFlow 5s ease-in-out infinite;
+            text-shadow: 0 10px 30px rgba(0,0,0,.18);
+        }
+        .hero-slogan-modern { animation: sloganPulse 3.8s ease-in-out infinite; }
+        @keyframes heroTextFlow { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
+        @keyframes sloganPulse { 0%,100% { transform: translateY(0); filter: drop-shadow(0 0 0 rgba(255,215,0,0)); } 50% { transform: translateY(-2px); filter: drop-shadow(0 0 12px rgba(255,215,0,.38)); } }
     </style>
 </head>
 <body class="text-gray-800 h-screen flex flex-col">
@@ -245,10 +258,10 @@
         <!-- VIEW: SCANNER ABSENSI -->
         <section id="scanView" class="page-section active">
             <div class="flex flex-col items-center justify-center min-h-[75vh]">
-                <div class="w-full max-w-6xl rounded-[2rem] overflow-hidden shadow-2xl border border-white/60 bg-white/90 backdrop-blur-xl relative">
+                <div class="w-full max-w-6xl rounded-[2rem] overflow-hidden shadow-2xl border border-blue-100 bg-white/95 backdrop-blur-xl relative">
                     <div class="landing-orbit opacity-80"></div>
                     <div class="relative grid grid-cols-1 lg:grid-cols-[1.1fr_.9fr] gap-0">
-                        <div class="relative overflow-hidden bg-gradient-to-br from-pusk-blue via-blue-800 to-cyan-700 text-white p-7 md:p-10 scan-grid-bg">
+                        <div class="relative overflow-hidden bg-gradient-to-br from-pusk-blue via-blue-900 to-blue-700 text-white p-6 md:p-9 scan-grid-bg">
                             <div class="absolute top-8 right-8 w-28 h-28 rounded-full bg-pusk-yellow/20 blur-2xl float-soft"></div>
                             <div class="absolute bottom-8 left-8 w-36 h-36 rounded-full bg-cyan-300/20 blur-3xl"></div>
                             <div class="running-wrap -mx-7 md:-mx-10 -mt-7 md:-mt-10 mb-8 py-2 px-3 bg-white/10 border-b border-white/15 text-white text-[11px] font-extrabold tracking-wide backdrop-blur">
@@ -259,12 +272,12 @@
                                     <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
                                     Smart Attendance Gateway
                                 </div>
-                                <h2 class="text-3xl md:text-5xl font-black leading-tight tracking-tight mb-4">Seputar UPTD Puskesmas Tanjung Puri Kabupaten Sintang</h2>
-                                <p class="text-sm md:text-base text-blue-50/95 leading-relaxed max-w-2xl mb-7"><span class="font-black text-pusk-yellow">SLOGAN</span> 𝐒𝐞𝐡𝐚𝐭 𝐁𝐞𝐫𝐬𝐚𝐦𝐚 𝐊𝐚𝐦𝐢, 𝐌𝐚𝐬𝐲𝐚𝐫𝐚𝐤𝐚𝐭 𝐁𝐞𝐫𝐩𝐫𝐞𝐬𝐭𝐚𝐬𝐢.</p>
+                                <h2 class="hero-title-modern text-3xl md:text-5xl font-black leading-tight tracking-tight mb-4">Absen DigitalUPTD Puskesmas Tanjung Puri Kabupaten Sintang</h2>
+                                <p class="hero-slogan-modern text-sm md:text-lg text-blue-50/95 leading-relaxed max-w-2xl mb-7 font-extrabold">𝐒𝐞𝐡𝐚𝐭 𝐁𝐞𝐫𝐬𝐚𝐦𝐚 𝐊𝐚𝐦𝐢, 𝐌𝐚𝐬𝐲𝐚𝐫𝐚𝐤𝐚𝐭 𝐁𝐞𝐫𝐩𝐫𝐞𝐬𝐭𝐚𝐬𝐢.</p>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                                     <div class="bg-white/12 border border-white/20 rounded-3xl p-4 backdrop-blur-md">
-                                        <p class="text-[10px] font-extrabold uppercase tracking-widest text-cyan-100 mb-2"><i class="fa-solid fa-clock mr-1"></i>Waktu Server</p>
+                                        <p class="text-[10px] font-extrabold uppercase tracking-widest text-blue-100 mb-2"><i class="fa-solid fa-clock mr-1"></i>Waktu Server</p>
                                         <div id="liveTime" class="text-4xl font-extrabold font-mono tracking-wider">00:00:00</div>
                                         <div id="liveDate" class="text-xs text-blue-100 font-semibold mt-1 uppercase tracking-widest">Senin, 1 Januari 2024</div>
                                     </div>
@@ -279,74 +292,74 @@
 
                                 <div id="distanceInfoBox" class="mb-6 border border-white/20 rounded-3xl p-4 text-left bg-white/12 backdrop-blur-md">
                                     <div class="flex items-center justify-between gap-2">
-                                        <p class="text-[10px] font-extrabold uppercase tracking-wider text-cyan-100"><i class="fa-solid fa-map-pin mr-1"></i>Monitor Jarak Lokasi</p>
+                                        <p class="text-[10px] font-extrabold uppercase tracking-wider text-blue-100"><i class="fa-solid fa-map-pin mr-1"></i>Monitor Jarak Lokasi</p>
                                         <span id="distanceBadge" class="text-[10px] font-extrabold px-2 py-1 rounded-full bg-white/20 text-white">Belum Dicek</span>
                                     </div>
                                     <p id="distanceText" class="text-xs font-bold text-blue-50 mt-1">Klik tombol <b>Cek Lokasi</b> untuk mulai memeriksa jarak Anda.</p>
-                                    <button id="btnCekLokasi" onclick="cekLokasiSekarang()" class="mt-3 w-full text-xs font-extrabold text-pusk-blue bg-white hover:bg-cyan-50 rounded-2xl py-2.5 transition shadow-lg"><i class="fa-solid fa-location-crosshairs mr-1"></i>Cek Lokasi Sekarang</button>
-                                    <div id="distanceLoading" class="hidden mt-2 text-[11px] font-bold text-cyan-100 items-center gap-2"><i class="fa-solid fa-spinner fa-spin"></i>Sedang mengecek lokasi...</div>
+                                    <button id="btnCekLokasi" onclick="cekLokasiSekarang()" class="mt-3 w-full text-xs font-extrabold text-pusk-blue bg-white hover:bg-yellow-50 rounded-2xl py-2.5 transition shadow-lg"><i class="fa-solid fa-location-crosshairs mr-1"></i>Cek Lokasi Sekarang</button>
+                                    <div id="distanceLoading" class="hidden mt-2 text-[11px] font-bold text-blue-100 items-center gap-2"><i class="fa-solid fa-spinner fa-spin"></i>Sedang mengecek lokasi...</div>
                                     <div id="distanceList" class="hidden mt-2 grid grid-cols-1 gap-1 text-[11px]"></div>
                                 </div>
 
                                 <div id="avgJamCard" class="hidden mb-6 rounded-3xl border border-white/20 bg-white/12 backdrop-blur-md p-4 shadow-xl">
                                     <div class="flex items-center justify-between gap-3 mb-3">
                                         <div>
-                                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-100">Rata-rata hari ini</p>
+                                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-blue-100">Rata-rata hari ini</p>
                                             <h3 class="text-sm font-extrabold text-white">Jam Masuk & Pulang Pegawai</h3>
                                         </div>
                                         <div class="w-10 h-10 rounded-2xl bg-pusk-yellow/20 text-pusk-yellow flex items-center justify-center float-soft"><i class="fa-solid fa-chart-line"></i></div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3">
-                                        <div class="rounded-2xl bg-emerald-400/15 border border-emerald-200/20 p-3">
-                                            <p class="text-[10px] font-black text-emerald-100 uppercase">Masuk</p>
+                                        <div class="rounded-2xl bg-blue-400/15 border border-blue-200/20 p-3">
+                                            <p class="text-[10px] font-black text-blue-100 uppercase">Masuk</p>
                                             <div id="avgJamMasuk" class="text-2xl font-black font-mono text-white mt-1">--:--</div>
-                                            <p id="avgJamMasukCount" class="text-[10px] text-emerald-50 font-bold">0 data</p>
+                                            <p id="avgJamMasukCount" class="text-[10px] text-blue-50 font-bold">0 data</p>
                                         </div>
-                                        <div class="rounded-2xl bg-orange-400/15 border border-orange-200/20 p-3">
-                                            <p class="text-[10px] font-black text-orange-100 uppercase">Pulang</p>
+                                        <div class="rounded-2xl bg-pusk-yellow/20 border border-pusk-yellow/30 p-3">
+                                            <p class="text-[10px] font-black text-yellow-100 uppercase">Pulang</p>
                                             <div id="avgJamPulang" class="text-2xl font-black font-mono text-white mt-1">--:--</div>
-                                            <p id="avgJamPulangCount" class="text-[10px] text-orange-50 font-bold">0 data</p>
+                                            <p id="avgJamPulangCount" class="text-[10px] text-yellow-50 font-bold">0 data</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <h3 class="text-left text-sm font-extrabold text-white mb-3 ml-1 uppercase tracking-wider">Pilih Tipe Scan</h3>
                                 <div class="grid grid-cols-2 gap-4 relative z-10">
-                                    <button onclick="mulaiLiveScan('MASUK')" title="Untuk pegawai yang hadir bekerja dan memulai jam kerja." class="action-card bg-gradient-to-br from-emerald-400 to-green-700 text-white rounded-3xl p-5 cursor-pointer flex flex-col items-center justify-center border border-emerald-300/40 shadow-xl">
+                                    <button onclick="mulaiLiveScan('MASUK')" title="Untuk pegawai yang hadir bekerja dan memulai jam kerja." class="action-card bg-gradient-to-br from-pusk-blue to-blue-700 text-white rounded-3xl p-5 cursor-pointer flex flex-col items-center justify-center border border-pusk-yellow/40 shadow-xl">
                                         <i class="fa-solid fa-camera-retro text-3xl mb-3 float-soft"></i>
                                         <span class="font-extrabold text-sm">Scan MASUK</span>
-                                        <span class="text-[10px] text-emerald-50 mt-1 text-center">Khusus hadir masuk di lokasi resmi</span>
+                                        <span class="text-[10px] text-blue-50 mt-1 text-center">Khusus hadir masuk di lokasi resmi</span>
                                     </button>
-                                    <button onclick="mulaiLiveScan('PULANG')" title="Untuk pegawai yang sudah absen masuk dan mengakhiri jam kerja." class="action-card bg-gradient-to-br from-rose-400 to-red-700 text-white rounded-3xl p-5 cursor-pointer flex flex-col items-center justify-center border border-rose-300/40 shadow-xl">
+                                    <button onclick="mulaiLiveScan('PULANG')" title="Untuk pegawai yang sudah absen masuk dan mengakhiri jam kerja." class="action-card bg-gradient-to-br from-blue-500 to-pusk-blue text-white rounded-3xl p-5 cursor-pointer flex flex-col items-center justify-center border border-pusk-yellow/40 shadow-xl">
                                         <i class="fa-solid fa-camera text-3xl mb-3 float-soft"></i>
                                         <span class="font-extrabold text-sm">Scan PULANG</span>
-                                        <span class="text-[10px] text-rose-50 mt-1 text-center">Menutup kehadiran hari ini</span>
+                                        <span class="text-[10px] text-blue-50 mt-1 text-center">Menutup kehadiran hari ini</span>
                                     </button>
                                     <button onclick="mulaiLiveScan('IZIN')" title="Untuk pengajuan izin dengan alasan jelas dan persetujuan atasan." class="action-card bg-gradient-to-br from-amber-400 to-yellow-600 text-white rounded-3xl p-4 cursor-pointer flex flex-col items-center justify-center border border-amber-300/40 shadow-xl">
                                         <i class="fa-solid fa-file-signature text-2xl mb-2"></i>
                                         <span class="font-extrabold text-sm">Scan IZIN</span>
-                                        <span class="text-[10px] text-amber-50 mt-1 text-center">Tidak perlu absen masuk</span>
+                                        <span class="text-[10px] text-amber-50 mt-1 text-center">Tidak perlu absen masuk/pulang</span>
                                     </button>
-                                    <button onclick="mulaiLiveScan('SAKIT')" title="Untuk keterangan sakit saat tidak dapat bekerja." class="action-card bg-gradient-to-br from-pink-400 to-rose-600 text-white rounded-3xl p-4 cursor-pointer flex flex-col items-center justify-center border border-pink-300/40 shadow-xl">
+                                    <button onclick="mulaiLiveScan('SAKIT')" title="Untuk keterangan sakit saat tidak dapat bekerja." class="action-card bg-gradient-to-br from-blue-400 to-blue-700 text-white rounded-3xl p-4 cursor-pointer flex flex-col items-center justify-center border border-blue-200/40 shadow-xl">
                                         <i class="fa-solid fa-notes-medical text-2xl mb-2"></i>
                                         <span class="font-extrabold text-sm">Scan SAKIT</span>
-                                        <span class="text-[10px] text-pink-50 mt-1 text-center">Catat status sakit</span>
+                                        <span class="text-[10px] text-blue-50 mt-1 text-center">Catat status sakit</span>
                                     </button>
-                                    <button onclick="mulaiLiveScan('TL')" title="Untuk pegawai yang melaksanakan tugas luar resmi." class="action-card bg-gradient-to-br from-sky-400 to-blue-700 text-white rounded-3xl p-4 cursor-pointer flex flex-col items-center justify-center border border-sky-300/40 shadow-xl col-span-2">
+                                    <button onclick="mulaiLiveScan('TL')" title="Untuk pegawai yang melaksanakan tugas luar resmi." class="action-card bg-gradient-to-br from-pusk-blue to-blue-800 text-white rounded-3xl p-4 cursor-pointer flex flex-col items-center justify-center border border-pusk-yellow/40 shadow-xl col-span-2">
                                         <i class="fa-solid fa-briefcase text-2xl mb-2"></i>
                                         <span class="font-extrabold text-sm">Scan TL / Tugas Luar</span>
-                                        <span class="text-[10px] text-sky-50 mt-1 text-center">Tugas resmi di luar area, tidak perlu absen masuk/pulang</span>
+                                        <span class="text-[10px] text-yellow-50 mt-1 text-center">Tugas resmi di luar area, tidak perlu absen masuk/pulang</span>
                                     </button>
                                 </div>
                                 <p class="text-[10px] text-blue-100 mt-4"><i class="fa-solid fa-circle-info mr-1"></i> Scanner khusus Live Camera. MASUK/PULANG wajib valid lokasi; IZIN/SAKIT/TL memiliki tombol scan sendiri dan tidak dicampur dengan absen masuk.</p>
                             </div>
                         </div>
 
-                        <div class="relative bg-slate-50 p-6 md:p-8">
+                        <div class="hidden lg:block relative bg-gradient-to-br from-white via-blue-50 to-yellow-50 p-6 md:p-8">
                             <div class="grid grid-cols-1 gap-4">
-                                <div class="info-card-modern rounded-3xl p-5 bg-white border border-cyan-100 shadow-sm">
+                                <div class="info-card-modern rounded-3xl p-5 bg-white border border-blue-100 shadow-sm">
                                     <div class="flex items-start gap-3">
-                                        <div class="w-11 h-11 rounded-2xl bg-cyan-100 text-cyan-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-route"></i></div>
+                                        <div class="w-11 h-11 rounded-2xl bg-blue-100 text-pusk-blue flex items-center justify-center shrink-0"><i class="fa-solid fa-route"></i></div>
                                         <div>
                                             <h3 class="text-base font-black text-slate-900">Alur Absen Live Scan</h3>
                                             <ol class="mt-3 space-y-2 text-xs text-slate-600 font-semibold leading-relaxed">
@@ -358,8 +371,8 @@
                                     </div>
                                 </div>
 
-                                <div class="info-card-modern rounded-3xl p-5 bg-gradient-to-br from-teal-50 to-white border border-teal-100 shadow-sm">
-                                    <h3 class="text-sm font-black text-teal-900 mb-3 uppercase tracking-wider"><i class="fa-solid fa-user-shield mr-1"></i>Mekanisme Izin, Sakit & TL</h3>
+                                <div class="info-card-modern rounded-3xl p-5 bg-gradient-to-br from-blue-50 to-white border border-blue-100 shadow-sm">
+                                    <h3 class="text-sm font-black text-pusk-blue mb-3 uppercase tracking-wider"><i class="fa-solid fa-user-shield mr-1"></i>Mekanisme Izin, Sakit & TL</h3>
                                     <div class="grid grid-cols-1 gap-3">
                                         <div class="rounded-2xl bg-white/80 border border-amber-100 p-3"><p class="text-[10px] font-black text-amber-600 uppercase">Izin</p><p class="text-xs text-slate-700 mt-1 font-semibold">Ajukan dengan alasan jelas dan persetujuan atasan .</p></div>
                                         <div class="rounded-2xl bg-white/80 border border-rose-100 p-3"><p class="text-[10px] font-black text-rose-600 uppercase">Sakit</p><p class="text-xs text-slate-700 mt-1 font-semibold">Laporkan kondisi kesehatan. Jika ada surat keterangan, simpan sebagai bukti pendukung sesuai kebijakan unit.</p></div>
@@ -367,18 +380,18 @@
                                     </div>
                                 </div>
 
-                                <div class="info-card-modern rounded-3xl p-5 bg-gradient-to-br from-violet-50 to-white border border-violet-100 shadow-sm">
-                                    <h3 class="text-sm font-black text-violet-900 mb-3 uppercase tracking-wider"><i class="fa-solid fa-door-open mr-1"></i>Status yang Tidak Perlu Absen Pulang</h3>
+                                <div class="info-card-modern rounded-3xl p-5 bg-gradient-to-br from-yellow-50 to-white border border-yellow-100 shadow-sm">
+                                    <h3 class="text-sm font-black text-pusk-blue mb-3 uppercase tracking-wider"><i class="fa-solid fa-door-open mr-1"></i>Status yang Tidak Perlu Absen Pulang</h3>
                                     <div class="flex flex-wrap gap-2 mb-3">
                                         <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-[10px] font-black">IZIN</span>
                                         <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black">SAKIT</span>
                                         <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-black">TL</span>
                                         <span class="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-[10px] font-black">CUTI</span>
                                     </div>
-                                    <p class="text-xs text-slate-600 font-semibold leading-relaxed">Pegawai dengan status tersebut tidak wajib scan pulang pada hari yang sama karena kehadirannya diselesaikan melalui pencatatan status/admin. Pegawai yang sudah scan <b>MASUK</b> tetap perlu scan <b>PULANG</b> agar data lengkap.</p>
+                                    <p class="text-xs text-slate-600 font-semibold leading-relaxed">Pegawai dengan status <b>IZIN</b>, Sakit, TL, atau Cuti tidak wajib scan pulang pada hari yang sama karena diselesaikan melalui scan/status khusus. Pegawai yang sudah scan <b>MASUK</b> tetap perlu scan <b>PULANG</b> agar data lengkap.</p>
                                 </div>
 
-                                <div id="jamOperasionalInfo" class="text-xs font-extrabold text-teal-800 bg-teal-50 border border-teal-100 rounded-2xl px-4 py-3">Jam Operasional Scan: memuat data...</div>
+                                <div id="jamOperasionalInfo" class="text-xs font-extrabold text-pusk-blue bg-yellow-50 border border-yellow-100 rounded-2xl px-4 py-3">Jam Operasional Scan: memuat data...</div>
                             </div>
                         </div>
                     </div>
@@ -810,9 +823,9 @@
                                 <div><label class="block text-[10px] font-bold text-gray-600 mb-1">Akhir</label><input type="time" id="setJamPulangAkhir" class="w-full px-3 py-2 bg-white border border-orange-200 rounded-lg text-sm font-bold"></div>
                             </div>
                         </div>
-                        <label class="flex items-start gap-3 bg-cyan-50 border border-cyan-100 rounded-xl p-3 cursor-pointer">
-                            <input type="checkbox" id="setTampilRataJam" class="mt-1 accent-cyan-600">
-                            <span><b class="text-xs text-cyan-800 uppercase">Tampilkan kartu rata-rata jam di landing</b><br><span class="text-[11px] text-gray-500 font-semibold">Jika aktif, landing menampilkan rata-rata jam masuk dan pulang hari ini dengan animasi modern.</span></span>
+                        <label class="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3 cursor-pointer">
+                            <input type="checkbox" id="setTampilRataJam" class="mt-1 accent-pusk-blue">
+                            <span><b class="text-xs text-pusk-blue uppercase">Tampilkan kartu rata-rata jam di landing</b><br><span class="text-[11px] text-gray-500 font-semibold">Jika aktif, landing menampilkan rata-rata jam masuk dan pulang hari ini dengan animasi modern.</span></span>
                         </label>
                     </div>
                 </div>
