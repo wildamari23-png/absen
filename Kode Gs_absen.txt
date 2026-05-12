@@ -56,7 +56,7 @@ function ensurePengaturanDefaults_() {
 
   const defaults = [
     ["App_Name", "PORTAL ABSENSI"], ["App_Logo", ""], ["App_Header_Name", "Sistem Digital"], ["App_Login_Bg", ""],
-    ["Running_Text", "Selamat datang di Portal Absensi Digital — disiplin, cepat, dan presisi."],
+    ["Running_Text", "Info layanan digital UPTD Puskesmas Tanjung Puri • sehat bersama kami • masyarakat berprestasi • scan cepat, data akurat"],
     ["Admin_User", "admin"], ["Admin_Pass", "sintang2026"],
     ["Nama_Puskesmas", "UPTD PUSKESMAS TANJUNG PURI SINTANG"],
     ["Lat_Puskesmas", "0.0636"], ["Lng_Puskesmas", "111.4988"], ["Rad_Puskesmas", "100"],

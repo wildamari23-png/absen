@@ -175,12 +175,20 @@
             position: relative; z-index: 10; background: white; border-radius: 50%;
             width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
         }
-        .running-wrap { overflow: hidden; white-space: nowrap; }
+        .running-wrap { overflow: hidden; white-space: nowrap; position: relative; }
+        .running-wrap::before, .running-wrap::after { content: ""; position: absolute; top: 0; bottom: 0; width: 54px; z-index: 2; pointer-events: none; }
+        .running-wrap::before { left: 0; background: linear-gradient(90deg, rgba(0,51,102,.95), transparent); }
+        .running-wrap::after { right: 0; background: linear-gradient(270deg, rgba(14,116,144,.88), transparent); }
         .running-text {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.25rem;
             padding-left: 100%;
-            animation: runningText 18s linear infinite;
+            letter-spacing: .08em;
+            text-shadow: 0 0 18px rgba(255,255,255,.35);
+            animation: runningText 24s linear infinite;
         }
+        .running-text::before, .running-text::after { content: "✦"; color: #FFD700; filter: drop-shadow(0 0 8px rgba(250,204,21,.9)); }
         @keyframes runningText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         .landing-orbit { position: absolute; inset: -35%; background: conic-gradient(from 120deg, rgba(14,165,233,.18), rgba(250,204,21,.25), rgba(16,185,129,.2), rgba(14,165,233,.18)); animation: orbitGlow 16s linear infinite; }
@@ -244,15 +252,15 @@
                             <div class="absolute top-8 right-8 w-28 h-28 rounded-full bg-pusk-yellow/20 blur-2xl float-soft"></div>
                             <div class="absolute bottom-8 left-8 w-36 h-36 rounded-full bg-cyan-300/20 blur-3xl"></div>
                             <div class="running-wrap -mx-7 md:-mx-10 -mt-7 md:-mt-10 mb-8 py-2 px-3 bg-white/10 border-b border-white/15 text-white text-[11px] font-extrabold tracking-wide backdrop-blur">
-                                <span id="runningTextMsg" class="running-text">Selamat datang di Portal Absensi Digital — disiplin, cepat, dan presisi.</span>
+                                <span id="runningTextMsg" class="running-text">Info layanan digital UPTD Puskesmas Tanjung Puri • sehat bersama kami • masyarakat berprestasi • scan cepat, data akurat</span>
                             </div>
                             <div class="relative z-10">
                                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 border border-white/20 text-[11px] font-extrabold uppercase tracking-widest mb-5">
                                     <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
                                     Smart Attendance Gateway
                                 </div>
-                                <h2 class="text-3xl md:text-5xl font-black leading-tight tracking-tight mb-4">Absensi Digital yang <span class="text-pusk-yellow">Cepat</span>, Presisi, dan Informatif.</h2>
-                                <p class="text-sm md:text-base text-blue-50/95 leading-relaxed max-w-2xl mb-7">Gunakan Live Scan QR dengan validasi lokasi, jam operasional, dan panduan status kehadiran dalam satu landing page modern.</p>
+                                <h2 class="text-3xl md:text-5xl font-black leading-tight tracking-tight mb-4">Seputar UPTD Puskesmas Tanjung Puri Kabupaten Sintang</h2>
+                                <p class="text-sm md:text-base text-blue-50/95 leading-relaxed max-w-2xl mb-7"><span class="font-black text-pusk-yellow">SLOGAN</span> 𝐒𝐞𝐡𝐚𝐭 𝐁𝐞𝐫𝐬𝐚𝐦𝐚 𝐊𝐚𝐦𝐢, 𝐌𝐚𝐬𝐲𝐚𝐫𝐚𝐤𝐚𝐭 𝐁𝐞𝐫𝐩𝐫𝐞𝐬𝐭𝐚𝐬𝐢.</p>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                                     <div class="bg-white/12 border border-white/20 rounded-3xl p-4 backdrop-blur-md">
@@ -570,15 +578,6 @@
     <option value="TL">TL</option>
     <option value="ALPA">Alpa</option>
 </select>
-                </div>
-                <div class="w-full lg:w-1/4">
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Filter Jarak</label>
-                    <select id="filterJarakHarian" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" onchange="renderTableHarian(true)">
-                        <option value="ALL">Semua Jarak</option>
-                        <option value="DEKAT">Dekat</option>
-                        <option value="SEDANG">Pertengahan</option>
-                        <option value="JAUH">Jauh</option>
-                    </select>
                 </div>
                 <div class="w-full lg:w-1/4">
                     <button onclick="terapkanBulkAlpa()" class="w-full bg-red-50 text-red-600 border border-red-200 font-bold py-2 px-3 rounded-lg text-sm hover:bg-red-100 transition"><i class="fa-solid fa-user-xmark mr-1"></i> Set ALPA Masal</button>
@@ -1025,7 +1024,7 @@
                     document.getElementById('appHeaderName').innerText = singkatan;
                     document.getElementById('previewAppSubText').innerText = singkatan;
                 }
-                document.getElementById('runningTextMsg').innerText = res.Running_Text || "Selamat datang di Portal Absensi Digital — disiplin, cepat, dan presisi.";
+                document.getElementById('runningTextMsg').innerText = res.Running_Text || "Info layanan digital UPTD Puskesmas Tanjung Puri • sehat bersama kami • masyarakat berprestasi • scan cepat, data akurat";
 
                 if(res.App_Logo && res.App_Logo.trim() !== "") {
                     document.getElementById('appLogoIcon').classList.add('hidden');
@@ -1256,11 +1255,33 @@
         }
 
         // 2. Keamanan & Scan Absensi User
+        function playScanBeep() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.16);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.17);
+                setTimeout(() => ctx.close(), 260);
+            } catch (_) {}
+        }
+
         function handlePopupScanMessage(event) {
             if (event.origin !== window.location.origin) return;
             const payload = event.data || {};
             if (payload.type !== 'PUSK_QR_RESULT') return;
             if (!payload.decodedText || !payload.actionType) return;
+            playScanBeep();
             handleScanResult(payload.decodedText, payload.actionType);
         }
 
@@ -1302,7 +1323,22 @@
   </div>
   <script>
     let scanner;
+    function beep() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = 1040;
+        gain.gain.value = 0.12;
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.14);
+        setTimeout(() => ctx.close(), 220);
+      } catch(_) {}
+    }
     function kirimHasil(text) {
+      beep();
       try {
         if (window.opener && !window.opener.closed) {
           window.opener.postMessage({ type: 'PUSK_QR_RESULT', decodedText: text, actionType: '${actionType}' }, window.location.origin);
@@ -1590,9 +1626,14 @@
             document.getElementById('tbHarian').innerHTML = `<tr><td colspan="6" class="text-center py-10"><i class="fa-solid fa-spinner fa-spin text-pusk-blue fa-2x"></i></td></tr>`;
 
             google.script.run.withSuccessHandler(function(res) {
-                dataAbsenHarianRaw = res.data;
-                window.kapusParams = { puskesmas: res.namaPuskesmas, nama: res.kapusNama, nip: res.kapusNip };
+                res = res || {};
+                dataAbsenHarianRaw = Array.isArray(res.data) ? res.data : [];
+                window.kapusParams = { puskesmas: res.namaPuskesmas || '', nama: res.kapusNama || '', nip: res.kapusNip || '' };
                 renderTableHarian(true);
+            }).withFailureHandler(function(err) {
+                dataAbsenHarianRaw = [];
+                document.getElementById('tbHarian').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Gagal memuat data harian. Klik reload untuk mencoba lagi.</td></tr>`;
+                Swal.fire('Gagal Memuat', (err && err.message) ? err.message : 'Koneksi lambat atau server Apps Script belum merespons.', 'error');
             }).getAbsenHarian(tgl);
         }
 
@@ -1601,19 +1642,11 @@
         function renderTableHarian(resetPg = false) {
             if(resetPg) currentPgHarian = 1;
             const filterKet = document.getElementById('filterKetHarian').value;
-            const filterJarak = document.getElementById('filterJarakHarian').value;
             const searchVal = document.getElementById('searchHarian').value.toLowerCase();
 
             filteredHarian = dataAbsenHarianRaw;
-            if(filterKet !== "ALL") filteredHarian = filteredHarian.filter(d => d.keterangan.toUpperCase() === filterKet.toUpperCase());
-            if(filterJarak !== "ALL") filteredHarian = filteredHarian.filter(d => {
-                const m = String(d.jarakInfo || '').match(/(\d+)\s*m/i); const dist = m ? parseInt(m[1],10) : null;
-                if (dist === null) return false;
-                if (filterJarak === 'DEKAT') return dist <= 100;
-                if (filterJarak === 'SEDANG') return dist > 100 && dist <= 300;
-                return dist > 300;
-            });
-            if(searchVal) filteredHarian = filteredHarian.filter(d => d.nama.toLowerCase().includes(searchVal) || d.jabatan.toLowerCase().includes(searchVal));
+            if(filterKet !== "ALL") filteredHarian = filteredHarian.filter(d => String(d.keterangan || '').toUpperCase() === filterKet.toUpperCase());
+            if(searchVal) filteredHarian = filteredHarian.filter(d => String(d.nama || '').toLowerCase().includes(searchVal) || String(d.jabatan || '').toLowerCase().includes(searchVal));
 
             // Stats
            // ====================== STATS BARU (SUDAH HADIR BENAR) ======================
