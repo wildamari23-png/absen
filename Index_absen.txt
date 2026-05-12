@@ -1405,6 +1405,9 @@
         }
 
         function bukaScannerOutFrame(actionType) {
+            const scannerLibTag = '<scr' + 'ipt src="https://unpkg.com/html5-qrcode"></scr' + 'ipt>';
+            const popupScriptOpen = '<scr' + 'ipt>';
+            const popupScriptClose = '</scr' + 'ipt>';
             const popupHtml = `
 <!doctype html>
 <html lang="id">
@@ -1412,7 +1415,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Scanner QR - Absensi</title>
-  <script src="https://unpkg.com/html5-qrcode"><\/script>
+  ${scannerLibTag}
   <style>
     body{margin:0;background:#0f172a;color:#e2e8f0;font-family:Arial,sans-serif}
     .wrap{max-width:680px;margin:0 auto;padding:20px}
@@ -1432,7 +1435,7 @@
     <div id="reader"></div>
     <div style="margin-top:12px"><button class="btn" id="btnStop">Tutup Scanner</button></div>
   </div>
-  <script>
+  ${popupScriptOpen}
     let scanner;
     function beep() {
       try {
@@ -1482,7 +1485,7 @@
       window.close();
     });
     runScanner().catch(() => alert('Kamera gagal diakses. Pastikan izin kamera aktif.'));
-  <\/script>
+  ${popupScriptClose}
 </body>
 </html>`;
 
@@ -1502,7 +1505,8 @@
             }).then((result) => { if(result.isConfirmed) { localStorage.removeItem('pusk_sintang_bound_qr'); Swal.fire('Berhasil', 'Kunci perangkat di HP ini telah dihapus.', 'success'); } });
         }
 
-        function handleScanResult(decodedText, actionType, onFinish = null) {
+        function handleScanResult(decodedText, actionType, onFinish) {
+            if (onFinish === undefined) onFinish = null;
             let boundQr = localStorage.getItem('pusk_sintang_bound_qr');
             if (boundQr && boundQr !== decodedText) {
                 Swal.fire({ icon: 'error', title: 'Titip Absen Ditolak! 🚫', text: 'HP ini sudah dikunci untuk akun pegawai lain. Anda harus menggunakan HP Anda sendiri.', confirmButtonColor: '#d33' });
@@ -1527,7 +1531,8 @@
             prosesKeBackend(decodedText, actionType, onFinish);
         }
 
-        function tampilkanFormScanKeterangan(decodedText, actionType, onFinish = null) {
+        function tampilkanFormScanKeterangan(decodedText, actionType, onFinish) {
+            if (onFinish === undefined) onFinish = null;
             const labelMap = { IZIN: 'Izin', SAKIT: 'Sakit', TL: 'Tugas Luar (TL)' };
             Swal.fire({
                 title: `Scan ${labelMap[actionType] || actionType}`,
@@ -1589,7 +1594,8 @@
             });
         }
 
-        function prosesKeBackend(decodedText, actionType, onFinish = null) {
+        function prosesKeBackend(decodedText, actionType, onFinish) {
+            if (onFinish === undefined) onFinish = null;
             let actionText = actionType === 'MASUK' ? 'Check-In' : 'Check-Out';
             showModernLoading(`Memproses ${actionText}`, 'QR berhasil dibaca, validasi data dan lokasi sedang berjalan.', 'fa-qrcode');
 
@@ -1609,7 +1615,8 @@
             .prosesAbsen(decodedText, currentUserLat, currentUserLng, actionType, currentUserAcc || 0);
         }
 
-        function tampilkanDialogPulangSebelumnya(res, decodedText, actionType, onFinish = null) {
+        function tampilkanDialogPulangSebelumnya(res, decodedText, actionType, onFinish) {
+            if (onFinish === undefined) onFinish = null;
             Swal.fire({
                 title: 'Lengkapi Absen Pulang Sebelumnya',
                 html: `
@@ -1774,7 +1781,8 @@
 
         function gantiHalHarian(pg) { currentPgHarian = pg; renderTableHarian(false); }
 
-        function renderTableHarian(resetPg = false) {
+        function renderTableHarian(resetPg) {
+            if (resetPg === undefined) resetPg = false;
             if(resetPg) currentPgHarian = 1;
             const filterKet = document.getElementById('filterKetHarian').value;
             const searchVal = document.getElementById('searchHarian').value.toLowerCase();
@@ -2211,7 +2219,8 @@ function populateLokasiFilter() {
 
         function gantiHalPegawai(pg) { currentPgPegawai = pg; renderTablePegawai(false); }
 
-function renderTablePegawai(resetPg = false) {
+function renderTablePegawai(resetPg) {
+    if (resetPg === undefined) resetPg = false;
     if(resetPg) currentPgPegawai = 1;
 
     const searchVal = document.getElementById('searchPegawai').value.toLowerCase().trim();
