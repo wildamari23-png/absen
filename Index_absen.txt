@@ -702,6 +702,10 @@
                             <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1">URL Logo Aplikasi (Opsional)</label><input type="text" id="setAppLogo" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" placeholder="https://link-gambar.com/logo.png"></div>
                             <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1">URL Gambar Layar Login (Opsional)</label><input type="text" id="setAppLoginBg" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" placeholder="https://link-gambar.com/bg-login.jpg"></div>
                             <div><label class="block text-xs font-bold text-gray-600 uppercase mb-1">Pesan Running Text Landing</label><input type="text" id="setRunningText" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold" placeholder="Selamat datang..."></div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div><label class="block text-xs font-bold text-emerald-700 uppercase mb-1">Pesan Berhasil Absen Masuk</label><textarea id="setPesanMasuk" rows="3" class="w-full px-3 py-2 bg-emerald-50 border border-emerald-100 rounded-lg text-sm font-semibold" placeholder="Gunakan {nama} dan {waktu}"></textarea></div>
+                                <div><label class="block text-xs font-bold text-orange-700 uppercase mb-1">Pesan Berhasil Absen Pulang</label><textarea id="setPesanPulang" rows="3" class="w-full px-3 py-2 bg-orange-50 border border-orange-100 rounded-lg text-sm font-semibold" placeholder="Gunakan {nama}, {waktu}, dan {jamKerja}"></textarea></div>
+                            </div>
                         </div>
                     </div>
                     <div class="w-full md:w-1/2 bg-blue-50 p-4 rounded-xl border border-blue-100 h-full flex flex-col justify-center">
@@ -1057,6 +1061,8 @@
                 document.getElementById('setAppLogo').value = res.App_Logo || '';
                 document.getElementById('setAppLoginBg').value = res.App_Login_Bg || '';
                 document.getElementById('setRunningText').value = res.Running_Text || '';
+                document.getElementById('setPesanMasuk').value = res.Pesan_Masuk_Berhasil || 'Absen MASUK berhasil. Selamat bekerja, {nama}! Semoga hari ini penuh manfaat dan pelayanan terbaik.';
+                document.getElementById('setPesanPulang').value = res.Pesan_Pulang_Berhasil || 'Absen PULANG berhasil. Terima kasih, {nama}. Semoga perjalanan pulang aman dan sehat selalu.';
                 document.getElementById('setNamaPusk').value = res.Nama_Puskesmas || '';
                 document.getElementById('setKapusNama').value = res.Kepala_Nama || '';
                 document.getElementById('setKapusNip').value = res.Kepala_NIP || '';
@@ -1089,6 +1095,8 @@
                 App_Logo: document.getElementById('setAppLogo').value,
                 App_Login_Bg: document.getElementById('setAppLoginBg').value,
                 Running_Text: document.getElementById('setRunningText').value,
+                Pesan_Masuk_Berhasil: document.getElementById('setPesanMasuk').value,
+                Pesan_Pulang_Berhasil: document.getElementById('setPesanPulang').value,
                 Nama_Puskesmas: document.getElementById('setNamaPusk').value,
                 Kepala_Nama: document.getElementById('setKapusNama').value,
                 Kepala_NIP: document.getElementById('setKapusNip').value,
@@ -1412,14 +1420,48 @@
             prosesKeBackend(decodedText, actionType, onFinish);
         }
 
+        function tampilkanAlertBerhasilAbsen(res, tipe) {
+            const isMasuk = tipe === 'MASUK';
+            const tone = isMasuk ? {
+                icon: 'bg-emerald-100 text-emerald-600',
+                label: 'text-emerald-600',
+                shell: 'bg-gradient-to-br from-emerald-50 via-white to-sky-50 border-emerald-100',
+                button: '#059669'
+            } : {
+                icon: 'bg-orange-100 text-orange-600',
+                label: 'text-orange-600',
+                shell: 'bg-gradient-to-br from-orange-50 via-white to-sky-50 border-orange-100',
+                button: '#ea580c'
+            };
+            const ikon = isMasuk ? 'fa-person-walking-arrow-right' : 'fa-house-chimney-heart';
+            const judul = isMasuk ? 'Masuk Tercatat!' : 'Pulang Tercatat!';
+            const sub = isMasuk ? 'Selamat memulai pelayanan hari ini' : 'Terima kasih atas dedikasi hari ini';
+            const jamInfo = isMasuk ? '' : `<div class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-orange-50 text-orange-700 border border-orange-100 text-xs font-black"><i class="fa-solid fa-hourglass-half"></i>Total jam kerja: ${res.jamKerja || '-'}</div>`;
+            const lokasiInfo = `<div class="mt-4 grid grid-cols-1 gap-2 text-left text-xs font-bold"><div class="bg-slate-50 border border-slate-100 rounded-2xl p-3"><span class="text-slate-400 uppercase text-[10px]">Lokasi Tugas Induk</span><br><span class="text-slate-700">${res.lokasiInduk || '-'}</span></div><div class="bg-slate-50 border border-slate-100 rounded-2xl p-3"><span class="text-slate-400 uppercase text-[10px]">Tagging Lokasi</span><br><span class="text-slate-700">${res.lokasiTag || '-'}</span></div></div>`;
+            Swal.fire({
+                icon: 'success',
+                title: judul,
+                html: `
+                    <div class="relative overflow-hidden rounded-[1.5rem] ${tone.shell} border p-5 text-center">
+                        <div class="mx-auto w-16 h-16 rounded-3xl ${tone.icon} flex items-center justify-center text-3xl shadow-inner mb-3"><i class="fa-solid ${ikon}"></i></div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] ${tone.label} mb-2">${sub}</p>
+                        <div class="text-4xl font-black font-mono text-slate-900 tracking-tight">${res.waktu || '-'}</div>
+                        ${jamInfo}
+                        <p class="mt-4 text-sm font-bold text-slate-700 leading-relaxed">${res.message || 'Absensi berhasil disimpan.'}</p>
+                        ${lokasiInfo}
+                    </div>`,
+                confirmButtonText: 'Mantap, Terima Kasih',
+                confirmButtonColor: tone.button
+            });
+        }
+
         function prosesKeBackend(decodedText, actionType, onFinish = null) {
             let actionText = actionType === 'MASUK' ? 'Check-In' : 'Check-Out';
             Swal.fire({ title: `Memproses ${actionText}...`, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             google.script.run.withSuccessHandler(function(res) {
-                const lokasiInfo = `<p class="mt-2 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg py-1 px-2">Lokasi Tugas Induk: ${res.lokasiInduk || '-'}<br>Tagging Lokasi: ${res.lokasiTag || '-'}</p>`;
-                if(res.status === 'SUCCESS_MASUK') { Swal.fire({ icon: 'success', title: 'Absen Masuk Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-pusk-blue">${res.waktu}</span><p class="mt-2 text-gray-600">${res.message}</p>${lokasiInfo}</div>`, confirmButtonColor: '#003366'}); }
-                else if (res.status === 'SUCCESS_PULANG') { Swal.fire({ icon: 'success', title: 'Absen Pulang Tercatat!', html: `<div class="text-center"><span class="text-3xl font-bold font-mono text-orange-600">${res.waktu}</span><p class="text-sm font-bold text-gray-500 mt-2">TOTAL JAM: ${res.jamKerja}</p><p class="text-gray-600 mt-2">${res.message}</p>${lokasiInfo}</div>`, confirmButtonColor: '#003366'}); }
+                if(res.status === 'SUCCESS_MASUK') { tampilkanAlertBerhasilAbsen(res, 'MASUK'); }
+                else if (res.status === 'SUCCESS_PULANG') { tampilkanAlertBerhasilAbsen(res, 'PULANG'); }
                 else if (res.status === 'OUT_OF_RADIUS') {
                     tampilkanFormLuarRadius(res.idQR, res.nama);
                 }
@@ -1585,7 +1627,13 @@
             const target = document.getElementById(targetId);
             if (!target) return;
             const jarakInfo = (window.jarakHarianCache || {})[cacheKey] || '';
-            target.innerHTML = renderJarakBadge(jarakInfo);
+            target.innerHTML = `${renderJarakBadge(jarakInfo)} <button type="button" onclick="tutupJarakHarian('${targetId}', '${cacheKey}')" class="distance-reveal-btn inline-flex mt-1 ml-1 items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white text-slate-500 border border-slate-200 hover:bg-slate-50"><i class="fa-solid fa-xmark"></i> Tutup</button>`;
+        }
+
+        function tutupJarakHarian(targetId, cacheKey) {
+            const target = document.getElementById(targetId);
+            if (!target) return;
+            target.innerHTML = renderTombolJarakHarian(targetId, cacheKey);
         }
 
         function renderTombolJarakHarian(targetId, cacheKey) {

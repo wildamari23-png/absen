@@ -57,6 +57,8 @@ function ensurePengaturanDefaults_() {
   const defaults = [
     ["App_Name", "PORTAL ABSENSI"], ["App_Logo", ""], ["App_Header_Name", "Sistem Digital"], ["App_Login_Bg", ""],
     ["Running_Text", "Info layanan digital UPTD Puskesmas Tanjung Puri • sehat bersama kami • masyarakat berprestasi • scan cepat, data akurat"],
+    ["Pesan_Masuk_Berhasil", "Absen MASUK berhasil. Selamat bekerja, {nama}! Semoga hari ini penuh manfaat dan pelayanan terbaik."],
+    ["Pesan_Pulang_Berhasil", "Absen PULANG berhasil. Terima kasih, {nama}. Semoga perjalanan pulang aman dan sehat selalu."],
     ["Admin_User", "admin"], ["Admin_Pass", "sintang2026"],
     ["Nama_Puskesmas", "UPTD PUSKESMAS TANJUNG PURI SINTANG"],
     ["Lat_Puskesmas", "0.0636"], ["Lng_Puskesmas", "111.4988"], ["Rad_Puskesmas", "100"],
@@ -157,6 +159,17 @@ function getListPegawai() {
 }
 
 // 4. LOGIKA ABSENSI
+function formatPesanAbsen_(template, ctx) {
+  template = String(template || "");
+  const data = ctx || {};
+  return template
+    .replace(/\{nama\}/g, data.nama || "")
+    .replace(/\{waktu\}/g, data.waktu || "")
+    .replace(/\{jamKerja\}/g, data.jamKerja || "")
+    .replace(/\{lokasi\}/g, data.lokasi || "")
+    .replace(/\{tanggal\}/g, data.tanggal || "");
+}
+
 function prosesAbsen(qrText, latUser, lngUser, action, gpsAccuracy) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const dataPgw = ss.getSheetByName("Pegawai").getDataRange().getValues();
@@ -248,7 +261,8 @@ function prosesAbsen(qrText, latUser, lngUser, action, gpsAccuracy) {
     }
     const blnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "MMMM"); const thnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "yyyy");
     sheetAbsen.appendRow([localTime, tglStr, blnStr, thnStr, pgwFound.id, pgwFound.nama, wktStr, "-", "-", lokasiStr, "HADIR", "-", latUser, lngUser]);
-    return { status: 'SUCCESS_MASUK', waktu: wktStr, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen MASUK berhasil. Selamat Bekerja, ${pgwFound.nama}!` };
+    const pesanMasuk = formatPesanAbsen_(settings.Pesan_Masuk_Berhasil || "Absen MASUK berhasil. Selamat bekerja, {nama}!", { nama: pgwFound.nama, waktu: wktStr, lokasi: lokasiInduk, tanggal: tglStr });
+    return { status: 'SUCCESS_MASUK', waktu: wktStr, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: pesanMasuk };
   }
   else if (action === "PULANG") {
     const jamPulangMulai = settings.Jam_Pulang_Mulai || "00:00";
@@ -276,7 +290,8 @@ function prosesAbsen(qrText, latUser, lngUser, action, gpsAccuracy) {
     let jamKerja = hitungJamKerja(wktMasukStr, wktStr);
 
     sheetAbsen.getRange(rowIndex, 8).setValue(wktStr); sheetAbsen.getRange(rowIndex, 9).setValue(jamKerja); sheetAbsen.getRange(rowIndex, 10).setValue(lokasiStr);
-    return { status: 'SUCCESS_PULANG', waktu: wktStr, jamKerja: jamKerja, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG berhasil. Hati-hati di jalan, ${pgwFound.nama}.` };
+    const pesanPulang = formatPesanAbsen_(settings.Pesan_Pulang_Berhasil || "Absen PULANG berhasil. Terima kasih, {nama}.", { nama: pgwFound.nama, waktu: wktStr, jamKerja: jamKerja, lokasi: lokasiInduk, tanggal: tglStr });
+    return { status: 'SUCCESS_PULANG', waktu: wktStr, jamKerja: jamKerja, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: pesanPulang };
   }
 }
 
@@ -674,36 +689,37 @@ function getAbsenHarian(tglStr) {
   const dAbsen = ss.getSheetByName("Absensi").getDataRange().getValues(); dAbsen.shift();
   const settings = getPengaturan();
 
+  const absenById = {};
+  for (let i = 0; i < dAbsen.length; i++) {
+    const a = dAbsen[i];
+    let tanggalAbsenSheet = a[1];
+    if (tanggalAbsenSheet instanceof Date) tanggalAbsenSheet = Utilities.formatDate(tanggalAbsenSheet, "Asia/Jakarta", "dd/MM/yyyy");
+    else tanggalAbsenSheet = String(tanggalAbsenSheet).replace(/'/g, "");
+    if (tanggalAbsenSheet === formattedDate && a[4]) absenById[String(a[4])] = a;
+  }
+
   let hasilHarian = [];
 
   dPgw.forEach(p => {
     let statusHarian = "BELUM ABSEN";
     let wktMasuk = "-", wktPulang = "-", jamKerja = "-", alasan = "-", jarakInfo = "-";
+    const a = absenById[String(p[0])] || null;
 
-    for(let a of dAbsen) {
-      let tanggalAbsenSheet = a[1];
-      if (tanggalAbsenSheet instanceof Date) tanggalAbsenSheet = Utilities.formatDate(tanggalAbsenSheet, "Asia/Jakarta", "dd/MM/yyyy");
-      else tanggalAbsenSheet = String(tanggalAbsenSheet).replace(/'/g, "");
+    if (a) {
+      let rawStatus = String(a[10]).toUpperCase().trim();
+      let mRaw = a[6];
+      let pRaw = a[7];
+      wktMasuk = mRaw instanceof Date ? Utilities.formatDate(mRaw, "Asia/Jakarta", "HH:mm:ss") : String(mRaw).replace(/'/g, "");
+      wktPulang = pRaw instanceof Date ? Utilities.formatDate(pRaw, "Asia/Jakarta", "HH:mm:ss") : String(pRaw).replace(/'/g, "");
+      jamKerja = a[8] || "-";
+      alasan = a[11] || "-";
+      jarakInfo = a[9] || "-";
 
-      if(a[4] === p[0] && tanggalAbsenSheet === formattedDate) {
-        let rawStatus = String(a[10]).toUpperCase().trim();
-
-        let mRaw = a[6];
-        let pRaw = a[7];
-        wktMasuk = mRaw instanceof Date ? Utilities.formatDate(mRaw, "Asia/Jakarta", "HH:mm:ss") : String(mRaw).replace(/'/g, "");
-        wktPulang = pRaw instanceof Date ? Utilities.formatDate(pRaw, "Asia/Jakarta", "HH:mm:ss") : String(pRaw).replace(/'/g, "");
-        jamKerja = a[8] || "-";
-        alasan = a[11] || "-";
-        jarakInfo = a[9] || "-";
-
-        // 🔥 LOGIKA BARU: Sudah masuk tapi belum pulang
-        if (rawStatus === "HADIR" && wktMasuk !== "-" && wktMasuk !== "" &&
-            (wktPulang === "-" || wktPulang === "" || !wktPulang)) {
-          statusHarian = "BELUM ABSEN PULANG";
-        } else {
-          statusHarian = rawStatus;
-        }
-        break;
+      if (rawStatus === "HADIR" && wktMasuk !== "-" && wktMasuk !== "" &&
+          (wktPulang === "-" || wktPulang === "" || !wktPulang)) {
+        statusHarian = "BELUM ABSEN PULANG";
+      } else {
+        statusHarian = rawStatus;
       }
     }
 
