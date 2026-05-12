@@ -59,6 +59,7 @@ function ensurePengaturanDefaults_() {
     ["Running_Text", "Info layanan digital UPTD Puskesmas Tanjung Puri • sehat bersama kami • masyarakat berprestasi • scan cepat, data akurat"],
     ["Pesan_Masuk_Berhasil", "Absen MASUK berhasil. Selamat bekerja, {nama}! Semoga hari ini penuh manfaat dan pelayanan terbaik."],
     ["Pesan_Pulang_Berhasil", "Absen PULANG berhasil. Terima kasih, {nama}. Semoga perjalanan pulang aman dan sehat selalu."],
+    ["Tampil_Kartu_Rata_Jam", "YA"],
     ["Admin_User", "admin"], ["Admin_Pass", "sintang2026"],
     ["Nama_Puskesmas", "UPTD PUSKESMAS TANJUNG PURI SINTANG"],
     ["Lat_Puskesmas", "0.0636"], ["Lng_Puskesmas", "111.4988"], ["Rad_Puskesmas", "100"],
@@ -213,7 +214,7 @@ function prosesAbsen(qrText, latUser, lngUser, action, gpsAccuracy) {
 
   let outOfRadius = effectiveDistance > targetRad;
   let lokasiStr = `Jarak: ${Math.round(distance)}m (akurasi ±${Math.round(accuracy)}m, toleransi ${Math.round(accuracyTolerance)}m, efektif ${Math.round(effectiveDistance)}m)`;
-  if (lokasiInduk !== "Puskesmas") { outOfRadius = false; lokasiStr = `${lokasiInduk.toUpperCase()} (${lokasiStr})`; }
+  if (lokasiInduk !== "Puskesmas") { lokasiStr = outOfRadius ? `LUAR AREA ${lokasiInduk.toUpperCase()} (${lokasiStr})` : `${lokasiInduk.toUpperCase()} (${lokasiStr})`; }
   else { lokasiStr = outOfRadius ? `LUAR AREA (${lokasiStr})` : `PUSKESMAS (${lokasiStr})`; }
 
   const sheetAbsen = ss.getSheetByName("Absensi");
@@ -257,7 +258,7 @@ function prosesAbsen(qrText, latUser, lngUser, action, gpsAccuracy) {
       return { status: 'ERROR', message: `Anda sudah tercatat ${ket} hari ini pada pukul ${wktMsk}.` };
     }
     if (outOfRadius) {
-      return { status: 'OUT_OF_RADIUS', idQR: pgwFound.id, nama: pgwFound.nama, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Anda berada di luar radius penugasan (${Math.round(effectiveDistance)}m efektif, akurasi ±${Math.round(accuracy)}m). Apakah Anda sedang Izin, Sakit, atau Dinas Luar?` };
+      return { status: 'ERROR', idQR: pgwFound.id, nama: pgwFound.nama, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen MASUK ditolak. Anda berada di luar lokasi resmi Puskesmas/Polindes (${Math.round(effectiveDistance)}m efektif, akurasi ±${Math.round(accuracy)}m). Gunakan tombol scan IZIN/SAKIT/TL jika memang tidak hadir di lokasi kerja.` };
     }
     const blnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "MMMM"); const thnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "yyyy");
     sheetAbsen.appendRow([localTime, tglStr, blnStr, thnStr, pgwFound.id, pgwFound.nama, wktStr, "-", "-", lokasiStr, "HADIR", "-", latUser, lngUser]);
@@ -403,6 +404,42 @@ function hitungJamKerja(masukStr, pulangStr) {
     let diffHrs = Math.floor((diffMs % 86400000) / 3600000); let diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
     return `${diffHrs} Jam ${diffMins} Menit`;
   } catch(e) { return "-"; }
+}
+
+function getNamaPegawaiByQr_(idQR) {
+  const rows = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Pegawai").getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === idQR) return rows[i][1];
+  }
+  return "";
+}
+
+function prosesScanKeterangan(qrText, statusPilihan, alasan, latUser, lngUser) {
+  const status = String(statusPilihan || "").toUpperCase();
+  if (!["IZIN", "SAKIT", "TL"].includes(status)) return { status: false, message: "Status scan tidak valid." };
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetAbsen = ss.getSheetByName("Absensi");
+  const dataAbsen = sheetAbsen.getDataRange().getValues();
+  const nama = getNamaPegawaiByQr_(qrText);
+  if (!nama) return { status: false, message: "QR Code tidak terdaftar di sistem." };
+
+  const localTime = new Date();
+  const tglStr = Utilities.formatDate(localTime, "Asia/Jakarta", "dd/MM/yyyy");
+  const blnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "MMMM");
+  const thnStr = Utilities.formatDate(localTime, "Asia/Jakarta", "yyyy");
+
+  for (let i = 1; i < dataAbsen.length; i++) {
+    let absenTgl = dataAbsen[i][1];
+    if (absenTgl instanceof Date) absenTgl = Utilities.formatDate(absenTgl, "Asia/Jakarta", "dd/MM/yyyy");
+    else absenTgl = String(absenTgl).replace(/'/g, "");
+    if (dataAbsen[i][4] === qrText && absenTgl === tglStr) {
+      return { status: false, message: `Data hari ini sudah tercatat dengan status ${dataAbsen[i][10] || '-'}.` };
+    }
+  }
+
+  sheetAbsen.appendRow([localTime, tglStr, blnStr, thnStr, qrText, nama, "-", "-", "-", "SCAN KETERANGAN", status, alasan || "-", latUser || "", lngUser || ""]);
+  return { status: true, message: `Status ${status} untuk ${nama} berhasil dicatat tanpa absen masuk.` };
 }
 
 function prosesAbsenManual(idQR, nama, statusPilihan, alasan, latUser, lngUser) {
@@ -680,6 +717,49 @@ function getDaftarCutiBulanIni() {
 }
 
 // 5. FITUR ADMIN HARIAN
+function getRataJamHariIni() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Absensi");
+  const rows = sheet.getDataRange().getValues();
+  rows.shift();
+  const tglStr = Utilities.formatDate(new Date(), "Asia/Jakarta", "dd/MM/yyyy");
+  let totalMasuk = 0, countMasuk = 0, totalPulang = 0, countPulang = 0;
+
+  rows.forEach(r => {
+    let tgl = r[1];
+    if (tgl instanceof Date) tgl = Utilities.formatDate(tgl, "Asia/Jakarta", "dd/MM/yyyy");
+    else tgl = String(tgl).replace(/'/g, "");
+    if (tgl !== tglStr) return;
+    const status = String(r[10] || "").toUpperCase();
+    if (status !== "HADIR") return;
+    const masuk = waktuToDetik_(r[6]);
+    const pulang = waktuToDetik_(r[7]);
+    if (masuk !== null) { totalMasuk += masuk; countMasuk++; }
+    if (pulang !== null) { totalPulang += pulang; countPulang++; }
+  });
+
+  return {
+    rataMasuk: countMasuk ? detikToJam_(Math.round(totalMasuk / countMasuk)) : "--:--",
+    rataPulang: countPulang ? detikToJam_(Math.round(totalPulang / countPulang)) : "--:--",
+    totalMasuk: countMasuk,
+    totalPulang: countPulang
+  };
+}
+
+function waktuToDetik_(value) {
+  if (!value || value === "-") return null;
+  let txt = value instanceof Date ? Utilities.formatDate(value, "Asia/Jakarta", "HH:mm:ss") : String(value).replace(/'/g, "");
+  const m = txt.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if (!m) return null;
+  return (parseInt(m[1], 10) * 3600) + (parseInt(m[2], 10) * 60) + (parseInt(m[3] || "0", 10));
+}
+
+function detikToJam_(total) {
+  const h = Math.floor(total / 3600) % 24;
+  const m = Math.floor((total % 3600) / 60);
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
 function getAbsenHarian(tglStr) {
   let parts = tglStr.split('-');
   let formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;

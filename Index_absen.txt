@@ -288,20 +288,57 @@
                                     <div id="distanceList" class="hidden mt-2 grid grid-cols-1 gap-1 text-[11px]"></div>
                                 </div>
 
-                                <h3 class="text-left text-sm font-extrabold text-white mb-3 ml-1 uppercase tracking-wider">Pilih Tipe Absensi</h3>
+                                <div id="avgJamCard" class="hidden mb-6 rounded-3xl border border-white/20 bg-white/12 backdrop-blur-md p-4 shadow-xl">
+                                    <div class="flex items-center justify-between gap-3 mb-3">
+                                        <div>
+                                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-100">Rata-rata hari ini</p>
+                                            <h3 class="text-sm font-extrabold text-white">Jam Masuk & Pulang Pegawai</h3>
+                                        </div>
+                                        <div class="w-10 h-10 rounded-2xl bg-pusk-yellow/20 text-pusk-yellow flex items-center justify-center float-soft"><i class="fa-solid fa-chart-line"></i></div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="rounded-2xl bg-emerald-400/15 border border-emerald-200/20 p-3">
+                                            <p class="text-[10px] font-black text-emerald-100 uppercase">Masuk</p>
+                                            <div id="avgJamMasuk" class="text-2xl font-black font-mono text-white mt-1">--:--</div>
+                                            <p id="avgJamMasukCount" class="text-[10px] text-emerald-50 font-bold">0 data</p>
+                                        </div>
+                                        <div class="rounded-2xl bg-orange-400/15 border border-orange-200/20 p-3">
+                                            <p class="text-[10px] font-black text-orange-100 uppercase">Pulang</p>
+                                            <div id="avgJamPulang" class="text-2xl font-black font-mono text-white mt-1">--:--</div>
+                                            <p id="avgJamPulangCount" class="text-[10px] text-orange-50 font-bold">0 data</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h3 class="text-left text-sm font-extrabold text-white mb-3 ml-1 uppercase tracking-wider">Pilih Tipe Scan</h3>
                                 <div class="grid grid-cols-2 gap-4 relative z-10">
-                                    <button onclick="mulaiLiveScan('MASUK')" class="action-card bg-gradient-to-br from-emerald-400 to-green-700 text-white rounded-3xl p-5 cursor-pointer flex flex-col items-center justify-center border border-emerald-300/40 shadow-xl">
+                                    <button onclick="mulaiLiveScan('MASUK')" title="Untuk pegawai yang hadir bekerja dan memulai jam kerja." class="action-card bg-gradient-to-br from-emerald-400 to-green-700 text-white rounded-3xl p-5 cursor-pointer flex flex-col items-center justify-center border border-emerald-300/40 shadow-xl">
                                         <i class="fa-solid fa-camera-retro text-3xl mb-3 float-soft"></i>
-                                        <span class="font-extrabold text-sm">Live Scan MASUK</span>
-                                        <span class="text-[10px] text-emerald-50 mt-1">Mulai hari kerja</span>
+                                        <span class="font-extrabold text-sm">Scan MASUK</span>
+                                        <span class="text-[10px] text-emerald-50 mt-1 text-center">Khusus hadir masuk di lokasi resmi</span>
                                     </button>
-                                    <button onclick="mulaiLiveScan('PULANG')" class="action-card bg-gradient-to-br from-rose-400 to-red-700 text-white rounded-3xl p-5 cursor-pointer flex flex-col items-center justify-center border border-rose-300/40 shadow-xl">
+                                    <button onclick="mulaiLiveScan('PULANG')" title="Untuk pegawai yang sudah absen masuk dan mengakhiri jam kerja." class="action-card bg-gradient-to-br from-rose-400 to-red-700 text-white rounded-3xl p-5 cursor-pointer flex flex-col items-center justify-center border border-rose-300/40 shadow-xl">
                                         <i class="fa-solid fa-camera text-3xl mb-3 float-soft"></i>
-                                        <span class="font-extrabold text-sm">Live Scan PULANG</span>
-                                        <span class="text-[10px] text-rose-50 mt-1">Akhiri hari kerja</span>
+                                        <span class="font-extrabold text-sm">Scan PULANG</span>
+                                        <span class="text-[10px] text-rose-50 mt-1 text-center">Menutup kehadiran hari ini</span>
+                                    </button>
+                                    <button onclick="mulaiLiveScan('IZIN')" title="Untuk pengajuan izin dengan alasan jelas dan persetujuan atasan." class="action-card bg-gradient-to-br from-amber-400 to-yellow-600 text-white rounded-3xl p-4 cursor-pointer flex flex-col items-center justify-center border border-amber-300/40 shadow-xl">
+                                        <i class="fa-solid fa-file-signature text-2xl mb-2"></i>
+                                        <span class="font-extrabold text-sm">Scan IZIN</span>
+                                        <span class="text-[10px] text-amber-50 mt-1 text-center">Tidak perlu absen masuk</span>
+                                    </button>
+                                    <button onclick="mulaiLiveScan('SAKIT')" title="Untuk keterangan sakit saat tidak dapat bekerja." class="action-card bg-gradient-to-br from-pink-400 to-rose-600 text-white rounded-3xl p-4 cursor-pointer flex flex-col items-center justify-center border border-pink-300/40 shadow-xl">
+                                        <i class="fa-solid fa-notes-medical text-2xl mb-2"></i>
+                                        <span class="font-extrabold text-sm">Scan SAKIT</span>
+                                        <span class="text-[10px] text-pink-50 mt-1 text-center">Catat status sakit</span>
+                                    </button>
+                                    <button onclick="mulaiLiveScan('TL')" title="Untuk pegawai yang melaksanakan tugas luar resmi." class="action-card bg-gradient-to-br from-sky-400 to-blue-700 text-white rounded-3xl p-4 cursor-pointer flex flex-col items-center justify-center border border-sky-300/40 shadow-xl col-span-2">
+                                        <i class="fa-solid fa-briefcase text-2xl mb-2"></i>
+                                        <span class="font-extrabold text-sm">Scan TL / Tugas Luar</span>
+                                        <span class="text-[10px] text-sky-50 mt-1 text-center">Tugas resmi di luar area, tidak perlu absen masuk/pulang</span>
                                     </button>
                                 </div>
-                                <p class="text-[10px] text-blue-100 mt-4"><i class="fa-solid fa-circle-info mr-1"></i> Scanner khusus Live Camera. Jika browser menolak kamera di iframe, scanner otomatis dibuka di tab/popup terpisah.</p>
+                                <p class="text-[10px] text-blue-100 mt-4"><i class="fa-solid fa-circle-info mr-1"></i> Scanner khusus Live Camera. MASUK/PULANG wajib valid lokasi; IZIN/SAKIT/TL memiliki tombol scan sendiri dan tidak dicampur dengan absen masuk.</p>
                             </div>
                         </div>
 
@@ -314,7 +351,7 @@
                                             <h3 class="text-base font-black text-slate-900">Alur Absen Live Scan</h3>
                                             <ol class="mt-3 space-y-2 text-xs text-slate-600 font-semibold leading-relaxed">
                                                 <li><b>1.</b> Aktifkan GPS presisi tinggi dan klik <b>Cek Lokasi Sekarang</b>.</li>
-                                                <li><b>2.</b> Pilih <b>Live Scan MASUK</b> atau <b>Live Scan PULANG</b>.</li>
+                                                <li><b>2.</b> Pilih tombol sesuai kebutuhan: <b>MASUK</b>, <b>PULANG</b>, <b>IZIN</b>, <b>SAKIT</b>, atau <b>TL</b>.</li>
                                                 <li><b>3.</b> Arahkan kamera ke QR dengan jarak ±15–30 cm dan cahaya cukup.</li>
                                             </ol>
                                         </div>
@@ -324,7 +361,7 @@
                                 <div class="info-card-modern rounded-3xl p-5 bg-gradient-to-br from-teal-50 to-white border border-teal-100 shadow-sm">
                                     <h3 class="text-sm font-black text-teal-900 mb-3 uppercase tracking-wider"><i class="fa-solid fa-user-shield mr-1"></i>Mekanisme Izin, Sakit & TL</h3>
                                     <div class="grid grid-cols-1 gap-3">
-                                        <div class="rounded-2xl bg-white/80 border border-amber-100 p-3"><p class="text-[10px] font-black text-amber-600 uppercase">Izin</p><p class="text-xs text-slate-700 mt-1 font-semibold">Ajukan dengan alasan jelas dan persetujuan atasan/admin. Status dicatat manual agar tidak masuk hitungan alpa.</p></div>
+                                        <div class="rounded-2xl bg-white/80 border border-amber-100 p-3"><p class="text-[10px] font-black text-amber-600 uppercase">Izin</p><p class="text-xs text-slate-700 mt-1 font-semibold">Ajukan dengan alasan jelas dan persetujuan atasan .</p></div>
                                         <div class="rounded-2xl bg-white/80 border border-rose-100 p-3"><p class="text-[10px] font-black text-rose-600 uppercase">Sakit</p><p class="text-xs text-slate-700 mt-1 font-semibold">Laporkan kondisi kesehatan. Jika ada surat keterangan, simpan sebagai bukti pendukung sesuai kebijakan unit.</p></div>
                                         <div class="rounded-2xl bg-white/80 border border-blue-100 p-3"><p class="text-[10px] font-black text-blue-600 uppercase">TL / Tugas Luar</p><p class="text-xs text-slate-700 mt-1 font-semibold">Digunakan untuk tugas resmi di luar lokasi induk/Polindes dan dicatat oleh admin berdasarkan surat/perintah tugas.</p></div>
                                     </div>
@@ -773,6 +810,10 @@
                                 <div><label class="block text-[10px] font-bold text-gray-600 mb-1">Akhir</label><input type="time" id="setJamPulangAkhir" class="w-full px-3 py-2 bg-white border border-orange-200 rounded-lg text-sm font-bold"></div>
                             </div>
                         </div>
+                        <label class="flex items-start gap-3 bg-cyan-50 border border-cyan-100 rounded-xl p-3 cursor-pointer">
+                            <input type="checkbox" id="setTampilRataJam" class="mt-1 accent-cyan-600">
+                            <span><b class="text-xs text-cyan-800 uppercase">Tampilkan kartu rata-rata jam di landing</b><br><span class="text-[11px] text-gray-500 font-semibold">Jika aktif, landing menampilkan rata-rata jam masuk dan pulang hari ini dengan animasi modern.</span></span>
+                        </label>
                     </div>
                 </div>
 
@@ -1044,6 +1085,7 @@
                 }
                 appSettingsCache = res;
                 updateJamOperasionalInfo();
+                updateKartuRataJamLanding();
                 if(res.App_Login_Bg && res.App_Login_Bg.trim() !== "") {
                     document.getElementById('loginBgImg').src = res.App_Login_Bg;
                 } else {
@@ -1085,6 +1127,7 @@
                 document.getElementById('setJamMasukAkhir').value = res.Jam_Masuk_Akhir || '10:00';
                 document.getElementById('setJamPulangMulai').value = res.Jam_Pulang_Mulai || '12:00';
                 document.getElementById('setJamPulangAkhir').value = res.Jam_Pulang_Akhir || '23:59';
+                document.getElementById('setTampilRataJam').checked = String(res.Tampil_Kartu_Rata_Jam || 'YA').toUpperCase() !== 'TIDAK';
             }).getPengaturan();
         }
 
@@ -1118,7 +1161,8 @@
                 Jam_Masuk_Mulai: document.getElementById('setJamMasukMulai').value,
                 Jam_Masuk_Akhir: document.getElementById('setJamMasukAkhir').value,
                 Jam_Pulang_Mulai: document.getElementById('setJamPulangMulai').value,
-                Jam_Pulang_Akhir: document.getElementById('setJamPulangAkhir').value
+                Jam_Pulang_Akhir: document.getElementById('setJamPulangAkhir').value,
+                Tampil_Kartu_Rata_Jam: document.getElementById('setTampilRataJam').checked ? 'YA' : 'TIDAK'
             };
             Swal.fire({title:'Menyimpan...', didOpen:()=>Swal.showLoading()});
             google.script.run.withSuccessHandler(res => {
@@ -1164,6 +1208,24 @@
                     }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             }
+        }
+
+        function updateKartuRataJamLanding() {
+            const card = document.getElementById('avgJamCard');
+            if (!card) return;
+            const tampil = String(appSettingsCache.Tampil_Kartu_Rata_Jam || 'YA').toUpperCase() !== 'TIDAK';
+            if (!tampil) { card.classList.add('hidden'); return; }
+            card.classList.remove('hidden');
+            google.script.run.withSuccessHandler(res => {
+                res = res || {};
+                document.getElementById('avgJamMasuk').innerText = res.rataMasuk || '--:--';
+                document.getElementById('avgJamPulang').innerText = res.rataPulang || '--:--';
+                document.getElementById('avgJamMasukCount').innerText = `${res.totalMasuk || 0} data masuk`;
+                document.getElementById('avgJamPulangCount').innerText = `${res.totalPulang || 0} data pulang`;
+            }).withFailureHandler(() => {
+                document.getElementById('avgJamMasukCount').innerText = 'Belum tersedia';
+                document.getElementById('avgJamPulangCount').innerText = 'Belum tersedia';
+            }).getRataJamHariIni();
         }
 
         function updateJamOperasionalInfo() {
@@ -1293,8 +1355,10 @@
             handleScanResult(payload.decodedText, payload.actionType);
         }
 
+        function isScanKeterangan(actionType) { return ['IZIN', 'SAKIT', 'TL'].includes(String(actionType || '').toUpperCase()); }
+
         function mulaiLiveScan(actionType) {
-            if(!currentUserLat || !currentUserLng) {
+            if(!isScanKeterangan(actionType) && (!currentUserLat || !currentUserLng)) {
                 Swal.fire('Peringatan GPS', 'Menunggu sinyal GPS...', 'warning');
                 return;
             }
@@ -1417,7 +1481,38 @@
                 });
                 return;
             }
+            if (isScanKeterangan(actionType)) {
+                tampilkanFormScanKeterangan(decodedText, actionType, onFinish);
+                return;
+            }
             prosesKeBackend(decodedText, actionType, onFinish);
+        }
+
+        function tampilkanFormScanKeterangan(decodedText, actionType, onFinish = null) {
+            const labelMap = { IZIN: 'Izin', SAKIT: 'Sakit', TL: 'Tugas Luar (TL)' };
+            Swal.fire({
+                title: `Scan ${labelMap[actionType] || actionType}`,
+                html: `<div class="text-left"><p class="text-xs text-slate-600 font-semibold mb-3">Status ini dicatat melalui tombol scan khusus dan tidak dianggap absen masuk.</p><label class="block text-xs font-black text-slate-500 uppercase mb-1">Catatan / alasan</label><textarea id="swal-scan-ket-alasan" class="swal2-textarea !mx-0 !mt-0 w-full" rows="4" placeholder="Tulis alasan jelas..."></textarea></div>`,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan Status',
+                confirmButtonColor: actionType === 'IZIN' ? '#d97706' : (actionType === 'SAKIT' ? '#e11d48' : '#2563eb'),
+                preConfirm: () => {
+                    const alasan = document.getElementById('swal-scan-ket-alasan').value.trim();
+                    if (!alasan) { Swal.showValidationMessage('Catatan/alasan wajib diisi.'); return false; }
+                    return alasan;
+                }
+            }).then(res => {
+                if (!res.isConfirmed) { if (onFinish) onFinish(); return; }
+                Swal.fire({ title: 'Menyimpan status...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                google.script.run.withSuccessHandler(r => {
+                    if (r && r.status) Swal.fire({ icon: 'success', title: 'Status Tersimpan', text: r.message || 'Status berhasil disimpan.', confirmButtonColor: '#003366' });
+                    else Swal.fire({ icon: 'error', title: 'Status Ditolak', text: (r && r.message) ? r.message : 'Status gagal disimpan.', confirmButtonColor: '#dc2626' });
+                    if (onFinish) onFinish();
+                }).withFailureHandler(err => {
+                    Swal.fire('Gagal', (err && err.message) ? err.message : 'Status gagal disimpan.', 'error');
+                    if (onFinish) onFinish();
+                }).prosesScanKeterangan(decodedText, actionType, res.value, currentUserLat || '', currentUserLng || '');
+            });
         }
 
         function tampilkanAlertBerhasilAbsen(res, tipe) {
@@ -1463,7 +1558,7 @@
                 if(res.status === 'SUCCESS_MASUK') { tampilkanAlertBerhasilAbsen(res, 'MASUK'); }
                 else if (res.status === 'SUCCESS_PULANG') { tampilkanAlertBerhasilAbsen(res, 'PULANG'); }
                 else if (res.status === 'OUT_OF_RADIUS') {
-                    tampilkanFormLuarRadius(res.idQR, res.nama);
+                    Swal.fire({ icon: 'error', title: 'Di Luar Area Resmi', text: res.message || 'Scan ditolak karena berada di luar lokasi Puskesmas/Polindes.', confirmButtonColor: '#dc2626' });
                 }
                 else if (res.status === 'NEED_PREVIOUS_PULANG') {
                     tampilkanDialogPulangSebelumnya(res, decodedText, actionType, onFinish);
@@ -1519,55 +1614,6 @@
                     }
                 }).withFailureHandler(() => { Swal.fire('Error', 'Gagal menyimpan jam pulang sebelumnya.', 'error'); if (onFinish) onFinish(); })
                 .setPulangHariSebelumnya(res.idQR, res.tanggal, result.value);
-            });
-        }
-
-        function tampilkanFormLuarRadius(idQR, nama) {
-            Swal.fire({
-                title: '',
-                html: `
-                    <div class="text-left bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden pulse-glow">
-                        <div class="absolute -top-6 -right-6 w-24 h-24 bg-blue-100 rounded-full opacity-50 blur-xl"></div>
-                        <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-orange-100 rounded-full opacity-50 blur-xl"></div>
-
-                        <div class="flex items-center gap-4 mb-5 relative z-10">
-                            <div class="w-12 h-12 rounded-full bg-pusk-blue text-white flex items-center justify-center text-xl shadow-md">
-                                <i class="fa-solid fa-user-clock"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Pengajuan Keterangan</p>
-                                <p class="text-sm font-extrabold text-pusk-blue leading-tight">${nama}</p>
-                            </div>
-                        </div>
-
-                        <div class="relative z-10 space-y-4">
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-600 mb-1.5 uppercase tracking-wider ml-1"><i class="fa-solid fa-clipboard-question mr-1"></i> Status Kehadiran</label>
-                                <select id="swal-keterangan" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:ring-2 focus:ring-pusk-blue outline-none transition shadow-sm appearance-none cursor-pointer">
-                                    <option value="SAKIT">🤒 Keterangan Sakit</option>
-                                    <option value="IZIN">📝 Izin Keperluan Pribadi</option>
-                                    <option value="TL">💼 Tugas Luar Dinas (TL)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-600 mb-1.5 uppercase tracking-wider ml-1"><i class="fa-solid fa-pen-to-square mr-1"></i> Catatan Detail</label>
-                                <textarea id="swal-alasan" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-pusk-blue outline-none transition shadow-sm resize-none" placeholder="Tuliskan alasan lengkap Anda di sini..." rows="3"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                showCancelButton: true, confirmButtonText: 'Kirim Pengajuan <i class="fa-solid fa-paper-plane ml-1"></i>', confirmButtonColor: '#003366', cancelButtonText: 'Batal',
-                customClass: { popup: 'rounded-3xl shadow-2xl border border-gray-100', confirmButton: 'rounded-xl font-bold px-6 py-3 shadow-md', cancelButton: 'rounded-xl font-bold px-6 py-3' },
-                preConfirm: () => {
-                    const ket = document.getElementById('swal-keterangan').value, alasan = document.getElementById('swal-alasan').value;
-                    if (!alasan) { Swal.showValidationMessage('Catatan wajib diisi!'); return false;}
-                    return { ket: ket, alasan: alasan }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({ title: 'Menyimpan...', didOpen: () => Swal.showLoading() });
-                    google.script.run.withSuccessHandler(res => { Swal.fire('Berhasil', res.message, 'success'); }).prosesAbsenManual(idQR, nama, result.value.ket, result.value.alasan, currentUserLat, currentUserLng);
-                }
             });
         }
 
