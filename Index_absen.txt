@@ -1404,10 +1404,14 @@
             bukaScannerOutFrame(actionType);
         }
 
+        function escapeHtmlText(value) {
+            return String(value || '').replace(/[&<>"']/g, function(ch) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+            });
+        }
+
         function bukaScannerOutFrame(actionType) {
-            const scannerLibTag = '<scr' + 'ipt src="https://unpkg.com/html5-qrcode"></scr' + 'ipt>';
-            const popupScriptOpen = '<scr' + 'ipt>';
-            const popupScriptClose = '</scr' + 'ipt>';
+            const safeActionType = escapeHtmlText(actionType);
             const popupHtml = `
 <!doctype html>
 <html lang="id">
@@ -1415,7 +1419,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Scanner QR - Absensi</title>
-  ${scannerLibTag}
   <style>
     body{margin:0;background:#0f172a;color:#e2e8f0;font-family:Arial,sans-serif}
     .wrap{max-width:680px;margin:0 auto;padding:20px}
@@ -1429,63 +1432,12 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>Live Scan ${actionType}</h1>
+      <h1>Live Scan ${safeActionType}</h1>
       <div class="small">Arahkan kamera ke QR ID Card. Setelah terbaca, jendela akan otomatis tertutup.</div>
     </div>
     <div id="reader"></div>
     <div style="margin-top:12px"><button class="btn" id="btnStop">Tutup Scanner</button></div>
   </div>
-  ${popupScriptOpen}
-    let scanner;
-    function beep() {
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.frequency.value = 1040;
-        gain.gain.value = 0.12;
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.start(); osc.stop(ctx.currentTime + 0.14);
-        setTimeout(() => ctx.close(), 220);
-      } catch(_) {}
-    }
-    function kirimHasil(text) {
-      beep();
-      try {
-        if (window.opener && !window.opener.closed) {
-          window.opener.postMessage({ type: 'PUSK_QR_RESULT', decodedText: text, actionType: '${actionType}' }, window.location.origin);
-        }
-      } catch(_) {}
-      setTimeout(() => window.close(), 250);
-    }
-    async function runScanner() {
-      scanner = new Html5Qrcode('reader');
-      try {
-        await scanner.start(
-          { facingMode: { exact: 'environment' } },
-          { fps: 12, qrbox: { width: 250, height: 250 } },
-          (decodedText) => {
-            scanner.stop().finally(() => kirimHasil(decodedText));
-          }
-        );
-      } catch (e1) {
-        await scanner.start(
-          { facingMode: 'environment' },
-          { fps: 10, qrbox: { width: 250, height: 250 } },
-          (decodedText) => {
-            scanner.stop().finally(() => kirimHasil(decodedText));
-          }
-        );
-      }
-    }
-    document.getElementById('btnStop').addEventListener('click', async () => {
-      try { if (scanner) await scanner.stop(); } catch(_) {}
-      window.close();
-    });
-    runScanner().catch(() => alert('Kamera gagal diakses. Pastikan izin kamera aktif.'));
-  ${popupScriptClose}
 </body>
 </html>`;
 
@@ -1494,10 +1446,91 @@
                 Swal.fire('Popup Diblokir', 'Izinkan popup browser untuk membuka scanner out-frame.', 'warning');
                 return;
             }
+
             popupScannerWindow.document.open();
             popupScannerWindow.document.write(popupHtml);
             popupScannerWindow.document.close();
             popupScannerWindow.focus();
+            muatLibraryScannerPopup(popupScannerWindow, actionType);
+        }
+
+        function muatLibraryScannerPopup(scannerWindow, actionType) {
+            const scannerScript = scannerWindow.document.createElement('script');
+            scannerScript.src = 'https://unpkg.com/html5-qrcode';
+            scannerScript.onload = function() { jalankanScannerPopup(scannerWindow, actionType); };
+            scannerScript.onerror = function() {
+                try { scannerWindow.alert('Library scanner gagal dimuat. Periksa koneksi internet lalu coba lagi.'); } catch(_) {}
+            };
+            scannerWindow.document.head.appendChild(scannerScript);
+        }
+
+        function jalankanScannerPopup(scannerWindow, actionType) {
+            let scanner = null;
+            const scannerDoc = scannerWindow.document;
+
+            function beep() {
+                try {
+                    const AudioCtx = scannerWindow.AudioContext || scannerWindow.webkitAudioContext;
+                    if (!AudioCtx) return;
+                    const ctx = new AudioCtx();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.frequency.value = 1040;
+                    gain.gain.value = 0.12;
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.start(); osc.stop(ctx.currentTime + 0.14);
+                    setTimeout(function() { ctx.close(); }, 220);
+                } catch(_) {}
+            }
+
+            function tutupScanner() {
+                try { scannerWindow.close(); } catch(_) {}
+            }
+
+            function kirimHasil(text) {
+                beep();
+                handleScanResult(text, actionType);
+                setTimeout(tutupScanner, 250);
+            }
+
+            function hentikanScanner(callback) {
+                if (!scanner) {
+                    callback();
+                    return;
+                }
+                try {
+                    scanner.stop().then(callback).catch(callback);
+                } catch(_) {
+                    callback();
+                }
+            }
+
+            function mulaiScanner() {
+                if (!scannerWindow.Html5Qrcode) {
+                    scannerWindow.alert('Library scanner belum siap. Silakan buka ulang scanner.');
+                    return;
+                }
+
+                scanner = new scannerWindow.Html5Qrcode('reader');
+                scanner.start(
+                    { facingMode: { exact: 'environment' } },
+                    { fps: 12, qrbox: { width: 250, height: 250 } },
+                    function(decodedText) { hentikanScanner(function() { kirimHasil(decodedText); }); }
+                ).catch(function() {
+                    scanner.start(
+                        { facingMode: 'environment' },
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        function(decodedText) { hentikanScanner(function() { kirimHasil(decodedText); }); }
+                    ).catch(function() {
+                        scannerWindow.alert('Kamera gagal diakses. Pastikan izin kamera aktif.');
+                    });
+                });
+            }
+
+            scannerDoc.getElementById('btnStop').addEventListener('click', function() {
+                hentikanScanner(tutupScanner);
+            });
+            mulaiScanner();
         }
 
         function resetDeviceBinding() {
