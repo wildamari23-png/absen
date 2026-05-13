@@ -62,6 +62,7 @@ function ensurePengaturanDefaults_() {
     ["Tampil_Kartu_Rata_Jam", "YA"],
     ["Admin_User", "admin"], ["Admin_Pass", "sintang2026"],
     ["Nama_Puskesmas", "UPTD PUSKESMAS TANJUNG PURI SINTANG"],
+    ["Alamat_Puskesmas", "Jl. Kelam, Tanjung Puri, Kabupaten Sintang, Kalimantan Barat"],
     ["Lat_Puskesmas", "0.0636"], ["Lng_Puskesmas", "111.4988"], ["Rad_Puskesmas", "100"],
     ["Lat_Pol_TebingRaya", "0.0650"], ["Lng_Pol_TebingRaya", "111.5000"], ["Rad_Pol_TebingRaya", "100"],
     ["Lat_Pol_MunggukBantok", "0.0650"], ["Lng_Pol_MunggukBantok", "111.5000"], ["Rad_Pol_MunggukBantok", "100"],
