@@ -214,9 +214,66 @@
         .hero-slogan-modern { animation: sloganPulse 3.8s ease-in-out infinite; }
         @keyframes heroTextFlow { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
         @keyframes sloganPulse { 0%,100% { transform: translateY(0); filter: drop-shadow(0 0 0 rgba(255,215,0,0)); } 50% { transform: translateY(-2px); filter: drop-shadow(0 0 12px rgba(255,215,0,.38)); } }
+
+        /* Mobile polish: halaman scan tidak mengunci layar dan panel panduan tetap terlihat */
+        html { min-height: 100%; }
+        body { min-height: 100vh; height: auto; overflow-x: hidden; }
+        main { padding-bottom: max(7.5rem, env(safe-area-inset-bottom)); }
+        .guide-panel-responsive { min-height: 100%; }
+        .note-chip-modern {
+            display: inline-flex;
+            align-items: flex-start;
+            gap: .45rem;
+            max-width: 24rem;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+        .note-chip-modern i { margin-top: .12rem; }
+        .note-chip-empty { opacity: .75; }
+        .gov-app-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 35;
+            overflow: hidden;
+            border-top: 1px solid rgba(255, 215, 0, .45);
+            background: linear-gradient(90deg, rgba(0, 32, 76, .96), rgba(0, 51, 102, .97), rgba(14, 116, 144, .96));
+            box-shadow: 0 -18px 45px rgba(15, 23, 42, .18);
+            backdrop-filter: blur(18px);
+        }
+        .gov-app-footer::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.16) 42%, rgba(255,215,0,.22) 50%, transparent 62%);
+            transform: translateX(-120%);
+            animation: footerFreezeGlow 7s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .gov-footer-logo { box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 0 26px rgba(255,215,0,.38); }
+        .gov-footer-dot { animation: footerDotPulse 1.8s ease-in-out infinite; }
+        @keyframes footerFreezeGlow { 0%, 46% { transform: translateX(-120%); } 70%, 100% { transform: translateX(120%); } }
+        @keyframes footerDotPulse { 0%,100% { transform: scale(.9); opacity: .72; } 50% { transform: scale(1.15); opacity: 1; } }
+
+        @media (max-width: 640px) {
+            main { width: 100%; padding-left: .85rem; padding-right: .85rem; padding-top: 1rem; }
+            #scanView .min-h-\[75vh\] { min-height: auto; justify-content: flex-start; }
+            #scanView .rounded-\[2rem\] { border-radius: 1.5rem; }
+            #scanView .action-card { border-radius: 1.25rem; padding: .95rem .7rem; }
+            #scanView .action-card i { font-size: 1.45rem; margin-bottom: .45rem; }
+            .guide-panel-responsive { border-top: 1px solid rgba(191, 219, 254, .9); padding: 1rem; }
+            .guide-panel-responsive .info-card-modern { border-radius: 1.25rem; padding: 1rem; }
+            .note-chip-modern { max-width: min(72vw, 18rem); }
+            .gov-app-footer .footer-secondary { display: none; }
+            .gov-app-footer .footer-title { font-size: .72rem; }
+            .gov-app-footer .footer-subtitle { font-size: .58rem; }
+        }
     </style>
 </head>
-<body class="text-gray-800 h-screen flex flex-col">
+<body class="text-gray-800 min-h-screen flex flex-col">
 
     <header class="bg-pusk-blue shadow-lg sticky top-0 z-40 border-b-4 border-pusk-yellow">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -355,7 +412,7 @@
                             </div>
                         </div>
 
-                        <div class="hidden lg:block relative bg-gradient-to-br from-white via-blue-50 to-yellow-50 p-6 md:p-8">
+                        <div class="guide-panel-responsive block relative bg-gradient-to-br from-white via-blue-50 to-yellow-50 p-4 sm:p-6 md:p-8">
                             <div class="grid grid-cols-1 gap-4">
                                 <div class="info-card-modern rounded-3xl p-5 bg-white border border-blue-100 shadow-sm">
                                     <div class="flex items-start gap-3">
@@ -929,6 +986,28 @@
 
     </main>
 
+    <footer class="gov-app-footer text-white">
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="gov-footer-logo w-11 h-11 rounded-2xl bg-white flex items-center justify-center shrink-0 overflow-hidden">
+                    <img id="footerLogoImg" src="" alt="Logo" class="hidden w-full h-full object-contain p-1">
+                    <i id="footerLogoIcon" class="fa-solid fa-hospital text-pusk-blue text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p id="footerAppName" class="footer-title text-xs sm:text-sm font-black uppercase tracking-[0.18em] truncate">PORTAL ABSENSI</p>
+                    <p id="footerUnitName" class="footer-subtitle text-[10px] sm:text-[11px] text-blue-100 font-bold truncate">Sistem Absensi Digital Pemerintahan</p>
+                </div>
+            </div>
+            <div class="footer-secondary hidden sm:flex items-center gap-3 text-right">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.22em] text-pusk-yellow">Government Smart Service</p>
+                    <p class="text-[10px] text-blue-100 font-semibold">Aman • Akurat • Realtime • Profesional</p>
+                </div>
+                <span class="gov-footer-dot w-3 h-3 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,.9)]"></span>
+            </div>
+        </div>
+    </footer>
+
     <!-- Modal Form Pegawai LENGKAP -->
     <div id="modalTambahPegawai" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="document.getElementById('modalTambahPegawai').classList.add('hidden')"></div>
@@ -1072,15 +1151,19 @@
                 if(res.App_Name) {
                     document.getElementById('appNameTitle').innerText = res.App_Name;
                     document.getElementById('loginAppName').innerText = res.App_Name;
+                    const footerAppName = document.getElementById('footerAppName'); if (footerAppName) footerAppName.innerText = res.App_Name;
                 }
 
+                const footerUnitName = document.getElementById('footerUnitName');
                 if(res.App_Header_Name) {
                     document.getElementById('appHeaderName').innerText = res.App_Header_Name;
                     document.getElementById('previewAppSubText').innerText = res.App_Header_Name;
+                    if (footerUnitName) footerUnitName.innerText = res.App_Header_Name;
                 } else if (res.Nama_Puskesmas) {
                     let singkatan = res.Nama_Puskesmas.replace("UPTD PUSKESMAS", "Puskesmas").substring(0, 25);
                     document.getElementById('appHeaderName').innerText = singkatan;
                     document.getElementById('previewAppSubText').innerText = singkatan;
+                    if (footerUnitName) footerUnitName.innerText = singkatan;
                 }
                 document.getElementById('runningTextMsg').innerText = res.Running_Text || "Info layanan digital UPTD Puskesmas Tanjung Puri • sehat bersama kami • masyarakat berprestasi • scan cepat, data akurat";
 
@@ -1089,12 +1172,16 @@
                     document.getElementById('loginLogoIcon').classList.add('hidden');
                     let img = document.getElementById('appLogoImg'); img.src = res.App_Logo; img.classList.remove('hidden');
                     let imgLog = document.getElementById('loginLogoImg'); imgLog.src = res.App_Logo; imgLog.classList.remove('hidden');
+                    const footerLogoIcon = document.getElementById('footerLogoIcon'); if (footerLogoIcon) footerLogoIcon.classList.add('hidden');
+                    const footerLogoImg = document.getElementById('footerLogoImg'); if (footerLogoImg) { footerLogoImg.src = res.App_Logo; footerLogoImg.classList.remove('hidden'); }
                     const fav = document.getElementById('appFavicon'); if (fav) fav.href = res.App_Logo;
                 } else {
                     document.getElementById('appLogoIcon').classList.remove('hidden');
                     document.getElementById('loginLogoIcon').classList.remove('hidden');
                     document.getElementById('appLogoImg').classList.add('hidden');
                     document.getElementById('loginLogoImg').classList.add('hidden');
+                    const footerLogoIcon = document.getElementById('footerLogoIcon'); if (footerLogoIcon) footerLogoIcon.classList.remove('hidden');
+                    const footerLogoImg = document.getElementById('footerLogoImg'); if (footerLogoImg) footerLogoImg.classList.add('hidden');
                 }
                 appSettingsCache = res;
                 updateJamOperasionalInfo();
@@ -1379,6 +1466,13 @@
         }
 
         function bukaScannerOutFrame(actionType) {
+            const popupLogoUrl = String((appSettingsCache && appSettingsCache.App_Logo) || document.getElementById('appLogoImg')?.src || '').trim();
+            const popupAppName = escapeHtml(document.getElementById('appNameTitle')?.innerText || appSettingsCache.App_Name || 'PORTAL ABSENSI');
+            const popupUnitName = escapeHtml(document.getElementById('appHeaderName')?.innerText || appSettingsCache.App_Header_Name || appSettingsCache.Nama_Puskesmas || 'Sistem Digital Pemerintahan');
+            const safeActionType = escapeHtml(actionType);
+            const popupLogoHtml = popupLogoUrl
+                ? `<img src="${escapeHtml(popupLogoUrl)}" alt="Logo Puskesmas" class="brand-logo-img">`
+                : `<i class="fa-solid fa-hospital brand-logo-icon"></i>`;
             const popupHtml = `
 <!doctype html>
 <html lang="id">
@@ -1386,25 +1480,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Scanner QR - Absensi</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/html5-qrcode"><\/script>
   <style>
-    body{margin:0;background:#0f172a;color:#e2e8f0;font-family:Arial,sans-serif}
-    .wrap{max-width:680px;margin:0 auto;padding:20px}
-    h1{font-size:18px;margin:0 0 12px}
-    #reader{border-radius:12px;overflow:hidden;background:#000}
-    .card{background:#1e293b;padding:12px;border-radius:12px;margin-bottom:12px}
-    .btn{padding:10px 12px;border:none;border-radius:10px;background:#ef4444;color:#fff;font-weight:700;cursor:pointer}
-    .small{font-size:12px;opacity:.85}
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap');
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 15%,rgba(255,215,0,.22),transparent 28%),radial-gradient(circle at 85% 8%,rgba(56,189,248,.2),transparent 24%),linear-gradient(135deg,#001b3f,#003366 48%,#075985);color:#e2e8f0;font-family:'Plus Jakarta Sans',Arial,sans-serif;overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:-45%;background:conic-gradient(from 90deg,transparent,rgba(255,215,0,.2),rgba(14,165,233,.18),transparent 45%);animation:scannerOrbit 16s linear infinite;pointer-events:none}
+    .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:18px 14px 28px}
+    .shell{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:32px;background:rgba(255,255,255,.1);box-shadow:0 28px 80px rgba(0,0,0,.34);backdrop-filter:blur(18px)}
+    .shell::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.14),transparent);transform:translateX(-120%);animation:scannerShine 5.8s ease-in-out infinite;pointer-events:none}
+    .brand{display:flex;align-items:center;gap:14px;padding:18px;border-bottom:1px solid rgba(255,255,255,.14);background:linear-gradient(90deg,rgba(255,255,255,.14),rgba(255,255,255,.05))}
+    .brand-logo{width:58px;height:58px;border-radius:22px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 4px rgba(255,255,255,.16),0 0 32px rgba(255,215,0,.42)}
+    .brand-logo-img{width:100%;height:100%;object-fit:contain;padding:6px}.brand-logo-icon{color:#003366;font-size:25px}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(52,211,153,.35);background:rgba(16,185,129,.14);color:#bbf7d0;border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.pulse{width:8px;height:8px;border-radius:999px;background:#34d399;box-shadow:0 0 18px #34d399;animation:pulse 1.7s ease-in-out infinite}
+    h1{font-size:24px;line-height:1.1;margin:9px 0 3px;color:#fff;font-weight:900}.unit{font-size:11px;color:#fde68a;font-weight:900;text-transform:uppercase;letter-spacing:.12em}.small{font-size:12px;color:#dbeafe;font-weight:700;line-height:1.55;margin-top:8px}
+    .scanner-zone{padding:16px}.reader-frame{position:relative;border-radius:28px;padding:10px;background:linear-gradient(135deg,rgba(255,215,0,.9),rgba(56,189,248,.55),rgba(255,255,255,.18));box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 20px 55px rgba(0,0,0,.3)}
+    #reader{border-radius:22px;overflow:hidden;background:#020617;min-height:320px}.scan-corners{position:absolute;inset:24px;pointer-events:none;border-radius:22px;background:linear-gradient(#facc15,#facc15) left top/46px 4px no-repeat,linear-gradient(#facc15,#facc15) left top/4px 46px no-repeat,linear-gradient(#38bdf8,#38bdf8) right top/46px 4px no-repeat,linear-gradient(#38bdf8,#38bdf8) right top/4px 46px no-repeat,linear-gradient(#38bdf8,#38bdf8) left bottom/46px 4px no-repeat,linear-gradient(#38bdf8,#38bdf8) left bottom/4px 46px no-repeat,linear-gradient(#facc15,#facc15) right bottom/46px 4px no-repeat,linear-gradient(#facc15,#facc15) right bottom/4px 46px no-repeat;filter:drop-shadow(0 0 12px rgba(250,204,21,.7))}
+    .meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px}.meta-card{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.1);border-radius:20px;padding:12px}.meta-label{font-size:9px;color:#bfdbfe;text-transform:uppercase;letter-spacing:.14em;font-weight:900}.meta-value{font-size:12px;color:#fff;font-weight:900;margin-top:4px}.actions{display:flex;gap:10px;padding:0 16px 18px}.btn{width:100%;padding:13px 14px;border:none;border-radius:18px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 12px 26px rgba(185,28,28,.28)}
+    @keyframes scannerOrbit{to{transform:rotate(360deg)}}@keyframes scannerShine{0%,45%{transform:translateX(-120%)}75%,100%{transform:translateX(120%)}}@keyframes pulse{0%,100%{transform:scale(.9);opacity:.7}50%{transform:scale(1.2);opacity:1}}
+    @media(max-width:520px){.wrap{padding:10px}.brand{padding:14px}.brand-logo{width:50px;height:50px;border-radius:18px}h1{font-size:20px}.meta{grid-template-columns:1fr}.scanner-zone{padding:12px}#reader{min-height:280px}.shell{border-radius:26px}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
-      <h1>Live Scan ${actionType}</h1>
-      <div class="small">Arahkan kamera ke QR ID Card. Setelah terbaca, jendela akan otomatis tertutup.</div>
+    <div class="shell">
+      <div class="brand">
+        <div class="brand-logo">${popupLogoHtml}</div>
+        <div>
+          <div class="eyebrow"><span class="pulse"></span> Live Secure Scanner</div>
+          <h1>Live Scan ${safeActionType}</h1>
+          <div class="unit">${popupUnitName}</div>
+          <div class="small">${popupAppName} siap membaca QR ID Card. Arahkan kamera ke kode QR dengan cahaya cukup; hasil akan otomatis terkirim dan jendela tertutup.</div>
+        </div>
+      </div>
+      <div class="scanner-zone">
+        <div class="reader-frame"><div id="reader"></div><div class="scan-corners"></div></div>
+      </div>
+      <div class="meta">
+        <div class="meta-card"><div class="meta-label">Mode Scan</div><div class="meta-value">${safeActionType}</div></div>
+        <div class="meta-card"><div class="meta-label">Status Kamera</div><div class="meta-value" id="cameraStatus">Mengaktifkan kamera...</div></div>
+      </div>
+      <div class="actions"><button class="btn" id="btnStop"><i class="fa-solid fa-xmark"></i> Tutup Scanner</button></div>
     </div>
-    <div id="reader"></div>
-    <div style="margin-top:12px"><button class="btn" id="btnStop">Tutup Scanner</button></div>
   </div>
   <script>
     let scanner;
@@ -1422,11 +1540,12 @@
         setTimeout(() => ctx.close(), 220);
       } catch(_) {}
     }
+    function setStatus(text) { const el = document.getElementById('cameraStatus'); if (el) el.textContent = text; }
     function kirimHasil(text) {
-      beep();
+      beep(); setStatus('QR terbaca, mengirim data...');
       try {
         if (window.opener && !window.opener.closed) {
-          window.opener.postMessage({ type: 'PUSK_QR_RESULT', decodedText: text, actionType: '${actionType}' }, window.location.origin);
+          window.opener.postMessage({ type: 'PUSK_QR_RESULT', decodedText: text, actionType: '${safeActionType}' }, window.location.origin);
         }
       } catch(_) {}
       setTimeout(() => window.close(), 250);
@@ -1436,26 +1555,24 @@
       try {
         await scanner.start(
           { facingMode: { exact: 'environment' } },
-          { fps: 12, qrbox: { width: 250, height: 250 } },
-          (decodedText) => {
-            scanner.stop().finally(() => kirimHasil(decodedText));
-          }
+          { fps: 14, qrbox: { width: 260, height: 260 } },
+          (decodedText) => { scanner.stop().finally(() => kirimHasil(decodedText)); }
         );
+        setStatus('Kamera belakang aktif');
       } catch (e1) {
         await scanner.start(
           { facingMode: 'environment' },
-          { fps: 10, qrbox: { width: 250, height: 250 } },
-          (decodedText) => {
-            scanner.stop().finally(() => kirimHasil(decodedText));
-          }
+          { fps: 12, qrbox: { width: 250, height: 250 } },
+          (decodedText) => { scanner.stop().finally(() => kirimHasil(decodedText)); }
         );
+        setStatus('Kamera aktif');
       }
     }
     document.getElementById('btnStop').addEventListener('click', async () => {
       try { if (scanner) await scanner.stop(); } catch(_) {}
       window.close();
     });
-    runScanner().catch(() => alert('Kamera gagal diakses. Pastikan izin kamera aktif.'));
+    runScanner().catch(() => { setStatus('Kamera gagal diakses'); alert('Kamera gagal diakses. Pastikan izin kamera aktif.'); });
   <\/script>
 </body>
 </html>`;
@@ -1746,6 +1863,34 @@
 
         function gantiHalHarian(pg) { currentPgHarian = pg; renderTableHarian(false); }
 
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderCatatanBadge(alasan, status) {
+            const note = String(alasan || '').trim();
+            if(!note) {
+                return `<span class="note-chip-modern note-chip-empty rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-bold text-slate-400"><i class="fa-regular fa-circle-dot"></i><span>Tidak ada catatan</span></span>`;
+            }
+
+            const ket = String(status || '').toUpperCase();
+            let tone = 'border-sky-200 bg-sky-50 text-sky-700';
+            let icon = 'fa-solid fa-note-sticky';
+            if(ket.includes('ALPA')) { tone = 'border-rose-200 bg-rose-50 text-rose-700'; icon = 'fa-solid fa-triangle-exclamation'; }
+            else if(ket.includes('CUTI')) { tone = 'border-purple-200 bg-purple-50 text-purple-700'; icon = 'fa-solid fa-umbrella-beach'; }
+            else if(ket.includes('SAKIT')) { tone = 'border-blue-200 bg-blue-50 text-blue-700'; icon = 'fa-solid fa-notes-medical'; }
+            else if(ket.includes('IZIN')) { tone = 'border-amber-200 bg-amber-50 text-amber-700'; icon = 'fa-solid fa-file-signature'; }
+            else if(ket.includes('TL') || ket.includes('TUGAS')) { tone = 'border-indigo-200 bg-indigo-50 text-indigo-700'; icon = 'fa-solid fa-briefcase'; }
+
+            const safeNote = escapeHtml(note);
+            return `<span class="note-chip-modern rounded-2xl border ${tone} px-3 py-2 text-[11px] font-extrabold shadow-sm shadow-slate-100" title="${safeNote}"><i class="${icon}"></i><span>${safeNote}</span></span>`;
+        }
+
         function renderTableHarian(resetPg = false) {
             if(resetPg) currentPgHarian = 1;
             const filterKet = document.getElementById('filterKetHarian').value;
@@ -1832,7 +1977,7 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
     <td class="px-4 py-3 text-center">
         <span class="px-3 py-1 rounded-2xl text-[10px] font-bold uppercase ${badgeClass}">${d.keterangan}</span>
     </td>
-    <td class="px-4 py-3 text-[11px] text-gray-500 truncate max-w-[100px]" title="${d.alasan}">${d.alasan}</td>
+    <td class="px-4 py-3 align-top min-w-[180px]">${renderCatatanBadge(d.alasan, d.keterangan)}</td>
     <td class="px-4 py-3 text-center"><button onclick="bukaModalSetManual('${eIdQr}', '${eNama}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1 rounded-lg text-[10px] font-bold shadow-sm"><i class="fa-solid fa-pen"></i> Set</button></td>
 </tr>`;
                 });
