@@ -1466,13 +1466,24 @@
         }
 
         function bukaScannerOutFrame(actionType) {
-            const popupLogoUrl = String((appSettingsCache && appSettingsCache.App_Logo) || document.getElementById('appLogoImg')?.src || '').trim();
-            const popupAppName = escapeHtml(document.getElementById('appNameTitle')?.innerText || appSettingsCache.App_Name || 'PORTAL ABSENSI');
-            const popupUnitName = escapeHtml(document.getElementById('appHeaderName')?.innerText || appSettingsCache.App_Header_Name || appSettingsCache.Nama_Puskesmas || 'Sistem Digital Pemerintahan');
+            popupScannerWindow = window.open('', 'puskesmasLiveScanner', 'width=720,height=860,resizable=yes,scrollbars=yes');
+            if (!popupScannerWindow) {
+                Swal.fire('Popup Diblokir', 'Izinkan popup browser untuk membuka scanner out-frame.', 'warning');
+                return;
+            }
+            popupScannerWindow.document.open();
+            popupScannerWindow.document.write('<!doctype html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Menyiapkan Scanner</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#003366;color:#fff;font-family:Arial,sans-serif}.box{text-align:center;padding:24px}.pulse{width:42px;height:42px;margin:0 auto 14px;border-radius:50%;border:4px solid rgba(255,255,255,.25);border-top-color:#FFD700;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}</style></head><body><div class="box"><div class="pulse"></div><b>Menyiapkan Live Scanner...</b><p>Mohon tunggu sebentar.</p></div></body></html>');
+            popupScannerWindow.document.close();
+            const appLogoImgEl = document.getElementById('appLogoImg');
+            const popupLogoUrl = String((appSettingsCache && appSettingsCache.App_Logo) || (appLogoImgEl ? appLogoImgEl.src : '') || '').trim();
+            const appNameEl = document.getElementById('appNameTitle');
+            const headerNameEl = document.getElementById('appHeaderName');
+            const popupAppName = escapeHtml((appNameEl && appNameEl.innerText) || appSettingsCache.App_Name || 'PORTAL ABSENSI');
+            const popupUnitName = escapeHtml((headerNameEl && headerNameEl.innerText) || appSettingsCache.App_Header_Name || appSettingsCache.Nama_Puskesmas || 'Sistem Digital Pemerintahan');
             const safeActionType = escapeHtml(actionType);
             const popupLogoHtml = popupLogoUrl
                 ? `<img src="${escapeHtml(popupLogoUrl)}" alt="Logo Puskesmas" class="brand-logo-img">`
-                : `<i class="fa-solid fa-hospital brand-logo-icon"></i>`;
+                : `<span class="brand-logo-icon">🏥</span>`;
             const popupHtml = `
 <!doctype html>
 <html lang="id">
@@ -1480,12 +1491,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Scanner QR - Absensi</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://unpkg.com/html5-qrcode"><\/script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap');
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 15%,rgba(255,215,0,.22),transparent 28%),radial-gradient(circle at 85% 8%,rgba(56,189,248,.2),transparent 24%),linear-gradient(135deg,#001b3f,#003366 48%,#075985);color:#e2e8f0;font-family:'Plus Jakarta Sans',Arial,sans-serif;overflow-x:hidden}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 15%,rgba(255,215,0,.22),transparent 28%),radial-gradient(circle at 85% 8%,rgba(56,189,248,.2),transparent 24%),linear-gradient(135deg,#001b3f,#003366 48%,#075985);color:#e2e8f0;font-family:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;overflow-x:hidden}
     body::before{content:"";position:fixed;inset:-45%;background:conic-gradient(from 90deg,transparent,rgba(255,215,0,.2),rgba(14,165,233,.18),transparent 45%);animation:scannerOrbit 16s linear infinite;pointer-events:none}
     .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:18px 14px 28px}
     .shell{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:32px;background:rgba(255,255,255,.1);box-shadow:0 28px 80px rgba(0,0,0,.34);backdrop-filter:blur(18px)}
@@ -1521,7 +1529,7 @@
         <div class="meta-card"><div class="meta-label">Mode Scan</div><div class="meta-value">${safeActionType}</div></div>
         <div class="meta-card"><div class="meta-label">Status Kamera</div><div class="meta-value" id="cameraStatus">Mengaktifkan kamera...</div></div>
       </div>
-      <div class="actions"><button class="btn" id="btnStop"><i class="fa-solid fa-xmark"></i> Tutup Scanner</button></div>
+      <div class="actions"><button class="btn" id="btnStop">✕ Tutup Scanner</button></div>
     </div>
   </div>
   <script>
@@ -1550,7 +1558,21 @@
       } catch(_) {}
       setTimeout(() => window.close(), 250);
     }
+    function loadScannerLibrary() {
+      return new Promise((resolve, reject) => {
+        if (window.Html5Qrcode) { resolve(); return; }
+        setStatus('Memuat mesin scanner...');
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/html5-qrcode';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Library scanner gagal dimuat'));
+        document.head.appendChild(script);
+        setTimeout(() => { if (!window.Html5Qrcode) reject(new Error('Library scanner timeout')); }, 15000);
+      });
+    }
     async function runScanner() {
+      await loadScannerLibrary();
       scanner = new Html5Qrcode('reader');
       try {
         await scanner.start(
@@ -1572,16 +1594,11 @@
       try { if (scanner) await scanner.stop(); } catch(_) {}
       window.close();
     });
-    runScanner().catch(() => { setStatus('Kamera gagal diakses'); alert('Kamera gagal diakses. Pastikan izin kamera aktif.'); });
+    runScanner().catch((err) => { setStatus('Scanner gagal dimuat / kamera ditolak'); alert((err && err.message ? err.message + '. ' : '') + 'Pastikan internet aktif dan izin kamera diberikan.'); });
   <\/script>
 </body>
 </html>`;
 
-            popupScannerWindow = window.open('', 'puskesmasLiveScanner', 'width=720,height=860,resizable=yes,scrollbars=yes');
-            if (!popupScannerWindow) {
-                Swal.fire('Popup Diblokir', 'Izinkan popup browser untuk membuka scanner out-frame.', 'warning');
-                return;
-            }
             popupScannerWindow.document.open();
             popupScannerWindow.document.write(popupHtml);
             popupScannerWindow.document.close();
