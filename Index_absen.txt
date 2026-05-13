@@ -214,9 +214,38 @@
         .hero-slogan-modern { animation: sloganPulse 3.8s ease-in-out infinite; }
         @keyframes heroTextFlow { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
         @keyframes sloganPulse { 0%,100% { transform: translateY(0); filter: drop-shadow(0 0 0 rgba(255,215,0,0)); } 50% { transform: translateY(-2px); filter: drop-shadow(0 0 12px rgba(255,215,0,.38)); } }
+
+        /* Mobile polish: halaman scan tidak mengunci layar dan panel panduan tetap terlihat */
+        html { min-height: 100%; }
+        body { min-height: 100vh; height: auto; overflow-x: hidden; }
+        main { padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
+        .guide-panel-responsive { min-height: 100%; }
+        .note-chip-modern {
+            display: inline-flex;
+            align-items: flex-start;
+            gap: .45rem;
+            max-width: 24rem;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+        .note-chip-modern i { margin-top: .12rem; }
+        .note-chip-empty { opacity: .75; }
+
+        @media (max-width: 640px) {
+            main { width: 100%; padding-left: .85rem; padding-right: .85rem; padding-top: 1rem; }
+            #scanView .min-h-\[75vh\] { min-height: auto; justify-content: flex-start; }
+            #scanView .rounded-\[2rem\] { border-radius: 1.5rem; }
+            #scanView .action-card { border-radius: 1.25rem; padding: .95rem .7rem; }
+            #scanView .action-card i { font-size: 1.45rem; margin-bottom: .45rem; }
+            .guide-panel-responsive { border-top: 1px solid rgba(191, 219, 254, .9); padding: 1rem; }
+            .guide-panel-responsive .info-card-modern { border-radius: 1.25rem; padding: 1rem; }
+            .note-chip-modern { max-width: min(72vw, 18rem); }
+        }
     </style>
 </head>
-<body class="text-gray-800 h-screen flex flex-col">
+<body class="text-gray-800 min-h-screen flex flex-col">
 
     <header class="bg-pusk-blue shadow-lg sticky top-0 z-40 border-b-4 border-pusk-yellow">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -355,7 +384,7 @@
                             </div>
                         </div>
 
-                        <div class="hidden lg:block relative bg-gradient-to-br from-white via-blue-50 to-yellow-50 p-6 md:p-8">
+                        <div class="guide-panel-responsive block relative bg-gradient-to-br from-white via-blue-50 to-yellow-50 p-4 sm:p-6 md:p-8">
                             <div class="grid grid-cols-1 gap-4">
                                 <div class="info-card-modern rounded-3xl p-5 bg-white border border-blue-100 shadow-sm">
                                     <div class="flex items-start gap-3">
@@ -1746,6 +1775,34 @@
 
         function gantiHalHarian(pg) { currentPgHarian = pg; renderTableHarian(false); }
 
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderCatatanBadge(alasan, status) {
+            const note = String(alasan || '').trim();
+            if(!note) {
+                return `<span class="note-chip-modern note-chip-empty rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-bold text-slate-400"><i class="fa-regular fa-circle-dot"></i><span>Tidak ada catatan</span></span>`;
+            }
+
+            const ket = String(status || '').toUpperCase();
+            let tone = 'border-sky-200 bg-sky-50 text-sky-700';
+            let icon = 'fa-solid fa-note-sticky';
+            if(ket.includes('ALPA')) { tone = 'border-rose-200 bg-rose-50 text-rose-700'; icon = 'fa-solid fa-triangle-exclamation'; }
+            else if(ket.includes('CUTI')) { tone = 'border-purple-200 bg-purple-50 text-purple-700'; icon = 'fa-solid fa-umbrella-beach'; }
+            else if(ket.includes('SAKIT')) { tone = 'border-blue-200 bg-blue-50 text-blue-700'; icon = 'fa-solid fa-notes-medical'; }
+            else if(ket.includes('IZIN')) { tone = 'border-amber-200 bg-amber-50 text-amber-700'; icon = 'fa-solid fa-file-signature'; }
+            else if(ket.includes('TL') || ket.includes('TUGAS')) { tone = 'border-indigo-200 bg-indigo-50 text-indigo-700'; icon = 'fa-solid fa-briefcase'; }
+
+            const safeNote = escapeHtml(note);
+            return `<span class="note-chip-modern rounded-2xl border ${tone} px-3 py-2 text-[11px] font-extrabold shadow-sm shadow-slate-100" title="${safeNote}"><i class="${icon}"></i><span>${safeNote}</span></span>`;
+        }
+
         function renderTableHarian(resetPg = false) {
             if(resetPg) currentPgHarian = 1;
             const filterKet = document.getElementById('filterKetHarian').value;
@@ -1832,7 +1889,7 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
     <td class="px-4 py-3 text-center">
         <span class="px-3 py-1 rounded-2xl text-[10px] font-bold uppercase ${badgeClass}">${d.keterangan}</span>
     </td>
-    <td class="px-4 py-3 text-[11px] text-gray-500 truncate max-w-[100px]" title="${d.alasan}">${d.alasan}</td>
+    <td class="px-4 py-3 align-top min-w-[180px]">${renderCatatanBadge(d.alasan, d.keterangan)}</td>
     <td class="px-4 py-3 text-center"><button onclick="bukaModalSetManual('${eIdQr}', '${eNama}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1 rounded-lg text-[10px] font-bold shadow-sm"><i class="fa-solid fa-pen"></i> Set</button></td>
 </tr>`;
                 });
