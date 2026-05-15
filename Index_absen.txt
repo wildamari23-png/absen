@@ -264,6 +264,10 @@
             box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
         }
         .gov-footer-address { overflow-wrap: anywhere; }
+        .login-ultra-card { background: rgba(255,255,255,.88); backdrop-filter: blur(24px); }
+        .login-ultra-card::before { content: ""; position: absolute; inset: -35%; background: conic-gradient(from 140deg, rgba(255,215,0,.18), rgba(59,130,246,.18), rgba(14,165,233,.14), rgba(255,215,0,.18)); animation: orbitGlow 16s linear infinite; pointer-events: none; }
+        .login-feature-chip { display: inline-flex; align-items: center; gap: .45rem; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.14); border-radius: 999px; padding: .45rem .7rem; font-size: 10px; font-weight: 900; color: #dbeafe; }
+        .login-input-modern { box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 10px 24px rgba(15,23,42,.04); }
         @keyframes footerFreezeGlow { 0%, 46% { transform: translateX(-120%); } 70%, 100% { transform: translateX(120%); } }
         @keyframes footerDotPulse { 0%,100% { transform: scale(.9); opacity: .72; } 50% { transform: scale(1.15); opacity: 1; } }
 
@@ -324,7 +328,7 @@
 
         <!-- VIEW: SCANNER ABSENSI -->
         <section id="scanView" class="page-section active">
-            <div class="flex flex-col items-center justify-center min-h-[75vh]">
+            <div class="flex flex-col items-center justify-center min-h-[75vh] relative overflow-hidden">
                 <div class="w-full max-w-6xl rounded-[2rem] overflow-hidden shadow-2xl border border-blue-100 bg-white/95 backdrop-blur-xl relative">
                     <div class="landing-orbit opacity-80"></div>
                     <div class="relative grid grid-cols-1 lg:grid-cols-[1.1fr_.9fr] gap-0">
@@ -470,21 +474,26 @@
         <!-- VIEW: LOGIN ADMIN MODERN -->
         <section id="loginView" class="page-section">
             <div class="flex flex-col items-center justify-center min-h-[75vh]">
-                <div class="glass-panel rounded-[2rem] w-full max-w-4xl shadow-2xl border border-white/50 relative overflow-hidden flex flex-col md:flex-row">
+                <div class="login-ultra-card rounded-[2rem] w-full max-w-5xl shadow-2xl border border-white/70 relative overflow-hidden flex flex-col md:flex-row">
 
                     <!-- Sisi Kiri: Gambar Cover Menarik -->
-                    <div class="hidden md:block md:w-1/2 relative overflow-hidden bg-pusk-blue">
+                    <div class="hidden md:block md:w-1/2 relative overflow-hidden bg-pusk-blue scan-grid-bg">
                         <img id="loginBgImg" src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000&auto=format&fit=crop" alt="Login Background" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition-transform duration-[10s] hover:scale-110">
                         <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-pusk-blue/90 via-pusk-blue/40 to-transparent"></div>
                         <div class="absolute bottom-0 left-0 p-10 text-white z-10 w-full">
                             <div class="w-16 h-1 bg-pusk-yellow mb-4 rounded-full"></div>
                             <h2 class="text-3xl font-extrabold mb-2 leading-tight" id="loginCoverTitle">Sistem Terpadu Kepegawaian</h2>
                             <p class="text-sm text-blue-100 opacity-90 leading-relaxed pr-4">Digitalisasi manajemen absensi modern, cepat, dan presisi tinggi dengan pelacakan Geofencing.</p>
+                            <div class="mt-5 flex flex-wrap gap-2">
+                                <span class="login-feature-chip"><i class="fa-solid fa-shield-halved text-pusk-yellow"></i> Secure Admin</span>
+                                <span class="login-feature-chip"><i class="fa-solid fa-satellite-dish text-emerald-300"></i> Realtime GPS</span>
+                                <span class="login-feature-chip"><i class="fa-solid fa-wand-magic-sparkles text-cyan-200"></i> Smart Report</span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Sisi Kanan: Form Login -->
-                    <div class="w-full md:w-1/2 p-10 lg:p-12 relative flex flex-col justify-center bg-white/60 backdrop-blur-md">
+                    <div class="w-full md:w-1/2 p-8 sm:p-10 lg:p-12 relative flex flex-col justify-center bg-white/75 backdrop-blur-xl">
                         <div class="absolute -top-16 -right-16 w-48 h-48 bg-pusk-blue opacity-10 rounded-full blur-3xl"></div>
 
                         <div class="text-center mb-8 relative z-10">
@@ -495,24 +504,24 @@
                                 </div>
                             </div>
                             <h2 id="loginAppName" class="text-2xl font-extrabold text-pusk-blue tracking-wide">PORTAL ABSENSI</h2>
-                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Administrator Area</p>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Administrator Command Center</p><div class="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-black uppercase tracking-widest"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sistem Online & Terenkripsi</div>
                         </div>
 
                         <div class="space-y-5 relative z-10">
                             <div>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-user text-gray-400"></i></div>
-                                    <input type="text" id="logUser" class="w-full pl-11 pr-4 py-3.5 bg-gray-50/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pusk-blue focus:bg-white outline-none transition text-sm font-semibold" placeholder="Username">
+                                    <input type="text" id="logUser" class="login-input-modern w-full pl-11 pr-4 py-3.5 bg-white/90 border border-blue-100 rounded-2xl focus:ring-2 focus:ring-pusk-blue focus:bg-white outline-none transition text-sm font-bold" placeholder="Username">
                                 </div>
                             </div>
                             <div>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-lock text-gray-400"></i></div>
-                                    <input type="password" id="logPass" class="w-full pl-11 pr-12 py-3.5 bg-gray-50/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pusk-blue focus:bg-white outline-none transition text-sm font-semibold" placeholder="Password">
+                                    <input type="password" id="logPass" class="login-input-modern w-full pl-11 pr-12 py-3.5 bg-white/90 border border-blue-100 rounded-2xl focus:ring-2 focus:ring-pusk-blue focus:bg-white outline-none transition text-sm font-bold" placeholder="Password">
                                     <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-pusk-blue transition"><i class="fa-solid fa-eye" id="eyeIcon"></i></button>
                                 </div>
                             </div>
-                            <button onclick="doLogin()" class="w-full bg-gradient-to-r from-pusk-blue to-blue-800 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm uppercase tracking-wider mt-4">
+                            <button onclick="doLogin()" class="w-full bg-gradient-to-r from-pusk-blue via-blue-700 to-cyan-700 text-white font-extrabold py-4 px-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-95 text-sm uppercase tracking-wider mt-4">
                                 Login ke Panel <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>
                             </button>
                         </div>
@@ -955,7 +964,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-end relative z-10 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Pilih Bulan</label>
-                        <select id="lapBulan" onchange="hitungHariKerjaOtomatis()" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
+                        <select id="lapBulan" onchange="hitungHariKerjaOtomatis(false)" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
                             <option value="JANUARI">Januari</option><option value="FEBRUARI">Februari</option><option value="MARET" selected>Maret</option>
                             <option value="APRIL">April</option><option value="MEI">Mei</option><option value="JUNI">Juni</option>
                             <option value="JULI">Juli</option><option value="AGUSTUS">Agustus</option><option value="SEPTEMBER">September</option>
@@ -964,7 +973,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Pilih Tahun</label>
-                        <select id="lapTahun" onchange="hitungHariKerjaOtomatis()" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
+                        <select id="lapTahun" onchange="hitungHariKerjaOtomatis(false)" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
                             <option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option>
                         </select>
                     </div>
@@ -973,15 +982,18 @@
                         <input type="number" id="lapHariKerja" class="w-full px-4 py-3 bg-red-50 border-2 border-red-200 rounded-xl font-extrabold text-red-700 text-center text-lg" value="17">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-orange-600 uppercase mb-2"><i class="fa-solid fa-calendar-xmark"></i> Input Libur Nasional</label>
-                        <input type="number" id="lapLiburManual" onchange="hitungHariKerjaOtomatis()" class="w-full px-4 py-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-extrabold text-orange-700 text-center text-lg" value="0">
+                        <label class="block text-xs font-bold text-orange-600 uppercase mb-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Libur Nasional AI + Manual</label>
+                        <input type="number" id="lapLiburManual" onchange="hitungHariKerjaOtomatis(true)" class="w-full px-4 py-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-extrabold text-orange-700 text-center text-lg" value="0">
                     </div>
                 </div>
-                <div id="liburInfoBox" class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-6 text-xs">
-                    <p class="font-extrabold text-gray-700"><i class="fa-solid fa-calendar-check mr-1"></i>Auto Hitung Hari Kerja</p>
-                    <p id="liburSummary" class="text-gray-600 mt-1">Memuat data libur nasional...</p>
-                    <ul id="liburDetailList" class="mt-2 list-disc pl-5 text-gray-600 space-y-0.5 max-h-28 overflow-y-auto"></ul>
-                    <p class="text-[10px] text-gray-500 mt-2">*Nilai target masih bisa Anda edit manual jika dibutuhkan.</p>
+                <div id="liburInfoBox" class="bg-gradient-to-br from-blue-50 via-white to-orange-50 border border-blue-100 rounded-2xl p-4 mb-6 text-xs shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
+                        <p class="font-black text-pusk-blue uppercase tracking-wider"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-orange-500"></i>AI Kalender Libur Nasional</p>
+                        <span id="liburAiBadge" class="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-white border border-blue-100 text-[10px] font-black text-blue-700"><span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>Siap sinkron bulan pilihan</span>
+                    </div>
+                    <p id="liburSummary" class="text-gray-700 font-semibold mt-1">Memuat data libur nasional...</p>
+                    <div id="liburDetailList" class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1"></div>
+                    <p class="text-[10px] text-gray-500 mt-3"><i class="fa-solid fa-circle-info mr-1"></i>Input libur dapat dikoreksi manual. Sistem akan menghitung target hari kerja dari weekday dikurangi total libur pada input.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
@@ -991,8 +1003,11 @@
                     <button onclick="generatePDFDetail()" class="w-full bg-gradient-to-r from-blue-500 to-blue-400 hover:from-blue-600 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
                         <i class="fa-solid fa-business-time mr-2"></i> Laporan Total Jam Kerja
                     </button>
-                    <button onclick="generatePDFASN()" class="w-full md:col-span-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
+                    <button onclick="generatePDFASN()" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
                         <i class="fa-solid fa-user-shield mr-2"></i> Laporan Khusus ASN
+                    </button>
+                    <button onclick="generatePDFPPPK()" class="w-full bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
+                        <i class="fa-solid fa-id-card-clip mr-2"></i> Laporan Khusus PPPK
                     </button>
                 </div>
             </div>
@@ -1159,6 +1174,7 @@
             if(viewId === 'pegawaiView') loadDataPegawai();
             if(viewId === 'settingView') loadPengaturan();
             if(viewId === 'harianView') loadAbsenHarian();
+            if(viewId === 'laporanView') setTimeout(() => hitungHariKerjaOtomatis(false), 150);
             if(viewId === 'scanView' || viewId === 'loginView') muatIdentitasAplikasi();
         }
 
@@ -1820,23 +1836,45 @@
             navTo('scanView'); Swal.fire({icon:'success', title:'Logout Berhasil', toast:true, position:'top-end', timer:2000, showConfirmButton:false});
         }
 
-        function hitungHariKerjaOtomatis() {
-            const bln = document.getElementById('lapBulan')?.value;
-            const thn = document.getElementById('lapTahun')?.value;
+        function hitungHariKerjaOtomatis(manualMode = false) {
+            const blnEl = document.getElementById('lapBulan');
+            const thnEl = document.getElementById('lapTahun');
+            const bln = blnEl ? blnEl.value : '';
+            const thn = thnEl ? thnEl.value : '';
             if (!bln || !thn) return;
             const summary = document.getElementById('liburSummary');
             const list = document.getElementById('liburDetailList');
-            summary.innerText = 'Menghitung hari kerja otomatis...';
-            list.innerHTML = '';
-            google.script.run.withSuccessHandler(res => {
-                const liburManual = parseInt(document.getElementById('lapLiburManual').value || 0, 10) || 0;
-                const targetFinal = Math.max(0, (res.targetHariKerja || 0) - liburManual);
+            const badge = document.getElementById('liburAiBadge');
+            const inputLibur = document.getElementById('lapLiburManual');
+            const applyResult = (res, keepManual) => {
+                res = res || {};
+                window.liburKerjaCache = res;
+                const aiCount = parseInt(res.totalLiburNasionalWeekday || 0, 10) || 0;
+                if (!keepManual && inputLibur) inputLibur.value = aiCount;
+                const totalLiburInput = parseInt((inputLibur && inputLibur.value) || aiCount || 0, 10) || 0;
+                const weekday = parseInt(res.totalWeekdays || 0, 10) || 0;
+                const targetFinal = Math.max(0, weekday - totalLiburInput);
                 document.getElementById('lapHariKerja').value = targetFinal;
-                summary.innerHTML = `Hari kerja weekday: <b>${res.totalWeekdays || 0}</b>, Libur nasional (weekday): <b>${res.totalLiburNasionalWeekday || 0}</b>, Input libur manual: <b>${liburManual}</b>, Target final: <b>${targetFinal}</b>`;
-                list.innerHTML = (res.detailLibur || []).length ? res.detailLibur.map(h => `<li>${h.tgl} — ${h.nama}</li>`).join('') : '<li>Tidak ada libur nasional weekday pada bulan ini.</li>';
-            }).withFailureHandler(() => {
-                summary.innerText = 'Gagal mengambil kalender libur nasional.';
-                list.innerHTML = '<li>Silakan isi target hari kerja manual.</li>';
+                if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>${escapeHtml(res.sumber || 'AI Kalender')} • ${aiCount} libur weekday`;
+                if (summary) summary.innerHTML = `Weekday bulan ini: <b>${weekday}</b> • Rekomendasi AI libur nasional: <b>${aiCount}</b> • Total libur dipakai: <b>${totalLiburInput}</b> • Target final: <b>${targetFinal}</b><br><span class="text-[10px] text-blue-600 font-black uppercase">${escapeHtml(res.rekomendasiAI || 'AI membantu membaca kalender nasional, nilai tetap bisa diedit manual.')}</span>`;
+                if (list) {
+                    const items = res.detailLibur || [];
+                    list.innerHTML = items.length ? items.map(h => `<div class="rounded-xl border border-orange-100 bg-white px-3 py-2 shadow-sm"><p class="font-black text-orange-700">${escapeHtml(h.tgl)}</p><p class="text-gray-600 font-semibold leading-snug">${escapeHtml(h.nama)}</p></div>`).join('') : '<div class="rounded-xl border border-emerald-100 bg-white px-3 py-2 font-bold text-emerald-700">Tidak ada libur nasional pada hari kerja bulan ini.</div>';
+                }
+            };
+
+            if (manualMode && window.liburKerjaCache) {
+                applyResult(window.liburKerjaCache, true);
+                return;
+            }
+
+            if (summary) summary.innerText = 'AI kalender sedang membaca libur nasional bulan pilihan...';
+            if (list) list.innerHTML = '';
+            if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>Sinkron kalender nasional...`;
+            google.script.run.withSuccessHandler(res => applyResult(res, manualMode)).withFailureHandler(() => {
+                if (summary) summary.innerText = 'Gagal mengambil kalender libur nasional. Silakan isi total libur secara manual.';
+                if (list) list.innerHTML = '<div class="rounded-xl border border-red-100 bg-white px-3 py-2 font-bold text-red-600">Koneksi kalender gagal. Input libur manual tetap dapat digunakan.</div>';
+                if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400"></span>Mode manual aktif`;
             }).getKalenderKerja(bln, thn);
         }
 
@@ -2687,29 +2725,113 @@ function renderTablePegawai(resetPg = false) {
         }
 
         function generatePDFASN() {
-            const bln = document.getElementById('lapBulan').value; const thn = document.getElementById('lapTahun').value; const hariKerja = document.getElementById('lapHariKerja').value;
+            generatePDFKhususStatus('ASN', 'ASN', 'Rekap_ASN');
+        }
+
+        function generatePDFPPPK() {
+            generatePDFKhususStatus('PPPK', 'PPPK', 'Rekap_PPPK');
+        }
+
+        function generatePDFKhususStatus(statusKey, label, filePrefix) {
+            const bln = document.getElementById('lapBulan').value;
+            const thn = document.getElementById('lapTahun').value;
+            const hariKerja = document.getElementById('lapHariKerja').value;
             if(!hariKerja) return Swal.fire('Error', 'Isi Target Hari Kerja.', 'warning');
-            Swal.fire({title: 'Menyusun Laporan ASN...', didOpen: () => Swal.showLoading()});
+            Swal.fire({title: `Menyusun Laporan ${label}...`, didOpen: () => Swal.showLoading()});
             google.script.run.withSuccessHandler(function(res) {
-                const asnRows = (res.rekapData || []).filter(r => String(r.status || '').toUpperCase().includes('ASN'));
-                if(asnRows.length === 0) return Swal.fire('Data Kosong', 'Tidak ada data ASN pada periode ini.', 'info');
-                const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: "landscape" }); const pW = doc.internal.pageSize.width;
-                doc.setFontSize(10); doc.setFont("helvetica", "bold");
-                doc.text("REKAPITULASI BULANAN CAPAIAN PRODUKTIVITAS KERJA PEGAWAI (ASN) BERDASARKAN LAPORAN KERJA HARIAN PEGAWAI", 14, 15);
-                doc.text(res.namaPuskesmas.toUpperCase(), 14, 21);
-                doc.text(`BULAN: ${bln} ${thn}`, 14, 27);
-                let tableData = [];
-                asnRows.forEach((r, i) => tableData.push([ i + 1, r.nama_nip, r.gol, r.jabatan + "\n" + r.status, r.hari_kerja || 0, r.hadir || 0, r.sakit || 0, r.izin || 0, r.cuti || 0, r.tl || 0, r.alpa || 0 ]));
+                const key = String(statusKey || '').toUpperCase();
+                const rows = (res.rekapData || []).filter(r => String(r.status || '').toUpperCase().includes(key));
+                if(rows.length === 0) return Swal.fire('Data Kosong', `Tidak ada data ${label} pada periode ini.`, 'info');
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+                const pW = doc.internal.pageSize.width;
+                const pH = doc.internal.pageSize.height;
+                const marginX = 10;
+                const bulanText = document.getElementById('lapBulan').options[document.getElementById('lapBulan').selectedIndex].text.toUpperCase();
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(9.5);
+                doc.text(`REKAPITULASI BULANAN CAPAIAN PRODUKTIVITAS KERJA PEGAWAI (${label})`, marginX, 12);
+                doc.setFontSize(8.5);
+                doc.text((res.namaPuskesmas || 'PUSKESMAS').toUpperCase(), marginX, 17);
+                doc.setFont("helvetica", "normal");
+                doc.text(`BULAN ${bulanText} ${thn}  •  Target Hari Kerja: ${hariKerja}`, marginX, 22);
+                doc.setDrawColor(0, 51, 102); doc.setLineWidth(.4); doc.line(marginX, 25, pW - marginX, 25);
+
+                const tableData = rows.map((r, i) => [
+                    i + 1,
+                    r.nama_nip,
+                    r.gol || '-',
+                    `${r.jabatan || '-'}
+${r.status || '-'}`,
+                    r.hari_kerja || 0,
+                    r.hadir || 0,
+                    r.sakit || 0,
+                    r.izin || 0,
+                    r.cuti || 0,
+                    r.tl || 0,
+                    r.alpa || 0
+                ]);
+
                 doc.autoTable({
-                    startY: 42,
-                    head: [[{content: 'NO', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'NAMA / NIP', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'PANGKAT\n/ GOL', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'JABATAN', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'HARI\nKERJA', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'ABSENSI', colSpan: 6, styles: {halign: 'center'}}], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'TL', 'ALPA']],
+                    startY: 29,
+                    margin: { left: marginX, right: marginX, bottom: 33 },
+                    tableWidth: pW - (marginX * 2),
+                    head: [[
+                        {content: 'NO', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'NAMA / NIP', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'PANGKAT\n/ GOL', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'JABATAN / STATUS', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'HARI\nKERJA', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'ABSENSI', colSpan: 6, styles: {halign: 'center'}}
+                    ], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'TL', 'ALPA']],
                     body: tableData,
-                    styles: { fontSize: 7, cellPadding: 1.2, valign: 'middle', lineColor: [80, 80, 80], lineWidth: 0.1, textColor: [20, 20, 20] },
-                    headStyles: { fillColor: [255, 255, 255], textColor: [20, 20, 20], lineColor: [50, 50, 50], lineWidth: 0.2 },
-                    columnStyles: { 0: {halign:'center',cellWidth:8},1:{cellWidth:40},2:{cellWidth:22,halign:'center'},3:{cellWidth:35},4:{halign:'center',cellWidth:15},5:{halign:'center',cellWidth:12},6:{halign:'center',cellWidth:12},7:{halign:'center',cellWidth:12},8:{halign:'center',cellWidth:12},9:{halign:'center',cellWidth:12},10:{halign:'center',cellWidth:12} }
+                    theme: 'grid',
+                    styles: { fontSize: 6.8, cellPadding: 1.15, valign: 'middle', overflow: 'linebreak', lineColor: [0, 0, 0], lineWidth: 0.1, textColor: [0, 0, 0], minCellHeight: 5.2 },
+                    headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.15, fontStyle: 'bold', fontSize: 6.8 },
+                    alternateRowStyles: { fillColor: [248, 250, 252] },
+                    columnStyles: {
+                        0: {halign:'center', cellWidth: 8},
+                        1: {cellWidth: 56},
+                        2: {halign:'center', cellWidth: 21},
+                        3: {cellWidth: 57},
+                        4: {halign:'center', cellWidth: 14, fontStyle:'bold'},
+                        5: {halign:'center', cellWidth: 13},
+                        6: {halign:'center', cellWidth: 13},
+                        7: {halign:'center', cellWidth: 13},
+                        8: {halign:'center', cellWidth: 13},
+                        9: {halign:'center', cellWidth: 13},
+                        10:{halign:'center', cellWidth: 13, fontStyle:'bold', textColor:[185,28,28]}
+                    },
+                    didDrawPage: function() {
+                        doc.setFontSize(7);
+                        doc.setTextColor(100);
+                        doc.text(`Dicetak otomatis oleh sistem absensi digital • ${label}`, marginX, pH - 8);
+                        doc.text(`Hal. ${doc.internal.getNumberOfPages()}`, pW - marginX, pH - 8, { align: 'right' });
+                        doc.setTextColor(0);
+                    }
                 });
-                tambahTandaTangan(doc, res, bln, thn, pW, false); doc.save(`Rekap_ASN_${bln}_${thn}.pdf`); Swal.close();
+
+                tambahTandaTanganRingkas(doc, res, bln, thn, pW, pH);
+                doc.save(`${filePrefix}_${bln}_${thn}.pdf`);
+                Swal.close();
             }).getRekapitulasi(bln, thn, hariKerja);
+        }
+
+        function tambahTandaTanganRingkas(doc, res, bln, thn, pW, pH) {
+            const finalY = doc.lastAutoTable.finalY || 35;
+            const y = Math.min(finalY + 9, pH - 38);
+            const rightX = pW - 48;
+            const bulanText = document.getElementById('lapBulan').options[document.getElementById('lapBulan').selectedIndex].text;
+            doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
+            doc.text(`Sintang, ${new Date().getDate()} ${bulanText} ${thn}`, rightX, y, { align: 'center' });
+            doc.setFont("helvetica", "bold");
+            let puskNameStr = res.namaPuskesmas || res.puskesmas || "PUSKESMAS";
+            doc.text(`KEPALA ${puskNameStr.toUpperCase().replace("UPTD ", "")}`, rightX, y + 5, { align: 'center' });
+            doc.text(res.kapusNama || res.nama || "...................", rightX, y + 24, { align: 'center' });
+            doc.setLineWidth(0.2); doc.line(rightX - 28, y + 25, rightX + 28, y + 25);
+            doc.setFont("helvetica", "normal"); doc.text(res.kapusNip || res.nip || "NIP. .................", rightX, y + 29, { align: 'center' });
         }
 
         function generatePDFDetail() {

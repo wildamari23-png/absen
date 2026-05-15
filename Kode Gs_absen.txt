@@ -925,6 +925,7 @@ function getKalenderKerja(bulanName, tahun) {
   }
 
   let holidayNames = [];
+  let holidaySource = "AI Kalender Google/Nasional";
   try {
     const calIds = [
       "id.indonesian#holiday@group.v.calendar.google.com",
@@ -947,6 +948,7 @@ function getKalenderKerja(bulanName, tahun) {
     // Fallback API publik jika kalender libur tidak tersedia/empty.
     if (!holidayNames.length) {
       try {
+        holidaySource = "AI fallback Nager.Date";
         const resp = UrlFetchApp.fetch(`https://date.nager.at/api/v3/PublicHolidays/${y}/ID`, { muteHttpExceptions: true });
         if (resp.getResponseCode() === 200) {
           const arr = JSON.parse(resp.getContentText() || "[]");
@@ -963,6 +965,7 @@ function getKalenderKerja(bulanName, tahun) {
     // Fallback tambahan khusus data Indonesia.
     if (!holidayNames.length) {
       try {
+        holidaySource = "AI fallback tanggalmerah Indonesia";
         const resp2 = UrlFetchApp.fetch(`https://tanggalmerah.upset.dev/api/holidays?year=${y}&month=${m + 1}&type=holiday`, { muteHttpExceptions: true });
         if (resp2.getResponseCode() === 200) {
           const obj = JSON.parse(resp2.getContentText() || "{}");
@@ -989,7 +992,9 @@ function getKalenderKerja(bulanName, tahun) {
     targetHariKerja: Math.max(0, weekdays - holidayWeekdays.length),
     totalWeekdays: weekdays,
     totalLiburNasionalWeekday: holidayWeekdays.length,
-    detailLibur: holidayWeekdays
+    detailLibur: holidayWeekdays,
+    sumber: holidaySource,
+    rekomendasiAI: `AI merekomendasikan ${holidayWeekdays.length} libur nasional pada hari kerja. Target hari kerja awal: ${Math.max(0, weekdays - holidayWeekdays.length)}.`
   };
 }
 
