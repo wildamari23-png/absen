@@ -2740,7 +2740,10 @@ function renderTablePegawai(resetPg = false) {
             Swal.fire({title: `Menyusun Laporan ${label}...`, didOpen: () => Swal.showLoading()});
             google.script.run.withSuccessHandler(function(res) {
                 const key = String(statusKey || '').toUpperCase();
-                const rows = (res.rekapData || []).filter(r => String(r.status || '').toUpperCase().includes(key));
+                const rows = (res.rekapData || []).filter(r => {
+                    const st = String(r.status || '').toUpperCase().trim();
+                    return key === 'PPPK' ? st === 'PPPK' : st.includes(key);
+                });
                 if(rows.length === 0) return Swal.fire('Data Kosong', `Tidak ada data ${label} pada periode ini.`, 'info');
 
                 const { jsPDF } = window.jspdf;
@@ -2770,7 +2773,6 @@ ${r.status || '-'}`,
                     r.sakit || 0,
                     r.izin || 0,
                     r.cuti || 0,
-                    r.tl || 0,
                     r.alpa || 0
                 ]);
 
@@ -2784,25 +2786,24 @@ ${r.status || '-'}`,
                         {content: 'PANGKAT\n/ GOL', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
                         {content: 'JABATAN / STATUS', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
                         {content: 'HARI\nKERJA', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
-                        {content: 'ABSENSI', colSpan: 6, styles: {halign: 'center'}}
-                    ], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'TL', 'ALPA']],
+                        {content: 'ABSENSI', colSpan: 5, styles: {halign: 'center'}}
+                    ], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'ALPA']],
                     body: tableData,
                     theme: 'grid',
                     styles: { fontSize: 6.8, cellPadding: 1.15, valign: 'middle', overflow: 'linebreak', lineColor: [0, 0, 0], lineWidth: 0.1, textColor: [0, 0, 0], minCellHeight: 5.2 },
                     headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.15, fontStyle: 'bold', fontSize: 6.8 },
                     alternateRowStyles: { fillColor: [248, 250, 252] },
                     columnStyles: {
-                        0: {halign:'center', cellWidth: 8},
-                        1: {cellWidth: 56},
-                        2: {halign:'center', cellWidth: 21},
-                        3: {cellWidth: 57},
-                        4: {halign:'center', cellWidth: 14, fontStyle:'bold'},
-                        5: {halign:'center', cellWidth: 13},
-                        6: {halign:'center', cellWidth: 13},
-                        7: {halign:'center', cellWidth: 13},
-                        8: {halign:'center', cellWidth: 13},
-                        9: {halign:'center', cellWidth: 13},
-                        10:{halign:'center', cellWidth: 13, fontStyle:'bold', textColor:[185,28,28]}
+                        0: {halign:'center', cellWidth: 9},
+                        1: {cellWidth: 72},
+                        2: {halign:'center', cellWidth: 25},
+                        3: {cellWidth: 78},
+                        4: {halign:'center', cellWidth: 17, fontStyle:'bold'},
+                        5: {halign:'center', cellWidth: 15},
+                        6: {halign:'center', cellWidth: 15},
+                        7: {halign:'center', cellWidth: 15},
+                        8: {halign:'center', cellWidth: 15},
+                        9: {halign:'center', cellWidth: 15, fontStyle:'bold', textColor:[185,28,28]}
                     },
                     didDrawPage: function() {
                         doc.setFontSize(7);
