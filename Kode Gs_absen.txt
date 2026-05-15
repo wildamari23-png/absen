@@ -953,7 +953,7 @@ function getKalenderKerja(bulanName, tahun) {
     };
   }
 
-  const values = sheet.getDataRange().getValues();
+  const values = sheet.getDataRange().getDisplayValues();
   if (values.length < 2) {
     return {
       targetHariKerja: weekdays,
@@ -972,30 +972,36 @@ function getKalenderKerja(bulanName, tahun) {
   const idxKet = header.indexOf("keteranganlibur") >= 0 ? header.indexOf("keteranganlibur") : 3;
 
   const holidayMap = {};
-  const toDateStr = (val) => {
+  const toDateStr = (val, fallbackYear) => {
     if (!val) return "";
     if (Object.prototype.toString.call(val) === "[object Date]" && !isNaN(val.getTime())) {
       return Utilities.formatDate(val, "Asia/Jakarta", "yyyy-MM-dd");
     }
     const raw = String(val).trim();
-    let m1 = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    let m1 = raw.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
     if (m1) return `${m1[1]}-${String(m1[2]).padStart(2, "0")}-${String(m1[3]).padStart(2, "0")}`;
-    let m2 = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    let m2 = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
     if (m2) return `${m2[3]}-${String(m2[2]).padStart(2, "0")}-${String(m2[1]).padStart(2, "0")}`;
-    return raw.slice(0, 10);
+    let m3 = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})$/);
+    if (m3 && fallbackYear) return `${fallbackYear}-${String(m3[2]).padStart(2, "0")}-${String(m3[1]).padStart(2, "0")}`;
+    const parsed = new Date(raw);
+    if (!isNaN(parsed.getTime())) return Utilities.formatDate(parsed, "Asia/Jakarta", "yyyy-MM-dd");
+    return "";
   };
 
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
-    const rowYear = parseInt(row[idxTahun], 10);
+    const rowYearRaw = String(row[idxTahun] || "").trim();
+    const rowYear = parseInt(rowYearRaw.replace(/[^0-9]/g, ""), 10);
     const rowMonthText = String(row[idxBulan] || "").toUpperCase().trim();
-    const rowMonthNumber = monthMap[rowMonthText] !== undefined ? monthMap[rowMonthText] + 1 : parseInt(row[idxBulan], 10);
-    const dateStr = toDateStr(row[idxTanggal]);
+    const rowMonthKey = rowMonthText.replace(/[^A-Z]/g, "");
+    const rowMonthNumber = monthMap[rowMonthText] !== undefined ? monthMap[rowMonthText] + 1 : (monthMap[rowMonthKey] !== undefined ? monthMap[rowMonthKey] + 1 : parseInt(row[idxBulan], 10));
+    const dateStr = toDateStr(row[idxTanggal], rowYear || y);
     const dateParts = dateStr.split("-");
     const dateYear = parseInt(dateParts[0], 10);
     const dateMonth = parseInt(dateParts[1], 10);
     const sameYear = rowYear === y || dateYear === y;
-    const sameMonth = rowMonthText === monthName || rowMonthNumber === monthNumber || dateMonth === monthNumber;
+    const sameMonth = rowMonthText === monthName || rowMonthKey === monthName || rowMonthNumber === monthNumber || dateMonth === monthNumber;
     if (!sameYear || !sameMonth || dateParts.length !== 3) continue;
     holidayMap[dateStr] = { tgl: dateStr, nama: String(row[idxKet] || "Libur Nasional").trim() || "Libur Nasional" };
   }
