@@ -1003,7 +1003,7 @@ function getKalenderKerja(bulanName, tahun) {
   const monthName = String(bulanName || "").toUpperCase().replace(/[^A-Z]/g, "").trim();
   const m = monthMap[monthName];
   const y = parseInt(tahun, 10);
-  if (m === undefined || isNaN(y)) return { targetHariKerja: 0, detailLibur: [], sumber: "Sheet Libur" };
+  if (m === undefined || isNaN(y)) return { targetHariKerja: 0, detailLibur: [], sumber: "Database Libur" };
 
   const start = new Date(y, m, 1, 0, 0, 0);
   const end = new Date(y, m + 1, 1, 0, 0, 0);
@@ -1025,8 +1025,8 @@ function getKalenderKerja(bulanName, tahun) {
         totalWeekdays: weekdays,
         totalLiburNasionalWeekday: 0,
         detailLibur: [],
-        sumber: "Sheet Libur belum ditemukan",
-        rekomendasiAI: "Sheet Libur belum ditemukan. Pastikan nama sheet persis Libur dengan kolom Tahun, Bulan, Tanggal, Keterangan Libur."
+        sumber: "Database Libur belum ditemukan",
+        rekomendasiAI: "Database Libur belum ditemukan. Pastikan nama sheet persis Libur dengan kolom Tahun, Bulan, Tanggal, Keterangan Libur."
       };
     }
 
@@ -1038,8 +1038,8 @@ function getKalenderKerja(bulanName, tahun) {
         totalWeekdays: weekdays,
         totalLiburNasionalWeekday: 0,
         detailLibur: [],
-        sumber: "Sheet Libur kosong",
-        rekomendasiAI: "Sheet Libur masih kosong. Isi kolom Tahun, Bulan, Tanggal, Keterangan Libur untuk menghitung otomatis."
+        sumber: "Database Libur kosong",
+        rekomendasiAI: "Database Libur masih kosong. Isi kolom Tahun, Bulan, Tanggal, Keterangan Libur untuk menghitung otomatis."
       };
     }
 
@@ -1105,8 +1105,8 @@ function getKalenderKerja(bulanName, tahun) {
       totalWeekdays: weekdays,
       totalLiburNasionalWeekday: holidayWeekdays.length,
       detailLibur: holidayWeekdays,
-      sumber: "Sheet Libur",
-      rekomendasiAI: `Data dibaca dari Sheet Libur: ${holidayWeekdays.length} libur pada hari kerja untuk bulan ${bulanName} ${tahun}. Baris tanggal valid terbaca: ${parsedRows}. Target hari kerja awal: ${Math.max(0, weekdays - holidayWeekdays.length)}.`
+      sumber: "Database Libur",
+      rekomendasiAI: `Data dibaca dari Database Libur: ${holidayWeekdays.length} libur pada hari kerja untuk bulan ${bulanName} ${tahun}. Baris tanggal valid terbaca: ${parsedRows}. Target hari kerja awal: ${Math.max(0, weekdays - holidayWeekdays.length)}.`
     };
   } catch (err) {
     return {
@@ -1114,8 +1114,8 @@ function getKalenderKerja(bulanName, tahun) {
       totalWeekdays: weekdays,
       totalLiburNasionalWeekday: 0,
       detailLibur: [],
-      sumber: "Sheet Libur error",
-      rekomendasiAI: `Sheet Libur gagal dibaca: ${err && err.message ? err.message : err}. Cek format kolom Tahun, Bulan, Tanggal, Keterangan Libur.`
+      sumber: "Database Libur error",
+      rekomendasiAI: `Database Libur gagal dibaca: ${err && err.message ? err.message : err}. Cek format kolom Tahun, Bulan, Tanggal, Keterangan Libur.`
     };
   }
 }
