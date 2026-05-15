@@ -214,9 +214,80 @@
         .hero-slogan-modern { animation: sloganPulse 3.8s ease-in-out infinite; }
         @keyframes heroTextFlow { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
         @keyframes sloganPulse { 0%,100% { transform: translateY(0); filter: drop-shadow(0 0 0 rgba(255,215,0,0)); } 50% { transform: translateY(-2px); filter: drop-shadow(0 0 12px rgba(255,215,0,.38)); } }
+
+        /* Mobile polish: halaman scan tidak mengunci layar dan panel panduan tetap terlihat */
+        html { min-height: 100%; }
+        body { min-height: 100vh; height: auto; overflow-x: hidden; }
+        main { padding-bottom: max(2.5rem, env(safe-area-inset-bottom)); }
+        .guide-panel-responsive { min-height: 100%; }
+        .note-chip-modern {
+            display: inline-flex;
+            align-items: flex-start;
+            gap: .45rem;
+            max-width: 24rem;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+        .note-chip-modern i { margin-top: .12rem; }
+        .note-chip-empty { opacity: .75; }
+        .gov-app-footer {
+            position: relative;
+            z-index: 20;
+            overflow: hidden;
+            border-top: 1px solid rgba(255, 215, 0, .45);
+            background: linear-gradient(90deg, rgba(0, 32, 76, .98), rgba(0, 51, 102, .98), rgba(14, 116, 144, .98));
+            box-shadow: 0 -10px 30px rgba(15, 23, 42, .14);
+            backdrop-filter: blur(18px);
+        }
+        .gov-app-footer::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.16) 42%, rgba(255,215,0,.22) 50%, transparent 62%);
+            transform: translateX(-120%);
+            animation: footerFreezeGlow 7s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .gov-footer-logo { box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 0 26px rgba(255,215,0,.38); }
+        .gov-footer-dot { animation: footerDotPulse 1.8s ease-in-out infinite; }
+        .gov-footer-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            border: 1px solid rgba(255,255,255,.18);
+            background: rgba(255,255,255,.1);
+            border-radius: 999px;
+            padding: .45rem .7rem;
+            white-space: nowrap;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+        }
+        .gov-footer-address { overflow-wrap: anywhere; }
+        .login-ultra-card { background: rgba(255,255,255,.88); backdrop-filter: blur(24px); }
+        .login-ultra-card::before { content: ""; position: absolute; inset: -35%; background: conic-gradient(from 140deg, rgba(255,215,0,.18), rgba(59,130,246,.18), rgba(14,165,233,.14), rgba(255,215,0,.18)); animation: orbitGlow 16s linear infinite; pointer-events: none; }
+        .login-feature-chip { display: inline-flex; align-items: center; gap: .45rem; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.14); border-radius: 999px; padding: .45rem .7rem; font-size: 10px; font-weight: 900; color: #dbeafe; }
+        .login-input-modern { box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 10px 24px rgba(15,23,42,.04); }
+        @keyframes footerFreezeGlow { 0%, 46% { transform: translateX(-120%); } 70%, 100% { transform: translateX(120%); } }
+        @keyframes footerDotPulse { 0%,100% { transform: scale(.9); opacity: .72; } 50% { transform: scale(1.15); opacity: 1; } }
+
+        @media (max-width: 640px) {
+            main { width: 100%; padding-left: .85rem; padding-right: .85rem; padding-top: 1rem; }
+            #scanView .min-h-\[75vh\] { min-height: auto; justify-content: flex-start; }
+            #scanView .rounded-\[2rem\] { border-radius: 1.5rem; }
+            #scanView .action-card { border-radius: 1.25rem; padding: .95rem .7rem; }
+            #scanView .action-card i { font-size: 1.45rem; margin-bottom: .45rem; }
+            .guide-panel-responsive { border-top: 1px solid rgba(191, 219, 254, .9); padding: 1rem; }
+            .guide-panel-responsive .info-card-modern { border-radius: 1.25rem; padding: 1rem; }
+            .note-chip-modern { max-width: min(72vw, 18rem); }
+            .gov-app-footer .footer-secondary { display: none; }
+            .gov-app-footer .footer-title { font-size: .72rem; }
+            .gov-app-footer .footer-subtitle { font-size: .58rem; }
+            .gov-app-footer .gov-footer-address { display: none; }
+        }
     </style>
 </head>
-<body class="text-gray-800 h-screen flex flex-col">
+<body class="text-gray-800 min-h-screen flex flex-col">
 
     <header class="bg-pusk-blue shadow-lg sticky top-0 z-40 border-b-4 border-pusk-yellow">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -257,7 +328,7 @@
 
         <!-- VIEW: SCANNER ABSENSI -->
         <section id="scanView" class="page-section active">
-            <div class="flex flex-col items-center justify-center min-h-[75vh]">
+            <div class="flex flex-col items-center justify-center min-h-[75vh] relative overflow-hidden">
                 <div class="w-full max-w-6xl rounded-[2rem] overflow-hidden shadow-2xl border border-blue-100 bg-white/95 backdrop-blur-xl relative">
                     <div class="landing-orbit opacity-80"></div>
                     <div class="relative grid grid-cols-1 lg:grid-cols-[1.1fr_.9fr] gap-0">
@@ -355,7 +426,7 @@
                             </div>
                         </div>
 
-                        <div class="hidden lg:block relative bg-gradient-to-br from-white via-blue-50 to-yellow-50 p-6 md:p-8">
+                        <div class="guide-panel-responsive block relative bg-gradient-to-br from-white via-blue-50 to-yellow-50 p-4 sm:p-6 md:p-8">
                             <div class="grid grid-cols-1 gap-4">
                                 <div class="info-card-modern rounded-3xl p-5 bg-white border border-blue-100 shadow-sm">
                                     <div class="flex items-start gap-3">
@@ -403,21 +474,26 @@
         <!-- VIEW: LOGIN ADMIN MODERN -->
         <section id="loginView" class="page-section">
             <div class="flex flex-col items-center justify-center min-h-[75vh]">
-                <div class="glass-panel rounded-[2rem] w-full max-w-4xl shadow-2xl border border-white/50 relative overflow-hidden flex flex-col md:flex-row">
+                <div class="login-ultra-card rounded-[2rem] w-full max-w-5xl shadow-2xl border border-white/70 relative overflow-hidden flex flex-col md:flex-row">
 
                     <!-- Sisi Kiri: Gambar Cover Menarik -->
-                    <div class="hidden md:block md:w-1/2 relative overflow-hidden bg-pusk-blue">
+                    <div class="hidden md:block md:w-1/2 relative overflow-hidden bg-pusk-blue scan-grid-bg">
                         <img id="loginBgImg" src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000&auto=format&fit=crop" alt="Login Background" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition-transform duration-[10s] hover:scale-110">
                         <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-pusk-blue/90 via-pusk-blue/40 to-transparent"></div>
                         <div class="absolute bottom-0 left-0 p-10 text-white z-10 w-full">
                             <div class="w-16 h-1 bg-pusk-yellow mb-4 rounded-full"></div>
                             <h2 class="text-3xl font-extrabold mb-2 leading-tight" id="loginCoverTitle">Sistem Terpadu Kepegawaian</h2>
                             <p class="text-sm text-blue-100 opacity-90 leading-relaxed pr-4">Digitalisasi manajemen absensi modern, cepat, dan presisi tinggi dengan pelacakan Geofencing.</p>
+                            <div class="mt-5 flex flex-wrap gap-2">
+                                <span class="login-feature-chip"><i class="fa-solid fa-shield-halved text-pusk-yellow"></i> Secure Admin</span>
+                                <span class="login-feature-chip"><i class="fa-solid fa-satellite-dish text-emerald-300"></i> Realtime GPS</span>
+                                <span class="login-feature-chip"><i class="fa-solid fa-wand-magic-sparkles text-cyan-200"></i> Smart Report</span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Sisi Kanan: Form Login -->
-                    <div class="w-full md:w-1/2 p-10 lg:p-12 relative flex flex-col justify-center bg-white/60 backdrop-blur-md">
+                    <div class="w-full md:w-1/2 p-8 sm:p-10 lg:p-12 relative flex flex-col justify-center bg-white/75 backdrop-blur-xl">
                         <div class="absolute -top-16 -right-16 w-48 h-48 bg-pusk-blue opacity-10 rounded-full blur-3xl"></div>
 
                         <div class="text-center mb-8 relative z-10">
@@ -428,24 +504,24 @@
                                 </div>
                             </div>
                             <h2 id="loginAppName" class="text-2xl font-extrabold text-pusk-blue tracking-wide">PORTAL ABSENSI</h2>
-                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Administrator Area</p>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Administrator Command Center</p><div class="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-black uppercase tracking-widest"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sistem Online & Terenkripsi</div>
                         </div>
 
                         <div class="space-y-5 relative z-10">
                             <div>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-user text-gray-400"></i></div>
-                                    <input type="text" id="logUser" class="w-full pl-11 pr-4 py-3.5 bg-gray-50/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pusk-blue focus:bg-white outline-none transition text-sm font-semibold" placeholder="Username">
+                                    <input type="text" id="logUser" class="login-input-modern w-full pl-11 pr-4 py-3.5 bg-white/90 border border-blue-100 rounded-2xl focus:ring-2 focus:ring-pusk-blue focus:bg-white outline-none transition text-sm font-bold" placeholder="Username">
                                 </div>
                             </div>
                             <div>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-lock text-gray-400"></i></div>
-                                    <input type="password" id="logPass" class="w-full pl-11 pr-12 py-3.5 bg-gray-50/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pusk-blue focus:bg-white outline-none transition text-sm font-semibold" placeholder="Password">
+                                    <input type="password" id="logPass" class="login-input-modern w-full pl-11 pr-12 py-3.5 bg-white/90 border border-blue-100 rounded-2xl focus:ring-2 focus:ring-pusk-blue focus:bg-white outline-none transition text-sm font-bold" placeholder="Password">
                                     <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-pusk-blue transition"><i class="fa-solid fa-eye" id="eyeIcon"></i></button>
                                 </div>
                             </div>
-                            <button onclick="doLogin()" class="w-full bg-gradient-to-r from-pusk-blue to-blue-800 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm uppercase tracking-wider mt-4">
+                            <button onclick="doLogin()" class="w-full bg-gradient-to-r from-pusk-blue via-blue-700 to-cyan-700 text-white font-extrabold py-4 px-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-95 text-sm uppercase tracking-wider mt-4">
                                 Login ke Panel <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>
                             </button>
                         </div>
@@ -785,6 +861,10 @@
                             <label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 ml-1">Nama Unit/Puskesmas</label>
                             <input type="text" id="setNamaPusk" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold">
                         </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 ml-1">Alamat Instansi</label>
+                            <textarea id="setAlamatPusk" rows="3" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-semibold text-sm" placeholder="Contoh: Jl. ... Kecamatan ... Kabupaten Sintang"></textarea>
+                        </div>
                         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
                             <p class="text-xs font-bold text-pusk-blue mb-3 uppercase"><i class="fa-solid fa-signature mr-1"></i> Penanda Tangan Laporan PDF</p>
                             <div class="space-y-3">
@@ -884,7 +964,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-end relative z-10 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Pilih Bulan</label>
-                        <select id="lapBulan" onchange="hitungHariKerjaOtomatis()" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
+                        <select id="lapBulan" onchange="hitungHariKerjaOtomatis(false)" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
                             <option value="JANUARI">Januari</option><option value="FEBRUARI">Februari</option><option value="MARET" selected>Maret</option>
                             <option value="APRIL">April</option><option value="MEI">Mei</option><option value="JUNI">Juni</option>
                             <option value="JULI">Juli</option><option value="AGUSTUS">Agustus</option><option value="SEPTEMBER">September</option>
@@ -893,7 +973,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Pilih Tahun</label>
-                        <select id="lapTahun" onchange="hitungHariKerjaOtomatis()" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
+                        <select id="lapTahun" onchange="hitungHariKerjaOtomatis(false)" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-pusk-blue">
                             <option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option>
                         </select>
                     </div>
@@ -902,15 +982,18 @@
                         <input type="number" id="lapHariKerja" class="w-full px-4 py-3 bg-red-50 border-2 border-red-200 rounded-xl font-extrabold text-red-700 text-center text-lg" value="17">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-orange-600 uppercase mb-2"><i class="fa-solid fa-calendar-xmark"></i> Input Libur Nasional</label>
-                        <input type="number" id="lapLiburManual" onchange="hitungHariKerjaOtomatis()" class="w-full px-4 py-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-extrabold text-orange-700 text-center text-lg" value="0">
+                        <label class="block text-xs font-bold text-orange-600 uppercase mb-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Libur Nasional AI + Manual</label>
+                        <input type="number" id="lapLiburManual" onchange="hitungHariKerjaOtomatis(true)" class="w-full px-4 py-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-extrabold text-orange-700 text-center text-lg" value="0">
                     </div>
                 </div>
-                <div id="liburInfoBox" class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-6 text-xs">
-                    <p class="font-extrabold text-gray-700"><i class="fa-solid fa-calendar-check mr-1"></i>Auto Hitung Hari Kerja</p>
-                    <p id="liburSummary" class="text-gray-600 mt-1">Memuat data libur nasional...</p>
-                    <ul id="liburDetailList" class="mt-2 list-disc pl-5 text-gray-600 space-y-0.5 max-h-28 overflow-y-auto"></ul>
-                    <p class="text-[10px] text-gray-500 mt-2">*Nilai target masih bisa Anda edit manual jika dibutuhkan.</p>
+                <div id="liburInfoBox" class="bg-gradient-to-br from-blue-50 via-white to-orange-50 border border-blue-100 rounded-2xl p-4 mb-6 text-xs shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
+                        <p class="font-black text-pusk-blue uppercase tracking-wider"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-orange-500"></i>AI Kalender Libur Nasional</p>
+                        <span id="liburAiBadge" class="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-white border border-blue-100 text-[10px] font-black text-blue-700"><span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>Siap sinkron bulan pilihan</span>
+                    </div>
+                    <p id="liburSummary" class="text-gray-700 font-semibold mt-1">Memuat data libur nasional...</p>
+                    <div id="liburDetailList" class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1"></div>
+                    <p class="text-[10px] text-gray-500 mt-3"><i class="fa-solid fa-circle-info mr-1"></i>Input libur dapat dikoreksi manual. Sistem akan menghitung target hari kerja dari weekday dikurangi total libur pada input.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
@@ -920,14 +1003,42 @@
                     <button onclick="generatePDFDetail()" class="w-full bg-gradient-to-r from-blue-500 to-blue-400 hover:from-blue-600 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
                         <i class="fa-solid fa-business-time mr-2"></i> Laporan Total Jam Kerja
                     </button>
-                    <button onclick="generatePDFASN()" class="w-full md:col-span-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
+                    <button onclick="generatePDFASN()" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
                         <i class="fa-solid fa-user-shield mr-2"></i> Laporan Khusus ASN
+                    </button>
+                    <button onclick="generatePDFPPPK()" class="w-full bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition">
+                        <i class="fa-solid fa-id-card-clip mr-2"></i> Laporan Khusus PPPK
                     </button>
                 </div>
             </div>
         </section>
 
     </main>
+
+    <footer class="gov-app-footer text-white">
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="gov-footer-logo w-10 h-10 rounded-2xl bg-white flex items-center justify-center shrink-0 overflow-hidden">
+                    <img id="footerLogoImg" src="" alt="Logo" class="hidden w-full h-full object-contain p-1">
+                    <i id="footerLogoIcon" class="fa-solid fa-hospital text-pusk-blue text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <p id="footerAppName" class="footer-title text-xs sm:text-sm font-black uppercase tracking-[0.18em] truncate">PORTAL ABSENSI</p>
+                        <span class="gov-footer-dot w-2.5 h-2.5 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,.9)]"></span>
+                        <p class="text-[9px] font-black uppercase tracking-[0.18em] text-pusk-yellow">Government Smart Service</p>
+                    </div>
+                    <p id="footerUnitName" class="footer-subtitle text-[10px] sm:text-[11px] text-blue-100 font-bold truncate">Sistem Absensi Digital Pemerintahan</p>
+                    <p id="footerAddress" class="gov-footer-address text-[10px] text-blue-100/90 font-semibold leading-snug"><i class="fa-solid fa-location-dot text-pusk-yellow mr-1"></i>Alamat instansi belum diatur</p>
+                </div>
+            </div>
+            <div class="footer-secondary flex flex-wrap items-center justify-start lg:justify-end gap-2 text-[10px] font-extrabold">
+                <span class="gov-footer-chip text-emerald-100"><i class="fa-solid fa-right-to-bracket text-emerald-300"></i>Masuk <b id="footerJamMasuk" class="text-white">06:00-10:00</b></span>
+                <span class="gov-footer-chip text-orange-100"><i class="fa-solid fa-right-from-bracket text-orange-300"></i>Pulang <b id="footerJamPulang" class="text-white">12:00-23:59</b></span>
+                <span class="gov-footer-chip text-blue-100"><i class="fa-solid fa-shield-halved text-pusk-yellow"></i>Aman • Realtime • Presisi</span>
+            </div>
+        </div>
+    </footer>
 
     <!-- Modal Form Pegawai LENGKAP -->
     <div id="modalTambahPegawai" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -1063,6 +1174,7 @@
             if(viewId === 'pegawaiView') loadDataPegawai();
             if(viewId === 'settingView') loadPengaturan();
             if(viewId === 'harianView') loadAbsenHarian();
+            if(viewId === 'laporanView') setTimeout(() => hitungHariKerjaOtomatis(false), 150);
             if(viewId === 'scanView' || viewId === 'loginView') muatIdentitasAplikasi();
         }
 
@@ -1072,15 +1184,19 @@
                 if(res.App_Name) {
                     document.getElementById('appNameTitle').innerText = res.App_Name;
                     document.getElementById('loginAppName').innerText = res.App_Name;
+                    const footerAppName = document.getElementById('footerAppName'); if (footerAppName) footerAppName.innerText = res.App_Name;
                 }
 
+                const footerUnitName = document.getElementById('footerUnitName');
                 if(res.App_Header_Name) {
                     document.getElementById('appHeaderName').innerText = res.App_Header_Name;
                     document.getElementById('previewAppSubText').innerText = res.App_Header_Name;
+                    if (footerUnitName) footerUnitName.innerText = res.App_Header_Name;
                 } else if (res.Nama_Puskesmas) {
                     let singkatan = res.Nama_Puskesmas.replace("UPTD PUSKESMAS", "Puskesmas").substring(0, 25);
                     document.getElementById('appHeaderName').innerText = singkatan;
                     document.getElementById('previewAppSubText').innerText = singkatan;
+                    if (footerUnitName) footerUnitName.innerText = singkatan;
                 }
                 document.getElementById('runningTextMsg').innerText = res.Running_Text || "Info layanan digital UPTD Puskesmas Tanjung Puri • sehat bersama kami • masyarakat berprestasi • scan cepat, data akurat";
 
@@ -1089,13 +1205,18 @@
                     document.getElementById('loginLogoIcon').classList.add('hidden');
                     let img = document.getElementById('appLogoImg'); img.src = res.App_Logo; img.classList.remove('hidden');
                     let imgLog = document.getElementById('loginLogoImg'); imgLog.src = res.App_Logo; imgLog.classList.remove('hidden');
+                    const footerLogoIcon = document.getElementById('footerLogoIcon'); if (footerLogoIcon) footerLogoIcon.classList.add('hidden');
+                    const footerLogoImg = document.getElementById('footerLogoImg'); if (footerLogoImg) { footerLogoImg.src = res.App_Logo; footerLogoImg.classList.remove('hidden'); }
                     const fav = document.getElementById('appFavicon'); if (fav) fav.href = res.App_Logo;
                 } else {
                     document.getElementById('appLogoIcon').classList.remove('hidden');
                     document.getElementById('loginLogoIcon').classList.remove('hidden');
                     document.getElementById('appLogoImg').classList.add('hidden');
                     document.getElementById('loginLogoImg').classList.add('hidden');
+                    const footerLogoIcon = document.getElementById('footerLogoIcon'); if (footerLogoIcon) footerLogoIcon.classList.remove('hidden');
+                    const footerLogoImg = document.getElementById('footerLogoImg'); if (footerLogoImg) footerLogoImg.classList.add('hidden');
                 }
+                updateFooterInfo(res);
                 appSettingsCache = res;
                 updateJamOperasionalInfo();
                 updateKartuRataJamLanding();
@@ -1119,6 +1240,7 @@
                 document.getElementById('setPesanMasuk').value = res.Pesan_Masuk_Berhasil || 'Absen MASUK berhasil. Selamat bekerja, {nama}! Semoga hari ini penuh manfaat dan pelayanan terbaik.';
                 document.getElementById('setPesanPulang').value = res.Pesan_Pulang_Berhasil || 'Absen PULANG berhasil. Terima kasih, {nama}. Semoga perjalanan pulang aman dan sehat selalu.';
                 document.getElementById('setNamaPusk').value = res.Nama_Puskesmas || '';
+                document.getElementById('setAlamatPusk').value = res.Alamat_Puskesmas || '';
                 document.getElementById('setKapusNama').value = res.Kepala_Nama || '';
                 document.getElementById('setKapusNip').value = res.Kepala_NIP || '';
                 document.getElementById('setLatPusk').value = res.Lat_Puskesmas || '';
@@ -1154,6 +1276,7 @@
                 Pesan_Masuk_Berhasil: document.getElementById('setPesanMasuk').value,
                 Pesan_Pulang_Berhasil: document.getElementById('setPesanPulang').value,
                 Nama_Puskesmas: document.getElementById('setNamaPusk').value,
+                Alamat_Puskesmas: document.getElementById('setAlamatPusk').value,
                 Kepala_Nama: document.getElementById('setKapusNama').value,
                 Kepala_NIP: document.getElementById('setKapusNip').value,
                 Lat_Puskesmas: document.getElementById('setLatPusk').value,
@@ -1239,6 +1362,19 @@
                 document.getElementById('avgJamMasukCount').innerText = 'Belum tersedia';
                 document.getElementById('avgJamPulangCount').innerText = 'Belum tersedia';
             }).getRataJamHariIni();
+        }
+
+        function updateFooterInfo(settings) {
+            const cfg = settings || {};
+            const alamat = String(cfg.Alamat_Puskesmas || '').trim();
+            const footerAddress = document.getElementById('footerAddress');
+            if (footerAddress) {
+                footerAddress.innerHTML = `<i class="fa-solid fa-location-dot text-pusk-yellow mr-1"></i>${escapeHtml(alamat || 'Alamat instansi belum diatur')}`;
+            }
+            const masuk = `${cfg.Jam_Masuk_Mulai || '06:00'}-${cfg.Jam_Masuk_Akhir || '10:00'}`;
+            const pulang = `${cfg.Jam_Pulang_Mulai || '12:00'}-${cfg.Jam_Pulang_Akhir || '23:59'}`;
+            const footerJamMasuk = document.getElementById('footerJamMasuk'); if (footerJamMasuk) footerJamMasuk.innerText = masuk;
+            const footerJamPulang = document.getElementById('footerJamPulang'); if (footerJamPulang) footerJamPulang.innerText = pulang;
         }
 
         function updateJamOperasionalInfo() {
@@ -1379,6 +1515,24 @@
         }
 
         function bukaScannerOutFrame(actionType) {
+            popupScannerWindow = window.open('', 'puskesmasLiveScanner', 'width=720,height=860,resizable=yes,scrollbars=yes');
+            if (!popupScannerWindow) {
+                Swal.fire('Popup Diblokir', 'Izinkan popup browser untuk membuka scanner out-frame.', 'warning');
+                return;
+            }
+            popupScannerWindow.document.open();
+            popupScannerWindow.document.write('<!doctype html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Menyiapkan Scanner</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#003366;color:#fff;font-family:Arial,sans-serif}.box{text-align:center;padding:24px}.pulse{width:42px;height:42px;margin:0 auto 14px;border-radius:50%;border:4px solid rgba(255,255,255,.25);border-top-color:#FFD700;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}</style></head><body><div class="box"><div class="pulse"></div><b>Menyiapkan Live Scanner...</b><p>Mohon tunggu sebentar.</p></div></body></html>');
+            popupScannerWindow.document.close();
+            const appLogoImgEl = document.getElementById('appLogoImg');
+            const popupLogoUrl = String((appSettingsCache && appSettingsCache.App_Logo) || (appLogoImgEl ? appLogoImgEl.src : '') || '').trim();
+            const appNameEl = document.getElementById('appNameTitle');
+            const headerNameEl = document.getElementById('appHeaderName');
+            const popupAppName = escapeHtml((appNameEl && appNameEl.innerText) || appSettingsCache.App_Name || 'PORTAL ABSENSI');
+            const popupUnitName = escapeHtml((headerNameEl && headerNameEl.innerText) || appSettingsCache.App_Header_Name || appSettingsCache.Nama_Puskesmas || 'Sistem Digital Pemerintahan');
+            const safeActionType = escapeHtml(actionType);
+            const popupLogoHtml = popupLogoUrl
+                ? `<img src="${escapeHtml(popupLogoUrl)}" alt="Logo Puskesmas" class="brand-logo-img">`
+                : `<span class="brand-logo-icon">🏥</span>`;
             const popupHtml = `
 <!doctype html>
 <html lang="id">
@@ -1386,25 +1540,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Scanner QR - Absensi</title>
-  <script src="https://unpkg.com/html5-qrcode"><\/script>
   <style>
-    body{margin:0;background:#0f172a;color:#e2e8f0;font-family:Arial,sans-serif}
-    .wrap{max-width:680px;margin:0 auto;padding:20px}
-    h1{font-size:18px;margin:0 0 12px}
-    #reader{border-radius:12px;overflow:hidden;background:#000}
-    .card{background:#1e293b;padding:12px;border-radius:12px;margin-bottom:12px}
-    .btn{padding:10px 12px;border:none;border-radius:10px;background:#ef4444;color:#fff;font-weight:700;cursor:pointer}
-    .small{font-size:12px;opacity:.85}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 15%,rgba(255,215,0,.22),transparent 28%),radial-gradient(circle at 85% 8%,rgba(56,189,248,.2),transparent 24%),linear-gradient(135deg,#001b3f,#003366 48%,#075985);color:#e2e8f0;font-family:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:-45%;background:conic-gradient(from 90deg,transparent,rgba(255,215,0,.2),rgba(14,165,233,.18),transparent 45%);animation:scannerOrbit 16s linear infinite;pointer-events:none}
+    .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:18px 14px 28px}
+    .shell{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:32px;background:rgba(255,255,255,.1);box-shadow:0 28px 80px rgba(0,0,0,.34);backdrop-filter:blur(18px)}
+    .shell::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.14),transparent);transform:translateX(-120%);animation:scannerShine 5.8s ease-in-out infinite;pointer-events:none}
+    .brand{display:flex;align-items:center;gap:14px;padding:18px;border-bottom:1px solid rgba(255,255,255,.14);background:linear-gradient(90deg,rgba(255,255,255,.14),rgba(255,255,255,.05))}
+    .brand-logo{width:58px;height:58px;border-radius:22px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 4px rgba(255,255,255,.16),0 0 32px rgba(255,215,0,.42)}
+    .brand-logo-img{width:100%;height:100%;object-fit:contain;padding:6px}.brand-logo-icon{color:#003366;font-size:25px}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(52,211,153,.35);background:rgba(16,185,129,.14);color:#bbf7d0;border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.pulse{width:8px;height:8px;border-radius:999px;background:#34d399;box-shadow:0 0 18px #34d399;animation:pulse 1.7s ease-in-out infinite}
+    h1{font-size:24px;line-height:1.1;margin:9px 0 3px;color:#fff;font-weight:900}.unit{font-size:11px;color:#fde68a;font-weight:900;text-transform:uppercase;letter-spacing:.12em}.small{font-size:12px;color:#dbeafe;font-weight:700;line-height:1.55;margin-top:8px}
+    .scanner-zone{padding:16px}.reader-frame{position:relative;border-radius:28px;padding:10px;background:linear-gradient(135deg,rgba(255,215,0,.9),rgba(56,189,248,.55),rgba(255,255,255,.18));box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 20px 55px rgba(0,0,0,.3)}
+    #reader{border-radius:22px;overflow:hidden;background:#020617;min-height:320px}.scan-corners{position:absolute;inset:24px;pointer-events:none;border-radius:22px;background:linear-gradient(#facc15,#facc15) left top/46px 4px no-repeat,linear-gradient(#facc15,#facc15) left top/4px 46px no-repeat,linear-gradient(#38bdf8,#38bdf8) right top/46px 4px no-repeat,linear-gradient(#38bdf8,#38bdf8) right top/4px 46px no-repeat,linear-gradient(#38bdf8,#38bdf8) left bottom/46px 4px no-repeat,linear-gradient(#38bdf8,#38bdf8) left bottom/4px 46px no-repeat,linear-gradient(#facc15,#facc15) right bottom/46px 4px no-repeat,linear-gradient(#facc15,#facc15) right bottom/4px 46px no-repeat;filter:drop-shadow(0 0 12px rgba(250,204,21,.7))}
+    .meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px}.meta-card{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.1);border-radius:20px;padding:12px}.meta-label{font-size:9px;color:#bfdbfe;text-transform:uppercase;letter-spacing:.14em;font-weight:900}.meta-value{font-size:12px;color:#fff;font-weight:900;margin-top:4px}.actions{display:flex;gap:10px;padding:0 16px 18px}.btn{width:100%;padding:13px 14px;border:none;border-radius:18px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 12px 26px rgba(185,28,28,.28)}
+    @keyframes scannerOrbit{to{transform:rotate(360deg)}}@keyframes scannerShine{0%,45%{transform:translateX(-120%)}75%,100%{transform:translateX(120%)}}@keyframes pulse{0%,100%{transform:scale(.9);opacity:.7}50%{transform:scale(1.2);opacity:1}}
+    @media(max-width:520px){.wrap{padding:10px}.brand{padding:14px}.brand-logo{width:50px;height:50px;border-radius:18px}h1{font-size:20px}.meta{grid-template-columns:1fr}.scanner-zone{padding:12px}#reader{min-height:280px}.shell{border-radius:26px}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
-      <h1>Live Scan ${actionType}</h1>
-      <div class="small">Arahkan kamera ke QR ID Card. Setelah terbaca, jendela akan otomatis tertutup.</div>
+    <div class="shell">
+      <div class="brand">
+        <div class="brand-logo">${popupLogoHtml}</div>
+        <div>
+          <div class="eyebrow"><span class="pulse"></span> Live Secure Scanner</div>
+          <h1>Live Scan ${safeActionType}</h1>
+          <div class="unit">${popupUnitName}</div>
+          <div class="small">${popupAppName} siap membaca QR ID Card. Arahkan kamera ke kode QR dengan cahaya cukup; hasil akan otomatis terkirim dan jendela tertutup.</div>
+        </div>
+      </div>
+      <div class="scanner-zone">
+        <div class="reader-frame"><div id="reader"></div><div class="scan-corners"></div></div>
+      </div>
+      <div class="meta">
+        <div class="meta-card"><div class="meta-label">Mode Scan</div><div class="meta-value">${safeActionType}</div></div>
+        <div class="meta-card"><div class="meta-label">Status Kamera</div><div class="meta-value" id="cameraStatus">Mengaktifkan kamera...</div></div>
+      </div>
+      <div class="actions"><button class="btn" id="btnStop">✕ Tutup Scanner</button></div>
     </div>
-    <div id="reader"></div>
-    <div style="margin-top:12px"><button class="btn" id="btnStop">Tutup Scanner</button></div>
   </div>
   <script>
     let scanner;
@@ -1422,49 +1597,57 @@
         setTimeout(() => ctx.close(), 220);
       } catch(_) {}
     }
+    function setStatus(text) { const el = document.getElementById('cameraStatus'); if (el) el.textContent = text; }
     function kirimHasil(text) {
-      beep();
+      beep(); setStatus('QR terbaca, mengirim data...');
       try {
         if (window.opener && !window.opener.closed) {
-          window.opener.postMessage({ type: 'PUSK_QR_RESULT', decodedText: text, actionType: '${actionType}' }, window.location.origin);
+          window.opener.postMessage({ type: 'PUSK_QR_RESULT', decodedText: text, actionType: '${safeActionType}' }, window.location.origin);
         }
       } catch(_) {}
       setTimeout(() => window.close(), 250);
     }
+    function loadScannerLibrary() {
+      return new Promise((resolve, reject) => {
+        if (window.Html5Qrcode) { resolve(); return; }
+        setStatus('Memuat mesin scanner...');
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/html5-qrcode';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Library scanner gagal dimuat'));
+        document.head.appendChild(script);
+        setTimeout(() => { if (!window.Html5Qrcode) reject(new Error('Library scanner timeout')); }, 15000);
+      });
+    }
     async function runScanner() {
+      await loadScannerLibrary();
       scanner = new Html5Qrcode('reader');
       try {
         await scanner.start(
           { facingMode: { exact: 'environment' } },
-          { fps: 12, qrbox: { width: 250, height: 250 } },
-          (decodedText) => {
-            scanner.stop().finally(() => kirimHasil(decodedText));
-          }
+          { fps: 14, qrbox: { width: 260, height: 260 } },
+          (decodedText) => { scanner.stop().finally(() => kirimHasil(decodedText)); }
         );
+        setStatus('Kamera belakang aktif');
       } catch (e1) {
         await scanner.start(
           { facingMode: 'environment' },
-          { fps: 10, qrbox: { width: 250, height: 250 } },
-          (decodedText) => {
-            scanner.stop().finally(() => kirimHasil(decodedText));
-          }
+          { fps: 12, qrbox: { width: 250, height: 250 } },
+          (decodedText) => { scanner.stop().finally(() => kirimHasil(decodedText)); }
         );
+        setStatus('Kamera aktif');
       }
     }
     document.getElementById('btnStop').addEventListener('click', async () => {
       try { if (scanner) await scanner.stop(); } catch(_) {}
       window.close();
     });
-    runScanner().catch(() => alert('Kamera gagal diakses. Pastikan izin kamera aktif.'));
+    runScanner().catch((err) => { setStatus('Scanner gagal dimuat / kamera ditolak'); alert((err && err.message ? err.message + '. ' : '') + 'Pastikan internet aktif dan izin kamera diberikan.'); });
   <\/script>
 </body>
 </html>`;
 
-            popupScannerWindow = window.open('', 'puskesmasLiveScanner', 'width=720,height=860,resizable=yes,scrollbars=yes');
-            if (!popupScannerWindow) {
-                Swal.fire('Popup Diblokir', 'Izinkan popup browser untuk membuka scanner out-frame.', 'warning');
-                return;
-            }
             popupScannerWindow.document.open();
             popupScannerWindow.document.write(popupHtml);
             popupScannerWindow.document.close();
@@ -1653,23 +1836,45 @@
             navTo('scanView'); Swal.fire({icon:'success', title:'Logout Berhasil', toast:true, position:'top-end', timer:2000, showConfirmButton:false});
         }
 
-        function hitungHariKerjaOtomatis() {
-            const bln = document.getElementById('lapBulan')?.value;
-            const thn = document.getElementById('lapTahun')?.value;
+        function hitungHariKerjaOtomatis(manualMode = false) {
+            const blnEl = document.getElementById('lapBulan');
+            const thnEl = document.getElementById('lapTahun');
+            const bln = blnEl ? blnEl.value : '';
+            const thn = thnEl ? thnEl.value : '';
             if (!bln || !thn) return;
             const summary = document.getElementById('liburSummary');
             const list = document.getElementById('liburDetailList');
-            summary.innerText = 'Menghitung hari kerja otomatis...';
-            list.innerHTML = '';
-            google.script.run.withSuccessHandler(res => {
-                const liburManual = parseInt(document.getElementById('lapLiburManual').value || 0, 10) || 0;
-                const targetFinal = Math.max(0, (res.targetHariKerja || 0) - liburManual);
+            const badge = document.getElementById('liburAiBadge');
+            const inputLibur = document.getElementById('lapLiburManual');
+            const applyResult = (res, keepManual) => {
+                res = res || {};
+                window.liburKerjaCache = res;
+                const aiCount = parseInt(res.totalLiburNasionalWeekday || 0, 10) || 0;
+                if (!keepManual && inputLibur) inputLibur.value = aiCount;
+                const totalLiburInput = parseInt((inputLibur && inputLibur.value) || aiCount || 0, 10) || 0;
+                const weekday = parseInt(res.totalWeekdays || 0, 10) || 0;
+                const targetFinal = Math.max(0, weekday - totalLiburInput);
                 document.getElementById('lapHariKerja').value = targetFinal;
-                summary.innerHTML = `Hari kerja weekday: <b>${res.totalWeekdays || 0}</b>, Libur nasional (weekday): <b>${res.totalLiburNasionalWeekday || 0}</b>, Input libur manual: <b>${liburManual}</b>, Target final: <b>${targetFinal}</b>`;
-                list.innerHTML = (res.detailLibur || []).length ? res.detailLibur.map(h => `<li>${h.tgl} — ${h.nama}</li>`).join('') : '<li>Tidak ada libur nasional weekday pada bulan ini.</li>';
-            }).withFailureHandler(() => {
-                summary.innerText = 'Gagal mengambil kalender libur nasional.';
-                list.innerHTML = '<li>Silakan isi target hari kerja manual.</li>';
+                if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>${escapeHtml(res.sumber || 'AI Kalender')} • ${aiCount} libur weekday`;
+                if (summary) summary.innerHTML = `Weekday bulan ini: <b>${weekday}</b> • Rekomendasi AI libur nasional: <b>${aiCount}</b> • Total libur dipakai: <b>${totalLiburInput}</b> • Target final: <b>${targetFinal}</b><br><span class="text-[10px] text-blue-600 font-black uppercase">${escapeHtml(res.rekomendasiAI || 'AI membantu membaca kalender nasional, nilai tetap bisa diedit manual.')}</span>`;
+                if (list) {
+                    const items = res.detailLibur || [];
+                    list.innerHTML = items.length ? items.map(h => `<div class="rounded-xl border border-orange-100 bg-white px-3 py-2 shadow-sm"><p class="font-black text-orange-700">${escapeHtml(h.tgl)}</p><p class="text-gray-600 font-semibold leading-snug">${escapeHtml(h.nama)}</p></div>`).join('') : '<div class="rounded-xl border border-emerald-100 bg-white px-3 py-2 font-bold text-emerald-700">Tidak ada libur nasional pada hari kerja bulan ini.</div>';
+                }
+            };
+
+            if (manualMode && window.liburKerjaCache) {
+                applyResult(window.liburKerjaCache, true);
+                return;
+            }
+
+            if (summary) summary.innerText = 'AI kalender sedang membaca libur nasional bulan pilihan...';
+            if (list) list.innerHTML = '';
+            if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>Sinkron kalender nasional...`;
+            google.script.run.withSuccessHandler(res => applyResult(res, manualMode)).withFailureHandler(() => {
+                if (summary) summary.innerText = 'Gagal mengambil kalender libur nasional. Silakan isi total libur secara manual.';
+                if (list) list.innerHTML = '<div class="rounded-xl border border-red-100 bg-white px-3 py-2 font-bold text-red-600">Koneksi kalender gagal. Input libur manual tetap dapat digunakan.</div>';
+                if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400"></span>Mode manual aktif`;
             }).getKalenderKerja(bln, thn);
         }
 
@@ -1745,6 +1950,34 @@
         }
 
         function gantiHalHarian(pg) { currentPgHarian = pg; renderTableHarian(false); }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderCatatanBadge(alasan, status) {
+            const note = String(alasan || '').trim();
+            if(!note) {
+                return `<span class="note-chip-modern note-chip-empty rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-bold text-slate-400"><i class="fa-regular fa-circle-dot"></i><span>Tidak ada catatan</span></span>`;
+            }
+
+            const ket = String(status || '').toUpperCase();
+            let tone = 'border-sky-200 bg-sky-50 text-sky-700';
+            let icon = 'fa-solid fa-note-sticky';
+            if(ket.includes('ALPA')) { tone = 'border-rose-200 bg-rose-50 text-rose-700'; icon = 'fa-solid fa-triangle-exclamation'; }
+            else if(ket.includes('CUTI')) { tone = 'border-purple-200 bg-purple-50 text-purple-700'; icon = 'fa-solid fa-umbrella-beach'; }
+            else if(ket.includes('SAKIT')) { tone = 'border-blue-200 bg-blue-50 text-blue-700'; icon = 'fa-solid fa-notes-medical'; }
+            else if(ket.includes('IZIN')) { tone = 'border-amber-200 bg-amber-50 text-amber-700'; icon = 'fa-solid fa-file-signature'; }
+            else if(ket.includes('TL') || ket.includes('TUGAS')) { tone = 'border-indigo-200 bg-indigo-50 text-indigo-700'; icon = 'fa-solid fa-briefcase'; }
+
+            const safeNote = escapeHtml(note);
+            return `<span class="note-chip-modern rounded-2xl border ${tone} px-3 py-2 text-[11px] font-extrabold shadow-sm shadow-slate-100" title="${safeNote}"><i class="${icon}"></i><span>${safeNote}</span></span>`;
+        }
 
         function renderTableHarian(resetPg = false) {
             if(resetPg) currentPgHarian = 1;
@@ -1832,7 +2065,7 @@ else if(d.keterangan === "ALPA") badgeClass = "bg-red-50 text-red-700 border bor
     <td class="px-4 py-3 text-center">
         <span class="px-3 py-1 rounded-2xl text-[10px] font-bold uppercase ${badgeClass}">${d.keterangan}</span>
     </td>
-    <td class="px-4 py-3 text-[11px] text-gray-500 truncate max-w-[100px]" title="${d.alasan}">${d.alasan}</td>
+    <td class="px-4 py-3 align-top min-w-[180px]">${renderCatatanBadge(d.alasan, d.keterangan)}</td>
     <td class="px-4 py-3 text-center"><button onclick="bukaModalSetManual('${eIdQr}', '${eNama}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1 rounded-lg text-[10px] font-bold shadow-sm"><i class="fa-solid fa-pen"></i> Set</button></td>
 </tr>`;
                 });
@@ -2492,29 +2725,114 @@ function renderTablePegawai(resetPg = false) {
         }
 
         function generatePDFASN() {
-            const bln = document.getElementById('lapBulan').value; const thn = document.getElementById('lapTahun').value; const hariKerja = document.getElementById('lapHariKerja').value;
+            generatePDFKhususStatus('ASN', 'ASN', 'Rekap_ASN');
+        }
+
+        function generatePDFPPPK() {
+            generatePDFKhususStatus('PPPK', 'PPPK', 'Rekap_PPPK');
+        }
+
+        function generatePDFKhususStatus(statusKey, label, filePrefix) {
+            const bln = document.getElementById('lapBulan').value;
+            const thn = document.getElementById('lapTahun').value;
+            const hariKerja = document.getElementById('lapHariKerja').value;
             if(!hariKerja) return Swal.fire('Error', 'Isi Target Hari Kerja.', 'warning');
-            Swal.fire({title: 'Menyusun Laporan ASN...', didOpen: () => Swal.showLoading()});
+            Swal.fire({title: `Menyusun Laporan ${label}...`, didOpen: () => Swal.showLoading()});
             google.script.run.withSuccessHandler(function(res) {
-                const asnRows = (res.rekapData || []).filter(r => String(r.status || '').toUpperCase().includes('ASN'));
-                if(asnRows.length === 0) return Swal.fire('Data Kosong', 'Tidak ada data ASN pada periode ini.', 'info');
-                const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: "landscape" }); const pW = doc.internal.pageSize.width;
-                doc.setFontSize(10); doc.setFont("helvetica", "bold");
-                doc.text("REKAPITULASI BULANAN CAPAIAN PRODUKTIVITAS KERJA PEGAWAI (ASN) BERDASARKAN LAPORAN KERJA HARIAN PEGAWAI", 14, 15);
-                doc.text(res.namaPuskesmas.toUpperCase(), 14, 21);
-                doc.text(`BULAN: ${bln} ${thn}`, 14, 27);
-                let tableData = [];
-                asnRows.forEach((r, i) => tableData.push([ i + 1, r.nama_nip, r.gol, r.jabatan + "\n" + r.status, r.hari_kerja || 0, r.hadir || 0, r.sakit || 0, r.izin || 0, r.cuti || 0, r.tl || 0, r.alpa || 0 ]));
-                doc.autoTable({
-                    startY: 42,
-                    head: [[{content: 'NO', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'NAMA / NIP', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'PANGKAT\n/ GOL', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'JABATAN', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'HARI\nKERJA', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}}, {content: 'ABSENSI', colSpan: 6, styles: {halign: 'center'}}], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'TL', 'ALPA']],
-                    body: tableData,
-                    styles: { fontSize: 7, cellPadding: 1.2, valign: 'middle', lineColor: [80, 80, 80], lineWidth: 0.1, textColor: [20, 20, 20] },
-                    headStyles: { fillColor: [255, 255, 255], textColor: [20, 20, 20], lineColor: [50, 50, 50], lineWidth: 0.2 },
-                    columnStyles: { 0: {halign:'center',cellWidth:8},1:{cellWidth:40},2:{cellWidth:22,halign:'center'},3:{cellWidth:35},4:{halign:'center',cellWidth:15},5:{halign:'center',cellWidth:12},6:{halign:'center',cellWidth:12},7:{halign:'center',cellWidth:12},8:{halign:'center',cellWidth:12},9:{halign:'center',cellWidth:12},10:{halign:'center',cellWidth:12} }
+                const key = String(statusKey || '').toUpperCase();
+                const rows = (res.rekapData || []).filter(r => {
+                    const st = String(r.status || '').toUpperCase().trim();
+                    return key === 'PPPK' ? st === 'PPPK' : st.includes(key);
                 });
-                tambahTandaTangan(doc, res, bln, thn, pW, false); doc.save(`Rekap_ASN_${bln}_${thn}.pdf`); Swal.close();
+                if(rows.length === 0) return Swal.fire('Data Kosong', `Tidak ada data ${label} pada periode ini.`, 'info');
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+                const pW = doc.internal.pageSize.width;
+                const pH = doc.internal.pageSize.height;
+                const marginX = 10;
+                const bulanText = document.getElementById('lapBulan').options[document.getElementById('lapBulan').selectedIndex].text.toUpperCase();
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(9.5);
+                doc.text(`REKAPITULASI BULANAN CAPAIAN PRODUKTIVITAS KERJA PEGAWAI (${label})`, marginX, 12);
+                doc.setFontSize(8.5);
+                doc.text((res.namaPuskesmas || 'PUSKESMAS').toUpperCase(), marginX, 17);
+                doc.setFont("helvetica", "normal");
+                doc.text(`BULAN ${bulanText} ${thn}  •  Target Hari Kerja: ${hariKerja}`, marginX, 22);
+                doc.setDrawColor(0, 51, 102); doc.setLineWidth(.4); doc.line(marginX, 25, pW - marginX, 25);
+
+                const tableData = rows.map((r, i) => [
+                    i + 1,
+                    r.nama_nip,
+                    r.gol || '-',
+                    `${r.jabatan || '-'}
+${r.status || '-'}`,
+                    r.hari_kerja || 0,
+                    r.hadir || 0,
+                    r.sakit || 0,
+                    r.izin || 0,
+                    r.cuti || 0,
+                    r.alpa || 0
+                ]);
+
+                doc.autoTable({
+                    startY: 29,
+                    margin: { left: marginX, right: marginX, bottom: 33 },
+                    tableWidth: pW - (marginX * 2),
+                    head: [[
+                        {content: 'NO', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'NAMA / NIP', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'PANGKAT\n/ GOL', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'JABATAN / STATUS', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'HARI\nKERJA', rowSpan: 2, styles: {halign: 'center', valign: 'middle'}},
+                        {content: 'ABSENSI', colSpan: 5, styles: {halign: 'center'}}
+                    ], ['HADIR', 'SAKIT', 'IZIN', 'CUTI', 'ALPA']],
+                    body: tableData,
+                    theme: 'grid',
+                    styles: { fontSize: 6.8, cellPadding: 1.15, valign: 'middle', overflow: 'linebreak', lineColor: [0, 0, 0], lineWidth: 0.1, textColor: [0, 0, 0], minCellHeight: 5.2 },
+                    headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.15, fontStyle: 'bold', fontSize: 6.8 },
+                    alternateRowStyles: { fillColor: [248, 250, 252] },
+                    columnStyles: {
+                        0: {halign:'center', cellWidth: 9},
+                        1: {cellWidth: 72},
+                        2: {halign:'center', cellWidth: 25},
+                        3: {cellWidth: 78},
+                        4: {halign:'center', cellWidth: 17, fontStyle:'bold'},
+                        5: {halign:'center', cellWidth: 15},
+                        6: {halign:'center', cellWidth: 15},
+                        7: {halign:'center', cellWidth: 15},
+                        8: {halign:'center', cellWidth: 15},
+                        9: {halign:'center', cellWidth: 15, fontStyle:'bold', textColor:[185,28,28]}
+                    },
+                    didDrawPage: function() {
+                        doc.setFontSize(7);
+                        doc.setTextColor(100);
+                        doc.text(`Dicetak otomatis oleh sistem absensi digital • ${label}`, marginX, pH - 8);
+                        doc.text(`Hal. ${doc.internal.getNumberOfPages()}`, pW - marginX, pH - 8, { align: 'right' });
+                        doc.setTextColor(0);
+                    }
+                });
+
+                tambahTandaTanganRingkas(doc, res, bln, thn, pW, pH);
+                doc.save(`${filePrefix}_${bln}_${thn}.pdf`);
+                Swal.close();
             }).getRekapitulasi(bln, thn, hariKerja);
+        }
+
+        function tambahTandaTanganRingkas(doc, res, bln, thn, pW, pH) {
+            const finalY = doc.lastAutoTable.finalY || 35;
+            const y = Math.min(finalY + 9, pH - 38);
+            const rightX = pW - 48;
+            const bulanText = document.getElementById('lapBulan').options[document.getElementById('lapBulan').selectedIndex].text;
+            doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
+            doc.text(`Sintang, ${new Date().getDate()} ${bulanText} ${thn}`, rightX, y, { align: 'center' });
+            doc.setFont("helvetica", "bold");
+            let puskNameStr = res.namaPuskesmas || res.puskesmas || "PUSKESMAS";
+            doc.text(`KEPALA ${puskNameStr.toUpperCase().replace("UPTD ", "")}`, rightX, y + 5, { align: 'center' });
+            doc.text(res.kapusNama || res.nama || "...................", rightX, y + 24, { align: 'center' });
+            doc.setLineWidth(0.2); doc.line(rightX - 28, y + 25, rightX + 28, y + 25);
+            doc.setFont("helvetica", "normal"); doc.text(res.kapusNip || res.nip || "NIP. .................", rightX, y + 29, { align: 'center' });
         }
 
         function generatePDFDetail() {
