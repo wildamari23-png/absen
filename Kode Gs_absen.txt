@@ -10,6 +10,13 @@ function doGet(e) {
   return html;
 }
 
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('Absensi Digital')
+    .addItem('Buat Dummy Data Sheet Libur', 'triggerDummyDataLibur')
+    .addToUi();
+}
+
 // 1. SETUP DATABASE OTOMATIS
 function initSetup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -40,12 +47,80 @@ function initSetup() {
     sheet.getRange("A1:H1").setFontWeight("bold").setBackground("#10b981").setFontColor("#FFFFFF");
   }
 
+  ensureSheetLibur_();
+
   if (!ss.getSheetByName("Pengaturan")) {
     let sheet = ss.insertSheet("Pengaturan");
     sheet.appendRow(["Key", "Value"]);
     sheet.getRange("A1:B1").setFontWeight("bold").setBackground("#003366").setFontColor("#FFFFFF");
   }
   ensurePengaturanDefaults_();
+}
+
+function ensureSheetLibur_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName("Libur") || ss.getSheetByName("libur") || ss.getSheetByName("LIBUR");
+  if (!sheet) sheet = ss.insertSheet("Libur");
+  const header = ["Tahun", "Bulan", "Tanggal", "Keterangan Libur"];
+  const currentHeader = sheet.getRange(1, 1, 1, 4).getDisplayValues()[0].join("").trim();
+  if (!currentHeader) sheet.getRange(1, 1, 1, 4).setValues([header]);
+  sheet.getRange("A1:D1").setFontWeight("bold").setBackground("#f59e0b").setFontColor("#FFFFFF");
+  sheet.setFrozenRows(1);
+  sheet.getRange("A:A").setNumberFormat("0");
+  sheet.getRange("C:C").setNumberFormat("dd/MM/yyyy");
+  try { sheet.autoResizeColumns(1, 4); } catch (e) {}
+  return sheet;
+}
+
+function getDummyDataLibur_() {
+  return [
+    [2026, "Januari", "01/01/2026", "Libur Tahun Baru Masehi"],
+    [2026, "Januari", "16/01/2026", "Isra Mikraj Nabi Muhammad SAW"],
+    [2026, "Februari", "17/02/2026", "Tahun Baru Imlek 2577 Kongzili"],
+    [2026, "Maret", "19/03/2026", "Hari Suci Nyepi Tahun Baru Saka 1948"],
+    [2026, "Maret", "20/03/2026", "Cuti Bersama Hari Suci Nyepi"],
+    [2026, "Maret", "21/03/2026", "Hari Raya Idul Fitri 1447 H"],
+    [2026, "Maret", "22/03/2026", "Hari Raya Idul Fitri 1447 H"],
+    [2026, "Maret", "23/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "Maret", "24/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "Maret", "25/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "Maret", "26/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "Maret", "27/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "April", "03/04/2026", "Wafat Yesus Kristus"],
+    [2026, "April", "05/04/2026", "Hari Paskah"],
+    [2026, "Mei", "01/05/2026", "Hari Buruh Internasional"],
+    [2026, "Mei", "14/05/2026", "Kenaikan Yesus Kristus"],
+    [2026, "Mei", "15/05/2026", "Cuti Bersama Kenaikan Yesus Kristus"],
+    [2026, "Mei", "27/05/2026", "Hari Raya Idul Adha 1447 H"],
+    [2026, "Mei", "28/05/2026", "Cuti Bersama Idul Adha 1447 H"],
+    [2026, "Juni", "01/06/2026", "Hari Lahir Pancasila"],
+    [2026, "Agustus", "17/08/2026", "Hari Kemerdekaan Republik Indonesia"],
+    [2026, "Agustus", "25/08/2026", "Maulid Nabi Muhammad SAW"],
+    [2026, "Desember", "24/12/2026", "Cuti Bersama Hari Raya Natal"],
+    [2026, "Desember", "25/12/2026", "Hari Raya Natal"]
+  ];
+}
+
+function triggerDummyDataLibur() {
+  const sheet = ensureSheetLibur_();
+  const dummy = getDummyDataLibur_();
+  const existingRows = sheet.getDataRange().getDisplayValues();
+  const existingKeys = new Set();
+  for (let i = 1; i < existingRows.length; i++) {
+    const r = existingRows[i];
+    existingKeys.add(`${String(r[0]).trim()}|${String(r[1]).trim().toUpperCase()}|${String(r[2]).trim()}|${String(r[3]).trim().toUpperCase()}`);
+  }
+  const rowsToAppend = dummy.filter(r => !existingKeys.has(`${r[0]}|${String(r[1]).toUpperCase()}|${r[2]}|${String(r[3]).toUpperCase()}`));
+  if (rowsToAppend.length) {
+    sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAppend.length, 4).setValues(rowsToAppend);
+    sheet.getRange(2, 3, sheet.getLastRow() - 1, 1).setNumberFormat("dd/MM/yyyy");
+  }
+  try { sheet.autoResizeColumns(1, 4); } catch (e) {}
+  return { status: true, message: `Dummy Sheet Libur siap. Ditambahkan ${rowsToAppend.length} baris baru. Total data: ${Math.max(0, sheet.getLastRow() - 1)}.` };
+}
+
+function buatDummyDataLibur() {
+  return triggerDummyDataLibur();
 }
 
 function ensurePengaturanDefaults_() {
