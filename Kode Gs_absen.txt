@@ -909,6 +909,20 @@ function getMonthNumber_(bulanName) {
   return map[String(bulanName || "").toUpperCase()] || "01";
 }
 
+function getCuratedLiburNasional_(year, monthNumber) {
+  const key = `${year}-${String(monthNumber).padStart(2, "0")}`;
+  const curated = {
+    "2026-05": [
+      { tgl: "2026-05-01", nama: "Hari Buruh Internasional" },
+      { tgl: "2026-05-14", nama: "Kenaikan Yesus Kristus" },
+      { tgl: "2026-05-15", nama: "Cuti Bersama Kenaikan Yesus Kristus" },
+      { tgl: "2026-05-27", nama: "Hari Raya Idul Adha 1447 H" },
+      { tgl: "2026-05-28", nama: "Cuti Bersama Idul Adha 1447 H" }
+    ]
+  };
+  return curated[key] || [];
+}
+
 function getKalenderKerja(bulanName, tahun) {
   const monthMap = { "JANUARI":0,"FEBRUARI":1,"MARET":2,"APRIL":3,"MEI":4,"JUNI":5,"JULI":6,"AGUSTUS":7,"SEPTEMBER":8,"OKTOBER":9,"NOVEMBER":10,"DESEMBER":11 };
   const monthName = String(bulanName || "").toUpperCase().trim();
@@ -999,6 +1013,7 @@ function getKalenderKerja(bulanName, tahun) {
     return day !== 0 && day !== 6;
   });
 
+  const holidaySource = sourcesUsed.length ? sourcesUsed.join(" + ") : "Mode manual / sumber libur tidak tersedia";
   return {
     targetHariKerja: Math.max(0, weekdays - holidayWeekdays.length),
     totalWeekdays: weekdays,
