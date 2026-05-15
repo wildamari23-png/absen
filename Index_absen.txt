@@ -982,14 +982,14 @@
                         <input type="number" id="lapHariKerja" class="w-full px-4 py-3 bg-red-50 border-2 border-red-200 rounded-xl font-extrabold text-red-700 text-center text-lg" value="17">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-orange-600 uppercase mb-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Libur Nasional AI + Manual</label>
+                        <label class="block text-xs font-bold text-orange-600 uppercase mb-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Libur Sheet + Manual</label>
                         <input type="number" id="lapLiburManual" onchange="hitungHariKerjaOtomatis(true)" class="w-full px-4 py-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-extrabold text-orange-700 text-center text-lg" value="0">
                     </div>
                 </div>
                 <div id="liburInfoBox" class="bg-gradient-to-br from-blue-50 via-white to-orange-50 border border-blue-100 rounded-2xl p-4 mb-6 text-xs shadow-sm">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
-                        <p class="font-black text-pusk-blue uppercase tracking-wider"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-orange-500"></i>AI Kalender Libur Nasional</p>
-                        <span id="liburAiBadge" class="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-white border border-blue-100 text-[10px] font-black text-blue-700"><span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>Siap sinkron bulan pilihan</span>
+                        <p class="font-black text-pusk-blue uppercase tracking-wider"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-orange-500"></i>Sheet Libur Nasional</p>
+                        <span id="liburAiBadge" class="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-white border border-blue-100 text-[10px] font-black text-blue-700"><span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>Siap membaca Sheet Libur</span>
                     </div>
                     <p id="liburSummary" class="text-gray-700 font-semibold mt-1">Memuat data libur nasional...</p>
                     <div id="liburDetailList" class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1"></div>
@@ -1855,8 +1855,8 @@
                 const weekday = parseInt(res.totalWeekdays || 0, 10) || 0;
                 const targetFinal = Math.max(0, weekday - totalLiburInput);
                 document.getElementById('lapHariKerja').value = targetFinal;
-                if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>${escapeHtml(res.sumber || 'AI Kalender')} • ${aiCount} libur weekday`;
-                if (summary) summary.innerHTML = `Weekday bulan ini: <b>${weekday}</b> • Rekomendasi AI libur nasional: <b>${aiCount}</b> • Total libur dipakai: <b>${totalLiburInput}</b> • Target final: <b>${targetFinal}</b><br><span class="text-[10px] text-blue-600 font-black uppercase">${escapeHtml(res.rekomendasiAI || 'AI membantu membaca kalender nasional, nilai tetap bisa diedit manual.')}</span>`;
+                if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>${escapeHtml(res.sumber || 'Sheet Libur')} • ${aiCount} libur weekday`;
+                if (summary) summary.innerHTML = `Weekday bulan ini: <b>${weekday}</b> • Data Sheet Libur: <b>${aiCount}</b> • Total libur dipakai: <b>${totalLiburInput}</b> • Target final: <b>${targetFinal}</b><br><span class="text-[10px] text-blue-600 font-black uppercase">${escapeHtml(res.rekomendasiAI || 'Sheet Libur membaca data nasional, nilai tetap bisa diedit manual.')}</span>`;
                 if (list) {
                     const items = res.detailLibur || [];
                     list.innerHTML = items.length ? items.map(h => `<div class="rounded-xl border border-orange-100 bg-white px-3 py-2 shadow-sm"><p class="font-black text-orange-700">${escapeHtml(h.tgl)}</p><p class="text-gray-600 font-semibold leading-snug">${escapeHtml(h.nama)}</p></div>`).join('') : '<div class="rounded-xl border border-emerald-100 bg-white px-3 py-2 font-bold text-emerald-700">Tidak ada libur nasional pada hari kerja bulan ini.</div>';
@@ -1868,12 +1868,12 @@
                 return;
             }
 
-            if (summary) summary.innerText = 'AI kalender sedang membaca libur nasional bulan pilihan...';
+            if (summary) summary.innerText = 'Membaca data dari Sheet Libur untuk bulan pilihan...';
             if (list) list.innerHTML = '';
-            if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>Sinkron kalender nasional...`;
+            if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>Membaca Sheet Libur...`;
             google.script.run.withSuccessHandler(res => applyResult(res, manualMode)).withFailureHandler(() => {
-                if (summary) summary.innerText = 'Gagal mengambil kalender libur nasional. Silakan isi total libur secara manual.';
-                if (list) list.innerHTML = '<div class="rounded-xl border border-red-100 bg-white px-3 py-2 font-bold text-red-600">Koneksi kalender gagal. Input libur manual tetap dapat digunakan.</div>';
+                if (summary) summary.innerText = 'Gagal membaca Sheet Libur. Silakan isi total libur secara manual.';
+                if (list) list.innerHTML = '<div class="rounded-xl border border-red-100 bg-white px-3 py-2 font-bold text-red-600">Sheet Libur gagal dibaca. Input libur manual tetap dapat digunakan.</div>';
                 if (badge) badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400"></span>Mode manual aktif`;
             }).getKalenderKerja(bln, thn);
         }

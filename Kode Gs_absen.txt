@@ -925,9 +925,10 @@ function getCuratedLiburNasional_(year, monthNumber) {
 
 function getKalenderKerja(bulanName, tahun) {
   const monthMap = { "JANUARI":0,"FEBRUARI":1,"MARET":2,"APRIL":3,"MEI":4,"JUNI":5,"JULI":6,"AGUSTUS":7,"SEPTEMBER":8,"OKTOBER":9,"NOVEMBER":10,"DESEMBER":11 };
-  const m = monthMap[String(bulanName || "").toUpperCase()];
+  const monthName = String(bulanName || "").toUpperCase().trim();
+  const m = monthMap[monthName];
   const y = parseInt(tahun, 10);
-  if (isNaN(m) || isNaN(y)) return { targetHariKerja: 0, detailLibur: [] };
+  if (isNaN(m) || isNaN(y)) return { targetHariKerja: 0, detailLibur: [], sumber: "Sheet Libur" };
 
   const start = new Date(y, m, 1, 0, 0, 0);
   const end = new Date(y, m + 1, 1, 0, 0, 0);
@@ -939,74 +940,68 @@ function getKalenderKerja(bulanName, tahun) {
     if (day !== 0 && day !== 6) weekdays++;
   }
 
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Libur") || ss.getSheetByName("libur") || ss.getSheetByName("LIBUR");
+  if (!sheet) {
+    return {
+      targetHariKerja: weekdays,
+      totalWeekdays: weekdays,
+      totalLiburNasionalWeekday: 0,
+      detailLibur: [],
+      sumber: "Sheet Libur belum ditemukan",
+      rekomendasiAI: "Sheet Libur belum ditemukan. Buat sheet bernama Libur dengan kolom Tahun, Bulan, Tanggal, Keterangan Libur."
+    };
+  }
+
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) {
+    return {
+      targetHariKerja: weekdays,
+      totalWeekdays: weekdays,
+      totalLiburNasionalWeekday: 0,
+      detailLibur: [],
+      sumber: "Sheet Libur kosong",
+      rekomendasiAI: "Sheet Libur masih kosong. Isi kolom Tahun, Bulan, Tanggal, Keterangan Libur untuk menghitung otomatis."
+    };
+  }
+
+  const header = values[0].map(h => String(h || "").toLowerCase().replace(/\s+/g, "").trim());
+  const idxTahun = header.indexOf("tahun") >= 0 ? header.indexOf("tahun") : 0;
+  const idxBulan = header.indexOf("bulan") >= 0 ? header.indexOf("bulan") : 1;
+  const idxTanggal = header.indexOf("tanggal") >= 0 ? header.indexOf("tanggal") : 2;
+  const idxKet = header.indexOf("keteranganlibur") >= 0 ? header.indexOf("keteranganlibur") : 3;
+
   const holidayMap = {};
-  const sourcesUsed = [];
-  const addHoliday = (tgl, nama, sumber) => {
-    if (!tgl) return;
-    const dateStr = String(tgl).slice(0, 10);
-    const parts = dateStr.split("-");
-    if (parts.length !== 3) return;
-    if (parseInt(parts[0], 10) !== y || parseInt(parts[1], 10) !== monthNumber) return;
-    holidayMap[dateStr] = { tgl: dateStr, nama: nama || "Libur Nasional" };
-    if (sumber && !sourcesUsed.includes(sumber)) sourcesUsed.push(sumber);
+  const toDateStr = (val) => {
+    if (!val) return "";
+    if (Object.prototype.toString.call(val) === "[object Date]" && !isNaN(val.getTime())) {
+      return Utilities.formatDate(val, "Asia/Jakarta", "yyyy-MM-dd");
+    }
+    const raw = String(val).trim();
+    let m1 = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (m1) return `${m1[1]}-${String(m1[2]).padStart(2, "0")}-${String(m1[3]).padStart(2, "0")}`;
+    let m2 = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (m2) return `${m2[3]}-${String(m2[2]).padStart(2, "0")}-${String(m2[1]).padStart(2, "0")}`;
+    return raw.slice(0, 10);
   };
 
-  // Sumber utama sesuai permintaan: libur.deno.dev berisi libur nasional/cuti bersama Indonesia.
-  try {
-    const respDeno = UrlFetchApp.fetch("https://libur.deno.dev/api", { muteHttpExceptions: true, followRedirects: true });
-    if (respDeno.getResponseCode() === 200) {
-      const arrDeno = JSON.parse(respDeno.getContentText() || "[]");
-      if (Array.isArray(arrDeno)) {
-        arrDeno.forEach(h => addHoliday(h && h.date, h && h.name, "libur.deno.dev"));
-      }
-    }
-  } catch (denoErr) {}
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    const rowYear = parseInt(row[idxTahun], 10);
+    const rowMonthText = String(row[idxBulan] || "").toUpperCase().trim();
+    const rowMonthNumber = monthMap[rowMonthText] !== undefined ? monthMap[rowMonthText] + 1 : parseInt(row[idxBulan], 10);
+    const dateStr = toDateStr(row[idxTanggal]);
+    const dateParts = dateStr.split("-");
+    const dateYear = parseInt(dateParts[0], 10);
+    const dateMonth = parseInt(dateParts[1], 10);
+    const sameYear = rowYear === y || dateYear === y;
+    const sameMonth = rowMonthText === monthName || rowMonthNumber === monthNumber || dateMonth === monthNumber;
+    if (!sameYear || !sameMonth || dateParts.length !== 3) continue;
+    holidayMap[dateStr] = { tgl: dateStr, nama: String(row[idxKet] || "Libur Nasional").trim() || "Libur Nasional" };
+  }
 
-  // Google Calendar tetap dipakai sebagai penguat jika tersedia.
-  try {
-    const calIds = [
-      "id.indonesian#holiday@group.v.calendar.google.com",
-      "en.indonesian#holiday@group.v.calendar.google.com",
-      "id.holiday@group.v.calendar.google.com"
-    ];
-    calIds.forEach(id => {
-      try {
-        const c = CalendarApp.getCalendarById(id);
-        if (!c) return;
-        c.getEvents(start, end).forEach(ev => {
-          const ds = Utilities.formatDate(ev.getStartTime(), "Asia/Jakarta", "yyyy-MM-dd");
-          addHoliday(ds, ev.getTitle(), "Google Calendar Nasional");
-        });
-      } catch (e) {}
-    });
-  } catch (e) {}
-
-  // Fallback API publik bila data utama tidak lengkap.
-  try {
-    const resp = UrlFetchApp.fetch(`https://date.nager.at/api/v3/PublicHolidays/${y}/ID`, { muteHttpExceptions: true });
-    if (resp.getResponseCode() === 200) {
-      const arr = JSON.parse(resp.getContentText() || "[]");
-      if (Array.isArray(arr)) {
-        arr.forEach(h => addHoliday(h && h.date, (h && (h.localName || h.name)) || "Libur Nasional", "Nager.Date"));
-      }
-    }
-  } catch (apiErr) {}
-
-  try {
-    const resp2 = UrlFetchApp.fetch(`https://tanggalmerah.upset.dev/api/holidays?year=${y}&month=${monthNumber}&type=holiday`, { muteHttpExceptions: true });
-    if (resp2.getResponseCode() === 200) {
-      const obj = JSON.parse(resp2.getContentText() || "{}");
-      const arr2 = (obj && (obj.data || obj.holidays)) || [];
-      if (Array.isArray(arr2)) {
-        arr2.forEach(h => addHoliday(h && (h.date || h.holiday_date || h.tanggal), h && (h.name || h.title || h.holiday_name), "tanggalmerah Indonesia"));
-      }
-    }
-  } catch (apiErr2) {}
-
-  const curatedHolidays = getCuratedLiburNasional_(y, monthNumber);
-  curatedHolidays.forEach(h => addHoliday(h.tgl, h.nama, "Basis Data Cuti Bersama"));
-
-  const holidayWeekdays = Object.values(holidayMap).sort((a,b)=>a.tgl.localeCompare(b.tgl)).filter(h => {
+  const detailLibur = Object.values(holidayMap).sort((a,b)=>a.tgl.localeCompare(b.tgl));
+  const holidayWeekdays = detailLibur.filter(h => {
     const d = new Date(h.tgl + "T00:00:00");
     const day = d.getDay();
     return day !== 0 && day !== 6;
@@ -1018,8 +1013,8 @@ function getKalenderKerja(bulanName, tahun) {
     totalWeekdays: weekdays,
     totalLiburNasionalWeekday: holidayWeekdays.length,
     detailLibur: holidayWeekdays,
-    sumber: holidaySource,
-    rekomendasiAI: `AI membaca ${holidayWeekdays.length} libur nasional/cuti bersama pada hari kerja dari ${holidaySource}. Target hari kerja awal: ${Math.max(0, weekdays - holidayWeekdays.length)}.`
+    sumber: "Sheet Libur",
+    rekomendasiAI: `Data dibaca dari Sheet Libur: ${holidayWeekdays.length} libur pada hari kerja untuk bulan ${bulanName} ${tahun}. Target hari kerja awal: ${Math.max(0, weekdays - holidayWeekdays.length)}.`
   };
 }
 
