@@ -1278,7 +1278,9 @@
         function loadPengaturan() {
             google.script.run.withSuccessHandler(res => {
                 res = res || {};
-                document.getElementById('setAppName').value = res.App_Name || 'PORTAL ABSENSI';
+                const setValue = (id, value) => { const el = document.getElementById(id); if (el) el.value = value; };
+                const setChecked = (id, value) => { const el = document.getElementById(id); if (el) el.checked = !!value; };
+                setValue('setAppName', res.App_Name || 'PORTAL ABSENSI');
                 document.getElementById('setAppHeaderName').value = res.App_Header_Name || '';
                 document.getElementById('setAppLogo').value = res.App_Logo || '';
                 document.getElementById('setAppLoginBg').value = res.App_Login_Bg || '';
@@ -1308,13 +1310,13 @@
                 document.getElementById('setJamMasukAkhir').value = res.Jam_Masuk_Akhir || '10:00';
                 document.getElementById('setJamPulangMulai').value = res.Jam_Pulang_Mulai || '12:00';
                 document.getElementById('setJamPulangAkhir').value = res.Jam_Pulang_Akhir || '23:59';
-                document.getElementById('setJamPulangJumatMulai').value = res.Jam_Pulang_Jumat_Mulai || res.Jam_Pulang_Mulai || '12:00';
-                document.getElementById('setJamPulangJumatAkhir').value = res.Jam_Pulang_Jumat_Akhir || res.Jam_Pulang_Akhir || '23:59';
-                document.getElementById('setTampilRataJam').checked = String(res.Tampil_Kartu_Rata_Jam || 'YA').toUpperCase() !== 'TIDAK';
-                document.getElementById('setUpdateNotifAktif').checked = String(res.Update_Notif_Aktif || 'YA').toUpperCase() !== 'TIDAK';
-                document.getElementById('setUpdateNotifJudul').value = res.Update_Notif_Judul || '🚀 Update Sistem Absensi';
-                document.getElementById('setUpdateNotifVersi').value = res.Update_Notif_Versi || '';
-                document.getElementById('setUpdateNotifPesan').value = res.Update_Notif_Pesan || '';
+                setValue('setJamPulangJumatMulai', res.Jam_Pulang_Jumat_Mulai || res.Jam_Pulang_Mulai || '12:00');
+                setValue('setJamPulangJumatAkhir', res.Jam_Pulang_Jumat_Akhir || res.Jam_Pulang_Akhir || '23:59');
+                setChecked('setTampilRataJam', String(res.Tampil_Kartu_Rata_Jam || 'YA').toUpperCase() !== 'TIDAK');
+                setChecked('setUpdateNotifAktif', String(res.Update_Notif_Aktif || 'YA').toUpperCase() !== 'TIDAK');
+                setValue('setUpdateNotifJudul', res.Update_Notif_Judul || '🚀 Update Sistem Absensi');
+                setValue('setUpdateNotifVersi', res.Update_Notif_Versi || '');
+                setValue('setUpdateNotifPesan', res.Update_Notif_Pesan || '');
             }).withFailureHandler(err => {
                 Swal.fire('Gagal Memuat Pengaturan', (err && err.message) ? err.message : 'Data pengaturan tidak bisa dimuat.', 'error');
             }).getPengaturan();
