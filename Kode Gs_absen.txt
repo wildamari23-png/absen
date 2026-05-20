@@ -149,6 +149,7 @@ function ensurePengaturanDefaults_() {
     ["Lat_Pol_JeroraSatu", "0.0650"], ["Lng_Pol_JeroraSatu", "111.5000"], ["Rad_Pol_JeroraSatu", "100"],
     ["Jam_Masuk_Mulai", "06:00"], ["Jam_Masuk_Akhir", "10:00"],
     ["Jam_Pulang_Mulai", "12:00"], ["Jam_Pulang_Akhir", "23:59"],
+    ["Jam_Pulang_Jumat_Mulai", "12:00"], ["Jam_Pulang_Jumat_Akhir", "23:59"],
     ["Kepala_Nama", "dr. ANDAR JIMMY PINTABAR, M.A.P.,M.HKes"],
     ["Kepala_NIP", "NIP. 198610292014021002"]
   ];
@@ -346,12 +347,13 @@ function prosesAbsen(qrText, latUser, lngUser, action, gpsAccuracy) {
     return { status: 'SUCCESS_MASUK', waktu: wktStr, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: pesanMasuk };
   }
   else if (action === "PULANG") {
-    const jamPulangMulai = settings.Jam_Pulang_Mulai || "00:00";
-    const jamPulangAkhir = settings.Jam_Pulang_Akhir || "23:59";
+    const isJumat = localTime.getDay() === 5;
+    const jamPulangMulai = isJumat ? (settings.Jam_Pulang_Jumat_Mulai || settings.Jam_Pulang_Mulai || "00:00") : (settings.Jam_Pulang_Mulai || "00:00");
+    const jamPulangAkhir = isJumat ? (settings.Jam_Pulang_Jumat_Akhir || settings.Jam_Pulang_Akhir || "23:59") : (settings.Jam_Pulang_Akhir || "23:59");
     const jamPulangMulaiTxt = formatJamSetting(jamPulangMulai);
     const jamPulangAkhirTxt = formatJamSetting(jamPulangAkhir);
     if (pgwFound.kunciJam !== "TIDAK" && !isDalamRentangJam(nowMenit, jamPulangMulai, jamPulangAkhir)) {
-      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG hanya diizinkan jam ${jamPulangMulaiTxt} - ${jamPulangAkhirTxt}.` };
+      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG${isJumat ? " (Jumat)" : ""} hanya diizinkan jam ${jamPulangMulaiTxt} - ${jamPulangAkhirTxt}.` };
     }
     if (rowIndex === -1) return { status: 'ERROR', message: `Anda belum melakukan Absen MASUK hari ini!` };
 
