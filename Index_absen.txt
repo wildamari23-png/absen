@@ -1196,6 +1196,8 @@
         function muatIdentitasAplikasi() {
             google.script.run.withSuccessHandler(res => {
                 res = res || {};
+                // Tampilkan notifikasi update sedini mungkin saat data pengaturan sudah diterima.
+                maybeShowUpdateNotif(res);
                 if(res.App_Name) {
                     document.getElementById('appNameTitle').innerText = res.App_Name;
                     document.getElementById('loginAppName').innerText = res.App_Name;
