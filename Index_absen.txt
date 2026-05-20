@@ -922,6 +922,16 @@
                             <input type="checkbox" id="setTampilRataJam" class="mt-1 accent-pusk-blue">
                             <span><b class="text-xs text-pusk-blue uppercase">Tampilkan kartu rata-rata jam di landing</b><br><span class="text-[11px] text-gray-500 font-semibold">Jika aktif, landing menampilkan rata-rata jam masuk dan pulang hari ini dengan animasi modern.</span></span>
                         </label>
+                        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 space-y-3">
+                            <p class="text-[11px] font-extrabold text-indigo-700 uppercase"><i class="fa-solid fa-bell mr-1"></i> Notifikasi Update Saat Masuk</p>
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" id="setUpdateNotifAktif" class="mt-1 accent-indigo-600">
+                                <span><b class="text-xs text-indigo-800 uppercase">Tampilkan popup update di halaman awal</b><br><span class="text-[11px] text-gray-500 font-semibold">Jika aktif, pengguna akan melihat dialog modern berisi pengumuman update saat pertama kali membuka aplikasi.</span></span>
+                            </label>
+                            <div><label class="block text-[10px] font-bold text-indigo-700 uppercase mb-1">Judul Notifikasi</label><input type="text" id="setUpdateNotifJudul" class="w-full px-3 py-2 bg-white border border-indigo-200 rounded-lg text-sm font-bold" placeholder="🚀 Update Sistem Absensi"></div>
+                            <div><label class="block text-[10px] font-bold text-indigo-700 uppercase mb-1">Versi / Label Update</label><input type="text" id="setUpdateNotifVersi" class="w-full px-3 py-2 bg-white border border-indigo-200 rounded-lg text-sm font-semibold" placeholder="v1.0.0"></div>
+                            <div><label class="block text-[10px] font-bold text-indigo-700 uppercase mb-1">Pesan Notifikasi</label><textarea id="setUpdateNotifPesan" rows="3" class="w-full px-3 py-2 bg-white border border-indigo-200 rounded-lg text-sm font-semibold" placeholder="Tuliskan info update terbaru..."></textarea></div>
+                        </div>
                     </div>
                 </div>
 
@@ -1144,6 +1154,7 @@
         let popupScannerWindow = null;
         let appSettingsCache = {};
         let isManualCheckingLocation = false;
+        let hasShownUpdateNotif = false;
 
         let currentPgHarian = 1, rowsPerPageHarian = 10;
         let currentPgPegawai = 1, rowsPerPagePegawai = 10;
@@ -1240,7 +1251,29 @@
                 } else {
                     document.getElementById('loginBgImg').src = "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000&auto=format&fit=crop";
                 }
+                maybeShowUpdateNotif(res);
             }).getPengaturan();
+        }
+
+        function maybeShowUpdateNotif(settings) {
+            if (hasShownUpdateNotif) return;
+            hasShownUpdateNotif = true;
+            const cfg = settings || {};
+            const aktif = String(cfg.Update_Notif_Aktif || "YA").toUpperCase() !== "TIDAK";
+            const pesan = String(cfg.Update_Notif_Pesan || "").trim();
+            if (!aktif || !pesan) return;
+            const judul = String(cfg.Update_Notif_Judul || "🚀 Update Sistem Absensi").trim();
+            const versi = String(cfg.Update_Notif_Versi || "").trim();
+            const labelVersi = versi ? `<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-[11px] font-extrabold text-indigo-700"><i class="fa-solid fa-sparkles"></i>${escapeHtml(versi)}</span>` : "";
+            Swal.fire({
+                title: judul,
+                html: `<div class="text-left space-y-3">${labelVersi}<p class="text-sm text-slate-600 font-semibold leading-relaxed">${escapeHtml(pesan).replace(/\n/g, '<br>')}</p></div>`,
+                icon: 'info',
+                confirmButtonText: 'Siap, Lanjutkan',
+                confirmButtonColor: '#3730a3',
+                background: '#ffffff',
+                customClass: { popup: 'rounded-3xl shadow-2xl', title: 'text-indigo-800 font-extrabold text-xl' }
+            });
         }
 
         // PENGATURAN LOAD & SIMPAN
@@ -1278,6 +1311,10 @@
                 document.getElementById('setJamPulangMulai').value = res.Jam_Pulang_Mulai || '12:00';
                 document.getElementById('setJamPulangAkhir').value = res.Jam_Pulang_Akhir || '23:59';
                 document.getElementById('setTampilRataJam').checked = String(res.Tampil_Kartu_Rata_Jam || 'YA').toUpperCase() !== 'TIDAK';
+                document.getElementById('setUpdateNotifAktif').checked = String(res.Update_Notif_Aktif || 'YA').toUpperCase() !== 'TIDAK';
+                document.getElementById('setUpdateNotifJudul').value = res.Update_Notif_Judul || '🚀 Update Sistem Absensi';
+                document.getElementById('setUpdateNotifVersi').value = res.Update_Notif_Versi || '';
+                document.getElementById('setUpdateNotifPesan').value = res.Update_Notif_Pesan || '';
             }).getPengaturan();
         }
 
@@ -1313,7 +1350,11 @@
                 Jam_Masuk_Akhir: document.getElementById('setJamMasukAkhir').value,
                 Jam_Pulang_Mulai: document.getElementById('setJamPulangMulai').value,
                 Jam_Pulang_Akhir: document.getElementById('setJamPulangAkhir').value,
-                Tampil_Kartu_Rata_Jam: document.getElementById('setTampilRataJam').checked ? 'YA' : 'TIDAK'
+                Tampil_Kartu_Rata_Jam: document.getElementById('setTampilRataJam').checked ? 'YA' : 'TIDAK',
+                Update_Notif_Aktif: document.getElementById('setUpdateNotifAktif').checked ? 'YA' : 'TIDAK',
+                Update_Notif_Judul: document.getElementById('setUpdateNotifJudul').value,
+                Update_Notif_Versi: document.getElementById('setUpdateNotifVersi').value,
+                Update_Notif_Pesan: document.getElementById('setUpdateNotifPesan').value
             };
             Swal.fire({title:'Menyimpan...', didOpen:()=>Swal.showLoading()});
             google.script.run.withSuccessHandler(res => {
