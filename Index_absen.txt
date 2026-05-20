@@ -1278,7 +1278,23 @@
         function loadPengaturan() {
             google.script.run.withSuccessHandler(res => {
                 res = res || {};
-                const setValue = (id, value) => { const el = document.getElementById(id); if (el) el.value = value; };
+                const normalText = (value) => {
+                    if (value === null || value === undefined) return '';
+                    if (value instanceof Date) {
+                        const hh = String(value.getHours()).padStart(2, '0');
+                        const mm = String(value.getMinutes()).padStart(2, '0');
+                        return `${hh}:${mm}`;
+                    }
+                    return String(value).replace(/^'+/, '').trim();
+                };
+                const normalTime = (value, fallback) => {
+                    const txt = normalText(value);
+                    const m = txt.match(/^(\d{1,2})[:.](\d{2})/);
+                    if (!m) return fallback;
+                    return `${String(parseInt(m[1], 10)).padStart(2, '0')}:${m[2]}`;
+                };
+                const setValue = (id, value) => { const el = document.getElementById(id); if (el) el.value = normalText(value); };
+                const setTimeValue = (id, value, fallback) => { const el = document.getElementById(id); if (el) el.value = normalTime(value, fallback); };
                 const setChecked = (id, value) => { const el = document.getElementById(id); if (el) el.checked = !!value; };
                 setValue('setAppName', res.App_Name || 'PORTAL ABSENSI');
                 setValue('setAppHeaderName', res.App_Header_Name || '');
@@ -1306,12 +1322,12 @@
                 setValue('setLatPolJerora', res.Lat_Pol_JeroraSatu || '');
                 setValue('setLngPolJerora', res.Lng_Pol_JeroraSatu || '');
                 setValue('setRadPolJerora', res.Rad_Pol_JeroraSatu || '');
-                setValue('setJamMasukMulai', res.Jam_Masuk_Mulai || '06:00');
-                setValue('setJamMasukAkhir', res.Jam_Masuk_Akhir || '10:00');
-                setValue('setJamPulangMulai', res.Jam_Pulang_Mulai || '12:00');
-                setValue('setJamPulangAkhir', res.Jam_Pulang_Akhir || '23:59');
-                setValue('setJamPulangJumatMulai', res.Jam_Pulang_Jumat_Mulai || res.Jam_Pulang_Mulai || '12:00');
-                setValue('setJamPulangJumatAkhir', res.Jam_Pulang_Jumat_Akhir || res.Jam_Pulang_Akhir || '23:59');
+                setTimeValue('setJamMasukMulai', res.Jam_Masuk_Mulai, '06:00');
+                setTimeValue('setJamMasukAkhir', res.Jam_Masuk_Akhir, '10:00');
+                setTimeValue('setJamPulangMulai', res.Jam_Pulang_Mulai, '12:00');
+                setTimeValue('setJamPulangAkhir', res.Jam_Pulang_Akhir, '23:59');
+                setTimeValue('setJamPulangJumatMulai', res.Jam_Pulang_Jumat_Mulai || res.Jam_Pulang_Mulai, '12:00');
+                setTimeValue('setJamPulangJumatAkhir', res.Jam_Pulang_Jumat_Akhir || res.Jam_Pulang_Akhir, '23:59');
                 setChecked('setTampilRataJam', String(res.Tampil_Kartu_Rata_Jam || 'YA').toUpperCase() !== 'TIDAK');
                 setChecked('setUpdateNotifAktif', String(res.Update_Notif_Aktif || 'YA').toUpperCase() !== 'TIDAK');
                 setValue('setUpdateNotifJudul', res.Update_Notif_Judul || '🚀 Update Sistem Absensi');
