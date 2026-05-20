@@ -1315,6 +1315,8 @@
                 document.getElementById('setUpdateNotifJudul').value = res.Update_Notif_Judul || '🚀 Update Sistem Absensi';
                 document.getElementById('setUpdateNotifVersi').value = res.Update_Notif_Versi || '';
                 document.getElementById('setUpdateNotifPesan').value = res.Update_Notif_Pesan || '';
+            }).withFailureHandler(err => {
+                Swal.fire('Gagal Memuat Pengaturan', (err && err.message) ? err.message : 'Data pengaturan tidak bisa dimuat.', 'error');
             }).getPengaturan();
         }
 
@@ -1362,6 +1364,9 @@
             google.script.run.withSuccessHandler(res => {
                 Swal.fire('Tersimpan', res.message, 'success');
                 muatIdentitasAplikasi();
+                loadPengaturan();
+            }).withFailureHandler(err => {
+                Swal.fire('Gagal Menyimpan', (err && err.message) ? err.message : 'Data pengaturan gagal disimpan.', 'error');
             }).simpanPengaturan(data);
         }
 
