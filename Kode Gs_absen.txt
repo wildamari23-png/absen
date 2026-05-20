@@ -10,6 +10,13 @@ function doGet(e) {
   return html;
 }
 
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('Absensi Digital')
+    .addItem('Buat Dummy Data Sheet Libur', 'triggerDummyDataLibur')
+    .addToUi();
+}
+
 // 1. SETUP DATABASE OTOMATIS
 function initSetup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -40,12 +47,80 @@ function initSetup() {
     sheet.getRange("A1:H1").setFontWeight("bold").setBackground("#10b981").setFontColor("#FFFFFF");
   }
 
+  ensureSheetLibur_();
+
   if (!ss.getSheetByName("Pengaturan")) {
     let sheet = ss.insertSheet("Pengaturan");
     sheet.appendRow(["Key", "Value"]);
     sheet.getRange("A1:B1").setFontWeight("bold").setBackground("#003366").setFontColor("#FFFFFF");
   }
   ensurePengaturanDefaults_();
+}
+
+function ensureSheetLibur_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName("Libur") || ss.getSheetByName("libur") || ss.getSheetByName("LIBUR");
+  if (!sheet) sheet = ss.insertSheet("Libur");
+  const header = ["Tahun", "Bulan", "Tanggal", "Keterangan Libur"];
+  const currentHeader = sheet.getRange(1, 1, 1, 4).getDisplayValues()[0].join("").trim();
+  if (!currentHeader) sheet.getRange(1, 1, 1, 4).setValues([header]);
+  sheet.getRange("A1:D1").setFontWeight("bold").setBackground("#f59e0b").setFontColor("#FFFFFF");
+  sheet.setFrozenRows(1);
+  sheet.getRange("A:A").setNumberFormat("0");
+  sheet.getRange("C:C").setNumberFormat("dd/MM/yyyy");
+  try { sheet.autoResizeColumns(1, 4); } catch (e) {}
+  return sheet;
+}
+
+function getDummyDataLibur_() {
+  return [
+    [2026, "Januari", "01/01/2026", "Libur Tahun Baru Masehi"],
+    [2026, "Januari", "16/01/2026", "Isra Mikraj Nabi Muhammad SAW"],
+    [2026, "Februari", "17/02/2026", "Tahun Baru Imlek 2577 Kongzili"],
+    [2026, "Maret", "19/03/2026", "Hari Suci Nyepi Tahun Baru Saka 1948"],
+    [2026, "Maret", "20/03/2026", "Cuti Bersama Hari Suci Nyepi"],
+    [2026, "Maret", "21/03/2026", "Hari Raya Idul Fitri 1447 H"],
+    [2026, "Maret", "22/03/2026", "Hari Raya Idul Fitri 1447 H"],
+    [2026, "Maret", "23/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "Maret", "24/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "Maret", "25/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "Maret", "26/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "Maret", "27/03/2026", "Cuti Bersama Idul Fitri 1447 H"],
+    [2026, "April", "03/04/2026", "Wafat Yesus Kristus"],
+    [2026, "April", "05/04/2026", "Hari Paskah"],
+    [2026, "Mei", "01/05/2026", "Hari Buruh Internasional"],
+    [2026, "Mei", "14/05/2026", "Kenaikan Yesus Kristus"],
+    [2026, "Mei", "15/05/2026", "Cuti Bersama Kenaikan Yesus Kristus"],
+    [2026, "Mei", "27/05/2026", "Hari Raya Idul Adha 1447 H"],
+    [2026, "Mei", "28/05/2026", "Cuti Bersama Idul Adha 1447 H"],
+    [2026, "Juni", "01/06/2026", "Hari Lahir Pancasila"],
+    [2026, "Agustus", "17/08/2026", "Hari Kemerdekaan Republik Indonesia"],
+    [2026, "Agustus", "25/08/2026", "Maulid Nabi Muhammad SAW"],
+    [2026, "Desember", "24/12/2026", "Cuti Bersama Hari Raya Natal"],
+    [2026, "Desember", "25/12/2026", "Hari Raya Natal"]
+  ];
+}
+
+function triggerDummyDataLibur() {
+  const sheet = ensureSheetLibur_();
+  const dummy = getDummyDataLibur_();
+  const existingRows = sheet.getDataRange().getDisplayValues();
+  const existingKeys = new Set();
+  for (let i = 1; i < existingRows.length; i++) {
+    const r = existingRows[i];
+    existingKeys.add(`${String(r[0]).trim()}|${String(r[1]).trim().toUpperCase()}|${String(r[2]).trim()}|${String(r[3]).trim().toUpperCase()}`);
+  }
+  const rowsToAppend = dummy.filter(r => !existingKeys.has(`${r[0]}|${String(r[1]).toUpperCase()}|${r[2]}|${String(r[3]).toUpperCase()}`));
+  if (rowsToAppend.length) {
+    sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAppend.length, 4).setValues(rowsToAppend);
+    sheet.getRange(2, 3, sheet.getLastRow() - 1, 1).setNumberFormat("dd/MM/yyyy");
+  }
+  try { sheet.autoResizeColumns(1, 4); } catch (e) {}
+  return { status: true, message: `Dummy Sheet Libur siap. Ditambahkan ${rowsToAppend.length} baris baru. Total data: ${Math.max(0, sheet.getLastRow() - 1)}.` };
+}
+
+function buatDummyDataLibur() {
+  return triggerDummyDataLibur();
 }
 
 function ensurePengaturanDefaults_() {
@@ -60,8 +135,13 @@ function ensurePengaturanDefaults_() {
     ["Pesan_Masuk_Berhasil", "Absen MASUK berhasil. Selamat bekerja, {nama}! Semoga hari ini penuh manfaat dan pelayanan terbaik."],
     ["Pesan_Pulang_Berhasil", "Absen PULANG berhasil. Terima kasih, {nama}. Semoga perjalanan pulang aman dan sehat selalu."],
     ["Tampil_Kartu_Rata_Jam", "YA"],
+    ["Update_Notif_Aktif", "YA"],
+    ["Update_Notif_Judul", "🚀 Update Sistem Absensi"],
+    ["Update_Notif_Pesan", "Sistem sudah diperbarui dengan fitur terbaru. Silakan cek menu informasi untuk detail perubahan."],
+    ["Update_Notif_Versi", "v1.0.0"],
     ["Admin_User", "admin"], ["Admin_Pass", "sintang2026"],
     ["Nama_Puskesmas", "UPTD PUSKESMAS TANJUNG PURI SINTANG"],
+    ["Alamat_Puskesmas", "Jl. Kelam, Tanjung Puri, Kabupaten Sintang, Kalimantan Barat"],
     ["Lat_Puskesmas", "0.0636"], ["Lng_Puskesmas", "111.4988"], ["Rad_Puskesmas", "100"],
     ["Lat_Pol_TebingRaya", "0.0650"], ["Lng_Pol_TebingRaya", "111.5000"], ["Rad_Pol_TebingRaya", "100"],
     ["Lat_Pol_MunggukBantok", "0.0650"], ["Lng_Pol_MunggukBantok", "111.5000"], ["Rad_Pol_MunggukBantok", "100"],
@@ -69,6 +149,7 @@ function ensurePengaturanDefaults_() {
     ["Lat_Pol_JeroraSatu", "0.0650"], ["Lng_Pol_JeroraSatu", "111.5000"], ["Rad_Pol_JeroraSatu", "100"],
     ["Jam_Masuk_Mulai", "06:00"], ["Jam_Masuk_Akhir", "10:00"],
     ["Jam_Pulang_Mulai", "12:00"], ["Jam_Pulang_Akhir", "23:59"],
+    ["Jam_Pulang_Jumat_Mulai", "12:00"], ["Jam_Pulang_Jumat_Akhir", "23:59"],
     ["Kepala_Nama", "dr. ANDAR JIMMY PINTABAR, M.A.P.,M.HKes"],
     ["Kepala_NIP", "NIP. 198610292014021002"]
   ];
@@ -266,12 +347,13 @@ function prosesAbsen(qrText, latUser, lngUser, action, gpsAccuracy) {
     return { status: 'SUCCESS_MASUK', waktu: wktStr, lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: pesanMasuk };
   }
   else if (action === "PULANG") {
-    const jamPulangMulai = settings.Jam_Pulang_Mulai || "00:00";
-    const jamPulangAkhir = settings.Jam_Pulang_Akhir || "23:59";
+    const isJumat = localTime.getDay() === 5;
+    const jamPulangMulai = isJumat ? (settings.Jam_Pulang_Jumat_Mulai || settings.Jam_Pulang_Mulai || "00:00") : (settings.Jam_Pulang_Mulai || "00:00");
+    const jamPulangAkhir = isJumat ? (settings.Jam_Pulang_Jumat_Akhir || settings.Jam_Pulang_Akhir || "23:59") : (settings.Jam_Pulang_Akhir || "23:59");
     const jamPulangMulaiTxt = formatJamSetting(jamPulangMulai);
     const jamPulangAkhirTxt = formatJamSetting(jamPulangAkhir);
     if (pgwFound.kunciJam !== "TIDAK" && !isDalamRentangJam(nowMenit, jamPulangMulai, jamPulangAkhir)) {
-      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG hanya diizinkan jam ${jamPulangMulaiTxt} - ${jamPulangAkhirTxt}.` };
+      return { status: 'ERROR', lokasiInduk: lokasiInduk, lokasiTag: lokasiTag, message: `Absen PULANG${isJumat ? " (Jumat)" : ""} hanya diizinkan jam ${jamPulangMulaiTxt} - ${jamPulangAkhirTxt}.` };
     }
     if (rowIndex === -1) return { status: 'ERROR', message: `Anda belum melakukan Absen MASUK hari ini!` };
 
@@ -910,12 +992,14 @@ function getMonthNumber_(bulanName) {
 
 function getKalenderKerja(bulanName, tahun) {
   const monthMap = { "JANUARI":0,"FEBRUARI":1,"MARET":2,"APRIL":3,"MEI":4,"JUNI":5,"JULI":6,"AGUSTUS":7,"SEPTEMBER":8,"OKTOBER":9,"NOVEMBER":10,"DESEMBER":11 };
-  const m = monthMap[String(bulanName || "").toUpperCase()];
+  const monthName = String(bulanName || "").toUpperCase().replace(/[^A-Z]/g, "").trim();
+  const m = monthMap[monthName];
   const y = parseInt(tahun, 10);
-  if (isNaN(m) || isNaN(y)) return { targetHariKerja: 0, detailLibur: [] };
+  if (m === undefined || isNaN(y)) return { targetHariKerja: 0, detailLibur: [], sumber: "Database Libur" };
 
   const start = new Date(y, m, 1, 0, 0, 0);
   const end = new Date(y, m + 1, 1, 0, 0, 0);
+  const monthNumber = m + 1;
 
   let weekdays = 0;
   for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
@@ -923,73 +1007,109 @@ function getKalenderKerja(bulanName, tahun) {
     if (day !== 0 && day !== 6) weekdays++;
   }
 
-  let holidayNames = [];
   try {
-    const calIds = [
-      "id.indonesian#holiday@group.v.calendar.google.com",
-      "en.indonesian#holiday@group.v.calendar.google.com",
-      "id.holiday@group.v.calendar.google.com"
-    ];
-    let uniq = {};
-    calIds.forEach(id => {
-      try {
-        const c = CalendarApp.getCalendarById(id);
-        if (!c) return;
-        c.getEvents(start, end).forEach(ev => {
-          const ds = Utilities.formatDate(ev.getStartTime(), "Asia/Jakarta", "yyyy-MM-dd");
-          uniq[ds + "_" + ev.getTitle()] = { tgl: ds, nama: ev.getTitle() };
-        });
-      } catch (e) {}
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const allSheets = ss.getSheets();
+    let sheet = ss.getSheetByName("Libur") || allSheets.find(sh => String(sh.getName()).toLowerCase().trim() === "libur");
+    if (!sheet) {
+      return {
+        targetHariKerja: weekdays,
+        totalWeekdays: weekdays,
+        totalLiburNasionalWeekday: 0,
+        detailLibur: [],
+        sumber: "Database Libur belum ditemukan",
+        rekomendasiAI: "Database Libur belum ditemukan. Pastikan nama sheet persis Libur dengan kolom Tahun, Bulan, Tanggal, Keterangan Libur."
+      };
+    }
+
+    const lastRow = sheet.getLastRow();
+    const lastCol = Math.max(sheet.getLastColumn(), 4);
+    if (lastRow < 2) {
+      return {
+        targetHariKerja: weekdays,
+        totalWeekdays: weekdays,
+        totalLiburNasionalWeekday: 0,
+        detailLibur: [],
+        sumber: "Database Libur kosong",
+        rekomendasiAI: "Database Libur masih kosong. Isi kolom Tahun, Bulan, Tanggal, Keterangan Libur untuk menghitung otomatis."
+      };
+    }
+
+    const values = sheet.getRange(1, 1, lastRow, lastCol).getDisplayValues();
+    const header = values[0].map(h => String(h || "").toLowerCase().replace(/[^a-z]/g, "").trim());
+    const findCol = (names, fallback) => {
+      for (let i = 0; i < header.length; i++) if (names.includes(header[i])) return i;
+      return fallback;
+    };
+    const idxTahun = findCol(["tahun", "year"], 0);
+    const idxBulan = findCol(["bulan", "month"], 1);
+    const idxTanggal = findCol(["tanggal", "tgl", "date"], 2);
+    const idxKet = findCol(["keteranganlibur", "keterangan", "ket", "nama", "namalibur"], 3);
+
+    const holidayMap = {};
+    const toDateStr = (val, fallbackYear) => {
+      if (!val) return "";
+      const raw = String(val).trim();
+      let m1 = raw.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+      if (m1) return `${m1[1]}-${String(m1[2]).padStart(2, "0")}-${String(m1[3]).padStart(2, "0")}`;
+      let m2 = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+      if (m2) return `${m2[3]}-${String(m2[2]).padStart(2, "0")}-${String(m2[1]).padStart(2, "0")}`;
+      let m3 = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})$/);
+      if (m3 && fallbackYear) return `${fallbackYear}-${String(m3[2]).padStart(2, "0")}-${String(m3[1]).padStart(2, "0")}`;
+      return "";
+    };
+    const monthToNumber = (value) => {
+      const txt = String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, "").trim();
+      if (monthMap[txt] !== undefined) return monthMap[txt] + 1;
+      const n = parseInt(txt, 10);
+      return isNaN(n) ? 0 : n;
+    };
+
+    let parsedRows = 0;
+    for (let i = 1; i < values.length; i++) {
+      const row = values[i] || [];
+      const rowYearRaw = String(row[idxTahun] || "").trim();
+      const rowYear = parseInt(rowYearRaw.replace(/[^0-9]/g, ""), 10);
+      const rowMonthNumber = monthToNumber(row[idxBulan]);
+      const dateStr = toDateStr(row[idxTanggal], rowYear || y);
+      const dateParts = dateStr.split("-");
+      const dateYear = parseInt(dateParts[0], 10);
+      const dateMonth = parseInt(dateParts[1], 10);
+      const validDate = dateParts.length === 3 && !isNaN(dateYear) && !isNaN(dateMonth);
+      if (!validDate) continue;
+      parsedRows++;
+      if (dateYear !== y || dateMonth !== monthNumber) continue;
+      // Jika kolom Tahun/Bulan terisi, jadikan penguat; kalau kosong, tanggal tetap menjadi sumber utama.
+      if (!isNaN(rowYear) && rowYear !== y) continue;
+      if (rowMonthNumber && rowMonthNumber !== monthNumber) continue;
+      holidayMap[dateStr] = { tgl: dateStr, nama: String(row[idxKet] || "Libur Nasional").trim() || "Libur Nasional" };
+    }
+
+    const detailLibur = Object.values(holidayMap).sort((a,b)=>a.tgl.localeCompare(b.tgl));
+    const holidayWeekdays = detailLibur.filter(h => {
+      const d = new Date(h.tgl + "T00:00:00");
+      const day = d.getDay();
+      return day !== 0 && day !== 6;
     });
-    holidayNames = Object.values(uniq).sort((a,b)=>a.tgl.localeCompare(b.tgl));
 
-    // Fallback API publik jika kalender libur tidak tersedia/empty.
-    if (!holidayNames.length) {
-      try {
-        const resp = UrlFetchApp.fetch(`https://date.nager.at/api/v3/PublicHolidays/${y}/ID`, { muteHttpExceptions: true });
-        if (resp.getResponseCode() === 200) {
-          const arr = JSON.parse(resp.getContentText() || "[]");
-          arr.forEach(h => {
-            if (!h || !h.date) return;
-            const hm = String(h.date).slice(5, 7);
-            if (parseInt(hm, 10) !== (m + 1)) return;
-            holidayNames.push({ tgl: h.date, nama: h.localName || h.name || "Libur Nasional" });
-          });
-        }
-      } catch (apiErr) {}
-    }
-
-    // Fallback tambahan khusus data Indonesia.
-    if (!holidayNames.length) {
-      try {
-        const resp2 = UrlFetchApp.fetch(`https://tanggalmerah.upset.dev/api/holidays?year=${y}&month=${m + 1}&type=holiday`, { muteHttpExceptions: true });
-        if (resp2.getResponseCode() === 200) {
-          const obj = JSON.parse(resp2.getContentText() || "{}");
-          const arr2 = obj?.data || obj?.holidays || [];
-          arr2.forEach(h => {
-            const tgl = h?.date || h?.holiday_date || h?.tanggal;
-            if (!tgl) return;
-            holidayNames.push({ tgl: String(tgl).slice(0, 10), nama: h?.name || h?.title || h?.holiday_name || "Libur Nasional" });
-          });
-        }
-      } catch (apiErr2) {}
-    }
-  } catch (e) {
-    holidayNames = [];
+    return {
+      targetHariKerja: Math.max(0, weekdays - holidayWeekdays.length),
+      totalWeekdays: weekdays,
+      totalLiburNasionalWeekday: holidayWeekdays.length,
+      detailLibur: holidayWeekdays,
+      sumber: "Database Libur",
+      rekomendasiAI: `Data dibaca dari Database Libur: ${holidayWeekdays.length} libur pada hari kerja untuk bulan ${bulanName} ${tahun}. Baris tanggal valid terbaca: ${parsedRows}. Target hari kerja awal: ${Math.max(0, weekdays - holidayWeekdays.length)}.`
+    };
+  } catch (err) {
+    return {
+      targetHariKerja: weekdays,
+      totalWeekdays: weekdays,
+      totalLiburNasionalWeekday: 0,
+      detailLibur: [],
+      sumber: "Database Libur error",
+      rekomendasiAI: `Database Libur gagal dibaca: ${err && err.message ? err.message : err}. Cek format kolom Tahun, Bulan, Tanggal, Keterangan Libur.`
+    };
   }
-
-  const holidayWeekdays = holidayNames.filter(h => {
-    const d = new Date(h.tgl + "T00:00:00");
-    const day = d.getDay();
-    return day !== 0 && day !== 6;
-  });
-
-  return {
-    targetHariKerja: Math.max(0, weekdays - holidayWeekdays.length),
-    totalWeekdays: weekdays,
-    totalLiburNasionalWeekday: holidayWeekdays.length,
-    detailLibur: holidayWeekdays
-  };
 }
 
 // 7. ABSENSI MANUAL KEGIATAN
